@@ -1,0 +1,4683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0E1116">
+  <title>Wyze AI — Security built for your space</title>
+  <meta name="description" content="Answer three quick questions, or just tell me what's going on. AI builds the camera setup for your space.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ─────────────────────────────────────────────────────────
+   WYZE TOKENS
+   ───────────────────────────────────────────────────────── */
+:root {
+  --ink:           #0E1116;
+  --ink-2:         #2A323C;
+  --ink-3:         #5C6770;
+  --line:          #E6E8EC;
+  --line-2:        #F0F2F5;
+  --paper:         #FAFBFC;
+  --paper-2:       #FFFFFF;
+  --paper-3:       #F1F3F5;
+
+  --night:         #0B0E13;
+  --night-2:       #14181F;
+
+  --wyze:          #0074E4;
+  --wyze-bright:   #1E8EFF;
+  --wyze-deep:     #0058B8;
+  --wyze-tint:     rgba(0, 116, 228, 0.08);
+  --wyze-ring:     rgba(0, 116, 228, 0.18);
+
+  --teal:          #23C4A0;
+  --teal-bright:   #2DDDB3;
+  --teal-deep:     #1AA384;
+  --teal-tint:     rgba(35, 196, 160, 0.10);
+
+  --ease:       cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+
+  --pad-x: 20px;
+  --pad-y: 64px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (min-width: 720px) {
+  :root { --pad-x: 32px; --pad-y: 96px; }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; scrollbar-width: none; -ms-overflow-style: none; }
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar { width: 0; height: 0; background: transparent; display: none; }
+
+:focus-visible {
+  outline: 2px solid var(--wyze);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ═════════════ NAV ═════════════ */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 18px var(--pad-x);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 240ms var(--ease), backdrop-filter 240ms var(--ease);
+}
+@media (min-width: 720px) { .nav { padding: 20px var(--pad-x); } }
+.nav.is-dark { color: #fff; }
+.nav.is-scrolled {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  color: var(--ink);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+.nav.is-scrolled .nav-logo svg path { fill: var(--ink); }
+.nav-logo svg { width: 84px; height: auto; display: block; }
+.nav-logo svg path { fill: #fff; transition: fill 240ms var(--ease); }
+@media (min-width: 720px) { .nav-logo svg { width: 96px; } }
+/* Desktop menu — hidden on mobile, inline on >=720px */
+.nav-menu { display: none; }
+@media (min-width: 720px) {
+  .nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+  .nav-menu a {
+    font-size: 14px;
+    font-weight: 500;
+    color: currentColor;
+    text-decoration: none;
+    opacity: 0.82;
+    transition: opacity 200ms var(--ease);
+  }
+  .nav-menu a:hover { opacity: 1; }
+}
+
+/* Hamburger toggle — visible only on mobile */
+.nav-toggle {
+  background: transparent;
+  border: 0;
+  padding: 10px;
+  margin: -10px;
+  cursor: pointer;
+  color: currentColor;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+@media (min-width: 720px) { .nav-toggle { display: none; } }
+.nav-toggle-bars {
+  position: relative;
+  width: 30px;
+  height: 22px;
+  display: block;
+}
+.nav-toggle-bars span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: currentColor;
+  border-radius: 3px;
+  transition:
+    top 320ms var(--ease),
+    transform 320ms var(--ease),
+    opacity 200ms var(--ease),
+    background 240ms var(--ease);
+}
+.nav-toggle-bars span:nth-child(1) { top: 1px; }
+.nav-toggle-bars span:nth-child(2) { top: 10px; }
+.nav-toggle-bars span:nth-child(3) { top: 19px; }
+.nav-toggle[aria-expanded="true"] .nav-toggle-bars span {
+  background: var(--ink);
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle-bars span:nth-child(1) {
+  top: 10px;
+  transform: rotate(45deg);
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle-bars span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0.4);
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle-bars span:nth-child(3) {
+  top: 10px;
+  transform: rotate(-45deg);
+}
+
+/* Mobile menu overlay */
+.nav-mobile {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  background: rgba(250, 251, 252, 0.97);
+  backdrop-filter: saturate(160%) blur(20px);
+  -webkit-backdrop-filter: saturate(160%) blur(20px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 320ms var(--ease), visibility 320ms var(--ease);
+}
+.nav-mobile.is-open { opacity: 1; visibility: visible; }
+@media (min-width: 720px) { .nav-mobile { display: none; } }
+.nav-mobile-inner {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  padding: 0 var(--pad-x);
+  display: flex;
+  flex-direction: column;
+}
+.nav-mobile-inner a {
+  font-size: clamp(26px, 7vw, 34px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-decoration: none;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 320ms var(--ease), transform 320ms var(--ease);
+}
+.nav-mobile-inner a:last-child { border-bottom: 0; }
+.nav-mobile.is-open .nav-mobile-inner a { opacity: 1; transform: translateY(0); }
+.nav-mobile.is-open .nav-mobile-inner a:nth-child(1) { transition-delay: 80ms; }
+.nav-mobile.is-open .nav-mobile-inner a:nth-child(2) { transition-delay: 130ms; }
+.nav-mobile.is-open .nav-mobile-inner a:nth-child(3) { transition-delay: 180ms; }
+.nav-mobile.is-open .nav-mobile-inner a:nth-child(4) { transition-delay: 230ms; }
+.nav-mobile.is-open .nav-mobile-inner a:nth-child(5) { transition-delay: 280ms; }
+body.nav-open { overflow: hidden; }
+
+/* ═════════════ HERO ═════════════ */
+.hero {
+  position: relative;
+  height: 70svh;
+  height: 70vh;
+  min-height: 520px;
+  background: var(--night);
+  color: #fff;
+  overflow: hidden;
+}
+
+/* ─ Hero product gallery ─ */
+.hero-gallery {
+  position: absolute; inset: 0;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.hero-gallery::-webkit-scrollbar { display: none; }
+/* ≥ 1500px → static 5-column grid, no scroll */
+@media (min-width: 1500px) {
+  .hero-gallery {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    overflow: hidden;
+    scroll-snap-type: none;
+  }
+}
+
+.hero-card {
+  position: relative;
+  /* default (small) — 1 main card visible, swipeable */
+  flex: 0 0 86%;
+  scroll-snap-align: start;
+  overflow: hidden;
+  background: var(--night);
+  color: inherit;
+  text-decoration: none;
+  display: flex;
+  isolation: isolate;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+.hero-card:last-child { border-right: 0; }
+
+/* 880–1179px → 2 main cards visible at a time + peek of 3rd on right, still swipeable */
+@media (min-width: 880px) {
+  .hero-card { flex: 0 0 43%; }
+}
+
+/* ≥ 1500px — cards become grid cells, flex sizing no longer applies */
+@media (min-width: 1500px) {
+  .hero-card { flex: initial; }
+}
+.hero-card:focus-visible {
+  outline: 2px solid var(--wyze-bright);
+  outline-offset: -4px;
+  border-radius: 4px;
+}
+
+/* Gallery arrows — the entire peek strip is the click target,
+   but ONLY the chevron icon itself is visible (translucent glass look).
+   No tint, no blur, no bubble over the peek card. */
+.hero-arrow {
+  position: absolute;
+  top: 0; bottom: 0;
+  z-index: 3;
+  width: 14%;
+  min-width: 60px;
+  max-width: 140px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 240ms var(--ease);
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.hero-arrow.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.hero-arrow.prev { left: 0; }
+.hero-arrow.next { right: 0; }
+
+/* The chevron is the only visible thing — translucent white "frosted glass" */
+.hero-arrow svg {
+  position: relative;
+  width: 56px; height: 56px;
+  display: block;
+  color: rgba(255, 255, 255, 0.55);          /* translucent stroke = glass */
+  filter:
+    drop-shadow(0 0 0.6px rgba(255, 255, 255, 0.55))   /* subtle inner edge */
+    drop-shadow(0 1px 3px rgba(11, 14, 19, 0.55))      /* contact shadow */
+    drop-shadow(0 4px 18px rgba(11, 14, 19, 0.55));    /* halo for legibility on bright frames */
+  transition: transform 240ms var(--ease), color 240ms var(--ease);
+}
+.hero-arrow:hover svg {
+  color: rgba(255, 255, 255, 0.85);
+  transform: scale(1.12);
+}
+.hero-arrow:active svg { transform: scale(0.96); }
+/* Arrows only show in the medium (2-up) range. Hidden on mobile + on desktop grid. */
+@media (max-width: 879px) { .hero-arrow { display: none; } }
+@media (min-width: 1500px) { .hero-arrow { display: none; } }
+
+.hero-card-media,
+.hero-card-fallback {
+  position: absolute; inset: 0;
+  z-index: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 700ms var(--ease);
+}
+/* Per-card framing — shift video crop, fill image cards edge to edge */
+.hero-card--windowcam .hero-card-media   { object-position: 62% center; }
+.hero-card--batterycam .hero-card-media  { object-position: 34% center; }
+.hero-card--floodcampro img.hero-card-media,
+.hero-card--scaleultra  img.hero-card-media {
+  object-fit: cover;
+  padding: 0;
+}
+.hero-card:hover .hero-card-media,
+.hero-card:focus-visible .hero-card-media,
+.hero-card:hover .hero-card-fallback,
+.hero-card:focus-visible .hero-card-fallback {
+  transform: scale(1.04);
+}
+
+/* Backdrop tints for the still-image product cards (the PNG floats on top) */
+.hero-card--floodcampro {
+  background:
+    radial-gradient(ellipse at 50% 22%, rgba(255, 220, 120, 0.32), transparent 60%),
+    linear-gradient(180deg, #1A1209 0%, #0B0E13 100%);
+}
+.hero-card--scaleultra {
+  background:
+    radial-gradient(circle at 50% 28%, rgba(35, 196, 160, 0.30), transparent 60%),
+    linear-gradient(180deg, #06181A 0%, #0B0E13 100%);
+}
+
+/* Per-product fallback backgrounds (legacy — used when no <video> source loads) */
+.hero-card--batterycam .hero-card-fallback {
+  background:
+    radial-gradient(circle at 28% 22%, rgba(30, 142, 255, 0.55), transparent 58%),
+    radial-gradient(circle at 78% 78%, rgba(35, 196, 160, 0.40), transparent 55%),
+    linear-gradient(180deg, #0A1A2E 0%, #0B0E13 100%);
+}
+.hero-card--doorbell .hero-card-fallback {
+  background:
+    radial-gradient(circle at 22% 30%, rgba(245, 158, 11, 0.40), transparent 55%),
+    radial-gradient(circle at 78% 70%, rgba(99, 50, 178, 0.55), transparent 60%),
+    linear-gradient(180deg, #1A0B26 0%, #0B0E13 100%);
+}
+.hero-card--floodlight .hero-card-fallback {
+  background:
+    radial-gradient(ellipse at 50% 22%, rgba(255, 220, 120, 0.42), transparent 55%),
+    radial-gradient(circle at 50% 88%, rgba(11, 14, 19, 0.8), transparent 55%),
+    linear-gradient(180deg, #2A1A04 0%, #0B0E13 100%);
+}
+.hero-card-fallback::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0 0.05 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+}
+
+.hero-card-scrim {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(180deg,
+    rgba(11, 14, 19, 0.18) 0%,
+    transparent 28%,
+    transparent 48%,
+    rgba(11, 14, 19, 0.55) 78%,
+    rgba(11, 14, 19, 0.92) 100%);
+  pointer-events: none;
+}
+
+.hero-card-content {
+  position: relative; z-index: 2;
+  margin-top: auto;
+  padding: 22px 22px 32px;
+  display: flex; flex-direction: column; gap: 8px;
+  width: 100%;
+  transition: transform 360ms var(--ease);
+}
+.hero-card:hover .hero-card-content,
+.hero-card:focus-visible .hero-card-content {
+  transform: translateY(-4px);
+}
+.hero-card-eyebrow {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.72;
+  margin: 0;
+}
+.hero-card-title {
+  font-size: clamp(20px, 1.9vw, 26px);
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 1.1;
+  margin: 0;
+}
+.hero-card-benefit {
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0;
+  opacity: 0.78;
+  max-width: 26ch;
+}
+.hero-card-cta {
+  margin-top: 8px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.42);
+  padding-bottom: 4px;
+  transition: gap 220ms var(--ease), border-color 220ms var(--ease);
+}
+.hero-card:hover .hero-card-cta,
+.hero-card:focus-visible .hero-card-cta {
+  gap: 12px;
+  border-color: #fff;
+}
+
+/* (legacy single-video helpers below kept for safety; harmless when unused) */
+.hero-media,
+.hero-media-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.hero-media {
+  z-index: 1;
+  object-fit: cover;
+  background: transparent;
+}
+.hero-media-fallback {
+  z-index: 0;
+  background:
+    radial-gradient(circle at 75% 25%, rgba(30, 142, 255, 0.32), transparent 55%),
+    radial-gradient(circle at 15% 80%, rgba(35, 196, 160, 0.22), transparent 50%),
+    linear-gradient(180deg, #0B0E13 0%, #14181F 100%);
+}
+.hero-media-fallback::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  opacity: 0.55;
+  mix-blend-mode: overlay;
+}
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(11,14,19,0.35) 0%, transparent 18%, transparent 70%, rgba(11,14,19,0.85) 100%);
+  pointer-events: none;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(45, 221, 179, 0.22); }
+  50%      { box-shadow: 0 0 0 8px transparent; }
+}
+.hero-cue {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #fff;
+  opacity: 0.6;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.hero-cue .line {
+  width: 1px; height: 28px;
+  background: linear-gradient(to bottom, transparent, currentColor);
+  animation: drop 1.8s var(--ease) infinite;
+}
+@keyframes drop {
+  0%   { transform: scaleY(0); transform-origin: top; }
+  60%  { transform: scaleY(1); transform-origin: top; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+@media (max-width: 480px) { .hero-cue { display: none; } }
+
+/* ═════════════ WELCOME BACK ═════════════ */
+.welcome {
+  position: relative;
+  background:
+    linear-gradient(180deg, #0F1A2E 0%, #0E2B2E 100%);
+  color: #fff;
+  padding: clamp(56px, 8vh, 104px) var(--pad-x);
+  text-align: center;
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.welcome::before {
+  content: "";
+  position: absolute; inset: -10% -5%; z-index: 0;
+  background:
+    radial-gradient(ellipse 55% 70% at 18% 28%, rgba(30, 142, 255, 0.42), transparent 60%),
+    radial-gradient(ellipse 55% 70% at 82% 72%, rgba(45, 221, 179, 0.34), transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(91, 192, 255, 0.10), transparent 70%);
+  pointer-events: none;
+  animation: welcome-aura 22s ease-in-out infinite alternate;
+  filter: blur(2px);
+}
+.welcome::after {
+  content: "";
+  position: absolute; left: 0; right: 0; top: 0; height: 1px; z-index: 1;
+  background: linear-gradient(90deg, transparent 0%, rgba(30, 142, 255, 0.55) 25%, rgba(45, 221, 179, 0.55) 75%, transparent 100%);
+}
+@keyframes welcome-aura {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(-2%, 1%, 0) scale(1.05); }
+  100% { transform: translate3d(2%, -1%, 0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome::before { animation: none; }
+}
+.welcome-inner { position: relative; z-index: 2; max-width: 1100px; margin: 0 auto; }
+.welcome-title {
+  font-size: clamp(32px, 5.4vw, 64px);
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 1.1;
+  margin: 0 0 clamp(20px, 3vw, 32px);
+  color: #fff;
+}
+.welcome-title .user-name {
+  background: linear-gradient(115deg, #1E8EFF 0%, #2DDDB3 55%, #1E8EFF 100%);
+  background-size: 200% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: marqueeAnchorDrift 28s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome-title .user-name { animation: none; }
+}
+.welcome .btn-command {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  text-decoration: none;
+  font-size: clamp(15px, 2.2vw, 22px);
+  font-weight: 700;
+  letter-spacing: -0.012em;
+  padding: clamp(12px, 1.8vw, 20px) clamp(22px, 3.4vw, 36px);
+  min-height: clamp(46px, 6vw, 60px);
+  border-radius: 999px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.32), 0 2px 10px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(
+    115deg,
+    #1E8EFF 0%,
+    #2DA8E8 12%,
+    #23C4A0 26%,
+    #2DDDB3 41%,
+    #5BC0FF 55%,
+    #1E8EFF 68%,
+    #2DDDB3 82%,
+    #23C4A0 93%,
+    #1E8EFF 100%
+  );
+  background-size: 420% 100%;
+  background-position: 0% 50%;
+  box-shadow: 0 10px 32px rgba(45, 173, 230, 0.32);
+  animation:
+    marqueeAnchorDrift 34s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite,
+    marqueeAnchorBreathe 19s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.welcome .btn-command:hover,
+.welcome .btn-command:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 40px rgba(45, 173, 230, 0.48);
+  outline: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome .btn-command { animation: none; }
+  .welcome .btn-command:hover { transform: none; }
+}
+
+/* ═════════════ DESCRIPTIVE ALERTS ═════════════ */
+.alerts-spot {
+  position: relative;
+  background: var(--night);
+  color: #fff;
+  padding: clamp(36px, 5.5vh, 72px) var(--pad-x) clamp(56px, 8vh, 100px);
+  text-align: center;
+  overflow: hidden;
+}
+.alerts-spot::before {
+  content: "";
+  position: absolute; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(30, 142, 255, 0.18), transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(35, 196, 160, 0.10), transparent 60%);
+  pointer-events: none;
+}
+.alerts-spot-inner { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; }
+.alerts-spot .marquee-rotator { max-width: 1100px; margin-left: auto; margin-right: auto; }
+.alerts-spot .marquee-anchor { margin-bottom: clamp(36px, 5.6vw, 64px); }
+.alerts-spot-media {
+  display: block;
+  width: 100%; height: auto;
+  max-width: 880px;
+  margin: 0 auto;
+  border-radius: 18px;
+  background: #000;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+}
+.alerts-spot-media[controls] { cursor: auto; }
+@media (max-width: 600px) {
+  .alerts-spot-media { border-radius: 14px; }
+}
+.alerts-spot-caption {
+  font-size: clamp(18px, 2.2vw, 26px);
+  font-weight: 500;
+  letter-spacing: -0.012em;
+  color: rgba(255, 255, 255, 0.7);
+  margin: clamp(22px, 3vw, 36px) auto 0;
+  max-width: 60ch;
+  line-height: 1.35;
+}
+.alerts-spot-cta {
+  margin-top: clamp(28px, 3.6vw, 44px);
+  display: inline-flex;
+}
+.alerts-spot .btn-primary {
+  color: #fff;
+  text-decoration: none;
+  font-size: clamp(15px, 2.4vw, 24px);
+  font-weight: 700;
+  letter-spacing: -0.012em;
+  padding: clamp(12px, 1.8vw, 20px) clamp(20px, 3.4vw, 36px);
+  min-height: clamp(46px, 6vw, 64px);
+  border-radius: 999px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.32), 0 2px 10px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(
+    115deg,
+    #1E8EFF 0%,
+    #2DA8E8 12%,
+    #23C4A0 26%,
+    #2DDDB3 41%,
+    #5BC0FF 55%,
+    #1E8EFF 68%,
+    #2DDDB3 82%,
+    #23C4A0 93%,
+    #1E8EFF 100%
+  );
+  background-size: 420% 100%;
+  background-position: 0% 50%;
+  box-shadow: 0 10px 32px rgba(45, 173, 230, 0.32);
+  animation:
+    marqueeAnchorDrift 34s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite,
+    marqueeAnchorBreathe 19s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+}
+.alerts-spot .btn-primary:hover,
+.alerts-spot .btn-primary:focus-visible {
+  background-image: linear-gradient(
+    115deg,
+    #1E8EFF 0%,
+    #2DA8E8 12%,
+    #23C4A0 26%,
+    #2DDDB3 41%,
+    #5BC0FF 55%,
+    #1E8EFF 68%,
+    #2DDDB3 82%,
+    #23C4A0 93%,
+    #1E8EFF 100%
+  );
+  background-color: transparent;
+  box-shadow: 0 12px 38px rgba(45, 173, 230, 0.46);
+}
+@media (prefers-reduced-motion: reduce) {
+  .alerts-spot .btn-primary { animation: none; }
+}
+.alerts-spot-caption span {
+  color: #fff;
+  font-weight: 600;
+  background: linear-gradient(115deg, #1E8EFF 0%, #2DDDB3 55%, #1E8EFF 100%);
+  background-size: 200% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: marqueeAnchorDrift 28s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .alerts-spot-caption span { animation: none; }
+}
+
+/* ═════════════ NEVER WONDER ═════════════ */
+.marquee {
+  position: relative;
+  background: var(--night);
+  color: #fff;
+  padding: clamp(28px, 4vh, 56px) var(--pad-x);
+  min-height: 30svh;
+  min-height: 30vh;
+  overflow: hidden;
+  text-align: center;
+  display: flex; align-items: center; justify-content: center;
+}
+.marquee::before {
+  content: "";
+  position: absolute; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(30, 142, 255, 0.18), transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(35, 196, 160, 0.10), transparent 55%);
+  pointer-events: none;
+}
+.marquee-inner { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; width: 100%; }
+.marquee-rotator {
+  position: relative;
+  height: clamp(44px, 7vw, 76px);
+  margin: 0 0 10px;
+  font-weight: 700;
+  font-size: clamp(28px, 5.5vw, 56px);
+  letter-spacing: -0.028em;
+  line-height: 1.05;
+  color: #fff;
+}
+.marquee-q {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 460ms var(--ease), transform 560ms var(--ease);
+}
+.marquee-q.is-active { opacity: 1; transform: translateY(0); }
+.marquee-anchor {
+  font-size: clamp(44px, 8.5vw, 96px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  margin: 0 0 24px;
+  background: linear-gradient(
+    115deg,
+    #1E8EFF 0%,
+    #2DA8E8 12%,
+    #23C4A0 26%,
+    #2DDDB3 41%,
+    #5BC0FF 55%,
+    #1E8EFF 68%,
+    #2DDDB3 82%,
+    #23C4A0 93%,
+    #1E8EFF 100%
+  );
+  background-size: 420% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation:
+    marqueeAnchorDrift 34s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite,
+    marqueeAnchorBreathe 19s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+}
+@keyframes marqueeAnchorDrift {
+  0%   { background-position:   0% 48%; }
+  17%  { background-position:  23% 51%; }
+  31%  { background-position:  41% 47%; }
+  46%  { background-position:  68% 53%; }
+  58%  { background-position:  82% 49%; }
+  73%  { background-position:  64% 52%; }
+  88%  { background-position:  29% 48%; }
+  100% { background-position:   0% 48%; }
+}
+@keyframes marqueeAnchorBreathe {
+  0%   { background-size: 420% 100%; }
+  37%  { background-size: 540% 100%; }
+  68%  { background-size: 380% 100%; }
+  100% { background-size: 420% 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-anchor { animation: none; }
+}
+.marquee .social-rotator { max-width: 560px; flex: 0 1 560px; touch-action: pan-y; user-select: none; }
+.marquee .review-quote { color: #fff; }
+.marquee .review-meta { color: rgba(255, 255, 255, 0.66); }
+.marquee .review-meta strong { color: rgba(255, 255, 255, 0.92); }
+
+.social-frame {
+  position: relative;
+  display: flex; align-items: stretch; justify-content: center;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.social-nav {
+  appearance: none;
+  flex: 1 1 0;
+  min-width: 44px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: opacity 320ms var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.social-nav:active { opacity: 0.55; }
+.social-nav:focus-visible { outline: 2px solid var(--teal-bright); outline-offset: 3px; border-radius: 6px; }
+.social-nav svg { width: 28px; height: 28px; opacity: 0.78; transition: opacity 200ms var(--ease); }
+.social-nav:hover svg { opacity: 1; }
+.social-frame.swiped .social-nav { opacity: 0; pointer-events: none; }
+@media (max-width: 600px) {
+  .social-nav svg { width: 22px; height: 22px; }
+}
+
+/* ═════════════ SOCIAL PROOF ═════════════ */
+.social {
+  background: var(--paper);
+  padding: clamp(40px, 6vh, 72px) var(--pad-x);
+}
+.social-inner { max-width: 1100px; margin: 0 auto; }
+.social-header { text-align: center; margin-bottom: 20px; }
+@media (min-width: 720px) { .social-header { margin-bottom: 28px; } }
+.review-hero-trusted {
+  font-size: clamp(26px, 4.5vw, 40px);
+  font-weight: 800; letter-spacing: -0.03em; line-height: 1.1;
+  color: #fff; text-align: center;
+  margin: 0 auto clamp(24px, 3vw, 36px);
+}
+.social-eyebrow {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10.5px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--ink-3); margin: 0 0 10px;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.social-eyebrow-stars { color: #F5A623; letter-spacing: 1px; }
+.social-title {
+  font-size: clamp(40px, 7.5vw, 80px);
+  font-weight: 800; letter-spacing: -0.035em; line-height: 1;
+  margin: 0 auto; max-width: 22ch;
+}
+.social-rotator {
+  position: relative;
+  max-width: 760px;
+  margin: 0 auto;
+  display: grid;
+}
+.social-rotator .review {
+  grid-area: 1 / 1;
+  padding: 10px 0 0;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 600ms var(--ease);
+}
+.social-rotator .review.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.review-stars { color: #F5A623; letter-spacing: 4px; font-size: 22px; line-height: 1; }
+.review-quote {
+  margin: 0;
+  font-size: clamp(18px, 2.4vw, 24px);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.32;
+  color: var(--ink);
+  max-width: 28ch;
+}
+.review-meta {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px; letter-spacing: 0.04em;
+  color: var(--ink-3);
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: center;
+  margin-top: 4px;
+}
+.review-meta strong { color: var(--ink-2); font-weight: 600; }
+.review-meta-dot { opacity: 0.5; }
+/* ═════════════ BUTTONS ═════════════ */
+.btn {
+  appearance: none; border: 0;
+  font-family: inherit; font-weight: 600; font-size: 15px;
+  letter-spacing: -0.005em;
+  padding: 14px 22px; border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  transition: transform 200ms var(--ease), background 220ms var(--ease), color 220ms var(--ease), opacity 220ms var(--ease), box-shadow 240ms var(--ease);
+  white-space: nowrap; min-height: 48px;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--wyze); color: #fff; box-shadow: 0 2px 8px rgba(0, 116, 228, 0.18); }
+.btn-primary:hover { background: var(--wyze-bright); }
+.btn-primary:disabled { background: var(--line); color: var(--ink-3); cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-ghost { background: transparent; color: inherit; padding-left: 6px; box-shadow: none; }
+.btn-ghost:hover { opacity: 0.7; }
+.btn-arrow { display: inline-block; transition: transform 240ms var(--ease); }
+.btn:hover:not(:disabled) .btn-arrow { transform: translateX(3px); }
+
+/* ═════════════ ONBOARDING ═════════════ */
+.onboard {
+  position: relative;
+  min-height: 100svh;
+  min-height: 100vh;
+  padding: 24px var(--pad-x) calc(20px + var(--safe-bottom));
+  background: var(--paper);
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  isolation: isolate;
+  transition: background 600ms var(--ease);
+}
+@media (min-width: 720px) {
+  .onboard {
+    min-height: auto;
+    padding: var(--pad-y) var(--pad-x);
+    align-items: flex-start;
+  }
+}
+
+/* Section-wide animated blue gradient — soft, slow, natural breathing */
+.onboard::before,
+.onboard::after {
+  content: "";
+  position: absolute;
+  inset: -120px -8%;
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform;
+}
+.onboard::before {
+  background:
+    radial-gradient(ellipse 55% 60% at 22% 28%, rgba(0, 116, 228, 0.22), transparent 65%),
+    radial-gradient(ellipse 60% 55% at 80% 72%, rgba(30, 142, 255, 0.18), transparent 70%);
+  filter: blur(60px);
+  animation: onboard-aura-a 18s ease-in-out infinite;
+}
+.onboard::after {
+  background:
+    radial-gradient(ellipse 50% 55% at 68% 22%, rgba(0, 116, 228, 0.14), transparent 70%),
+    radial-gradient(ellipse 55% 50% at 28% 78%, rgba(30, 142, 255, 0.12), transparent 70%);
+  filter: blur(72px);
+  animation: onboard-aura-b 22s ease-in-out infinite;
+}
+@keyframes onboard-aura-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1);     }
+  50%      { transform: translate3d(2%, 1.5%, 0) scale(1.04); }
+}
+@keyframes onboard-aura-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1);      }
+  50%      { transform: translate3d(-2%, -1.5%, 0) scale(1.05); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .onboard::before, .onboard::after { animation: none; }
+}
+
+.onboard-inner {
+  max-width: 980px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 24px;
+}
+@media (min-width: 720px) { .onboard-inner { gap: 24px; justify-content: center; } }
+.onboard-status {
+  display: flex; align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+@media (min-width: 720px) {
+  .onboard-status {
+    gap: 18px;
+    flex: 1;
+    min-width: 0;
+  }
+}
+/* On desktop the status bar is moved into the active card's footer
+   so it shares the row with the primary action button. */
+.card-footer > .onboard-status { margin: 0; }
+.onboard-eyebrow {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-3);
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.onboard-eyebrow strong { color: var(--ink); font-weight: 600; }
+
+/* Dynamic progress bar */
+.progress {
+  flex: 1;
+  height: 5px;
+  background: var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+  max-width: 380px;
+}
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--wyze) 0%, var(--wyze-bright) 60%, var(--teal-bright) 100%);
+  border-radius: 999px;
+  transition: width 760ms var(--ease);
+  box-shadow: 0 0 12px rgba(0, 116, 228, 0.4);
+  position: relative;
+}
+.progress-fill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.45) 50%, transparent 100%);
+  background-size: 50% 100%;
+  background-repeat: no-repeat;
+  animation: progress-shine 2.4s var(--ease) infinite;
+}
+@keyframes progress-shine {
+  0%   { background-position: -50% 0; }
+  100% { background-position: 200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .progress-fill::after { animation: none; }
+}
+
+/* Grid-stacked cards: all share the same cell, sized to the tallest.
+   No scale, no slide — pure opacity crossfade for a calm transition. */
+.card-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  flex: 1;
+  min-height: 0;
+}
+@media (min-width: 720px) {
+  .card-stage { flex: none; grid-template-rows: auto; }
+}
+.card-stage > .card {
+  grid-column: 1;
+  grid-row: 1;
+}
+.card {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 320ms var(--ease), visibility 0s linear 320ms;
+}
+@media (min-width: 720px) {
+  .card { grid-template-rows: auto auto auto auto; }
+}
+.card > .tile-grid,
+.card > .space-grid {
+  align-self: center;
+}
+@media (min-width: 720px) {
+  .card > .tile-grid,
+  .card > .space-grid { align-self: start; }
+}
+.card.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 320ms var(--ease), visibility 0s linear 0s;
+}
+
+/* Wyatt greeting — mascot-led header above the active card prompt */
+.wyatt-greet {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.wyatt-avatar {
+  width: 104px; height: 104px;
+  object-fit: contain;
+  display: block;
+}
+@media (min-width: 720px) { .wyatt-avatar { width: 140px; height: 140px; } }
+.wyatt-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--wyze-deep);
+  letter-spacing: -0.014em;
+  line-height: 1.2;
+}
+@media (min-width: 720px) { .wyatt-title { font-size: 22px; } }
+
+.card-prompt {
+  font-size: clamp(36px, 10vw, 52px);
+  font-weight: 700; letter-spacing: -0.028em; line-height: 1.05;
+  margin: 0 auto 12px; max-width: 16ch;
+  text-align: center;
+}
+@media (min-width: 720px) { .card-prompt { max-width: 20ch; } }
+.br-mobile { display: inline; }
+@media (min-width: 720px) { .br-mobile { display: none; } }
+.card-help {
+  font-size: 14px; color: var(--ink-2);
+  margin: 0 auto 24px; max-width: 50ch; line-height: 1.5;
+  text-align: center;
+}
+@media (min-width: 720px) { .card-help { font-size: 15px; margin-bottom: 32px; } }
+.card-help kbd {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px; background: var(--paper-3);
+  border: 1px solid var(--line);
+  padding: 1px 6px; border-radius: 4px; color: var(--ink-2);
+}
+@media (max-width: 720px) { .card-help .desk-only { display: none; } }
+
+/* ═════ Tiles ═════ */
+.tile-grid { display: grid; gap: 10px; }
+@media (min-width: 720px) {
+  .tile-grid { gap: 14px; }
+  .tile-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .tile-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+}
+.tile {
+  position: relative;
+  display: flex; align-items: center; gap: 14px;
+  text-align: left;
+  background: var(--paper-2);
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition:
+    background 240ms var(--ease),
+    border-color 240ms var(--ease),
+    transform 180ms var(--ease),
+    box-shadow 320ms var(--ease);
+  font-family: inherit; color: inherit;
+  min-height: 68px;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+.tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--rx, 50%) var(--ry, 50%), rgba(0, 116, 228, 0.18), transparent 60%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 600ms var(--ease);
+}
+.tile.is-rippling::before {
+  opacity: 1;
+  animation: ripple-fade 700ms var(--ease) forwards;
+}
+@keyframes ripple-fade {
+  0%   { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+@media (min-width: 720px) {
+  .tile {
+    flex-direction: column; align-items: center;
+    text-align: center;
+    padding: 22px 22px 20px; min-height: 168px;
+    border-radius: 18px; gap: 12px;
+  }
+}
+.tile:hover { border-color: var(--ink-3); }
+.tile:active { transition-duration: 100ms; }
+.tile.is-selected {
+  background: linear-gradient(135deg, var(--wyze-tint), rgba(35, 196, 160, 0.06));
+  border-color: var(--wyze);
+  box-shadow: 0 0 0 4px var(--wyze-ring), 0 12px 28px rgba(0, 116, 228, 0.12);
+}
+/* Tile keyboard-shortcut chip is now hidden on every breakpoint. */
+.tile-key { display: none; }
+.tile-icon {
+  flex-shrink: 0; width: 44px; height: 44px;
+  display: grid; place-items: center;
+  border-radius: 12px;
+  background: var(--paper-3);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  transition:
+    background 260ms var(--ease),
+    color 260ms var(--ease),
+    border-color 260ms var(--ease),
+    transform 360ms var(--ease);
+}
+.tile.is-selected .tile-icon {
+  background: linear-gradient(135deg, var(--wyze), var(--wyze-bright));
+  color: #fff;
+  border-color: var(--wyze);
+  box-shadow: 0 6px 18px rgba(0, 116, 228, 0.28);
+}
+.tile-icon svg { width: 22px; height: 22px; }
+.tile-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+@media (min-width: 720px) {
+  .tile-text { gap: 4px; align-items: center; text-align: center; }
+}
+.tile-label { font-size: 16px; font-weight: 600; letter-spacing: -0.012em; line-height: 1.2; }
+@media (min-width: 720px) { .tile-label { font-size: 17px; } }
+.tile-benefit { font-size: 13.5px; color: var(--ink-2); line-height: 1.4; }
+@media (min-width: 720px) { .tile-benefit { font-size: 14px; max-width: 26ch; } }
+.tile.is-selected .tile-benefit { color: var(--ink); }
+.tile-check { display: none; }
+
+/* Persistent chat-launch — big header + chat composer that opens AI shopping */
+.persistent-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex-shrink: 0;
+}
+@media (min-width: 720px) {
+  .persistent-chat { gap: 18px; }
+}
+.pc-title {
+  margin: 0;
+  font-size: clamp(22px, 6vw, 32px); font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.024em;
+  line-height: 1.15;
+  white-space: nowrap;
+  text-align: center;
+}
+@media (min-width: 720px) { .pc-title { font-size: 40px; } }
+.pc-composer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--paper-2);
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 4px 4px 10px;
+  transition: border-color 220ms var(--ease), box-shadow 220ms var(--ease);
+}
+.pc-wyatt {
+  flex-shrink: 0;
+  width: 32px; height: 32px;
+  object-fit: contain;
+  display: block;
+}
+.pc-composer:focus-within {
+  border-color: var(--wyze);
+  box-shadow: 0 0 0 4px var(--wyze-ring);
+}
+.pc-input {
+  flex: 1; min-width: 0;
+  appearance: none; border: 0; background: transparent;
+  font-family: inherit; font-size: 15px;
+  padding: 12px 0;
+  outline: 0;
+  color: var(--ink);
+}
+.pc-input::placeholder { color: var(--ink-3); }
+.pc-send {
+  appearance: none; border: 0; cursor: pointer;
+  flex-shrink: 0;
+  width: 40px; height: 40px;
+  background: transparent;
+  color: var(--wyze);
+  display: grid; place-items: center;
+  transition: color 200ms var(--ease), transform 100ms var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.pc-send:hover { color: var(--wyze-bright); }
+.pc-send:active { transform: scale(0.9); }
+.pc-send svg { width: 22px; height: 22px; stroke-width: 3.2; }
+.pc-browse {
+  margin-top: 22px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+@media (min-width: 720px) {
+  .pc-browse { margin-top: 32px; padding-top: 28px; gap: 18px; }
+}
+.pc-browse-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pc-browse-title {
+  margin: 0;
+  font-size: clamp(22px, 6vw, 32px);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.024em;
+  line-height: 1.15;
+}
+@media (min-width: 720px) { .pc-browse-title { font-size: 40px; } }
+.pc-collections {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+@media (min-width: 720px) { .pc-collections { gap: 16px; } }
+.pc-collection {
+  position: relative;
+  display: block;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #EFE7DC;
+  color: var(--ink);
+  text-decoration: none;
+  height: 180px;
+  transition: transform 260ms var(--ease), box-shadow 260ms var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+@media (min-width: 720px) { .pc-collection { height: 240px; border-radius: 22px; } }
+.pc-collection:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(15, 23, 30, 0.11);
+}
+.pc-collection-media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.pc-collection-media img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: right center;
+  display: block;
+  transition: transform 380ms var(--ease);
+}
+.pc-collection:hover .pc-collection-media img { transform: scale(1.04); }
+.pc-collection-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(248, 242, 234, 0.92) 0%, rgba(248, 242, 234, 0.78) 28%, rgba(248, 242, 234, 0.32) 52%, rgba(248, 242, 234, 0) 68%);
+  pointer-events: none;
+}
+.pc-collection-content {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: 22px 22px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  max-width: 62%;
+}
+@media (min-width: 720px) {
+  .pc-collection-content { padding: 32px 36px; gap: 8px; max-width: 56%; }
+}
+.pc-collection-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.022em;
+  line-height: 1.05;
+  color: var(--ink);
+}
+@media (min-width: 720px) { .pc-collection-title { font-size: 32px; } }
+.pc-collection-tag {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ink-2);
+  font-weight: 500;
+  line-height: 1.3;
+}
+@media (min-width: 720px) { .pc-collection-tag { font-size: 16.5px; } }
+.pc-collection-cta {
+  align-self: flex-start;
+  margin-top: 10px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: var(--teal);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  transition: background 200ms var(--ease), box-shadow 200ms var(--ease);
+  box-shadow: 0 2px 10px rgba(35, 196, 160, 0.28);
+}
+@media (min-width: 720px) {
+  .pc-collection-cta { font-size: 14.5px; margin-top: 14px; padding: 11px 20px; }
+}
+.pc-collection:hover .pc-collection-cta {
+  background: var(--teal-deep);
+  box-shadow: 0 4px 14px rgba(35, 196, 160, 0.40);
+}
+body.chat-active .persistent-chat { display: none; }
+
+/* ═════ Step 3 inputs ═════ */
+.space-grid { display: grid; gap: 10px; }
+@media (min-width: 720px) { .space-grid { grid-template-columns: 1fr 1fr; gap: 14px; } }
+.space-row {
+  background: var(--paper-2);
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  padding: 14px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px; min-height: 68px;
+  transition: border-color 220ms var(--ease), background 220ms var(--ease);
+}
+@media (min-width: 720px) { .space-row { padding: 20px 22px; border-radius: 18px; } }
+.space-row:hover { border-color: var(--ink-3); }
+.space-row.is-on { background: var(--wyze-tint); border-color: var(--wyze); }
+.space-row[data-row="garage"],
+.space-row[data-row="yard"] { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.space-label { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.space-label .lbl { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+@media (min-width: 720px) { .space-label .lbl { font-size: 16px; } }
+.space-label .sub { font-size: 12.5px; color: var(--ink-2); line-height: 1.35; }
+@media (min-width: 720px) { .space-label .sub { font-size: 13px; } }
+.space-left { display: flex; align-items: center; gap: 14px; min-width: 0; flex: 1; }
+.space-icon {
+  width: 38px; height: 38px;
+  display: grid; place-items: center;
+  border-radius: 12px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+  flex-shrink: 0;
+  transition: color 220ms var(--ease), border-color 220ms var(--ease), background 220ms var(--ease);
+}
+.space-icon svg { width: 20px; height: 20px; }
+.space-row.is-on .space-icon { color: var(--wyze); border-color: var(--wyze); background: var(--paper-2); }
+@media (min-width: 720px) {
+  .space-icon { width: 42px; height: 42px; border-radius: 13px; }
+  .space-icon svg { width: 22px; height: 22px; }
+}
+.stepper {
+  display: inline-flex; align-items: center; gap: 2px;
+  background: var(--paper); border: 1px solid var(--line);
+  border-radius: 999px; padding: 4px; flex-shrink: 0;
+}
+.stepper button {
+  appearance: none; border: 0; background: transparent;
+  width: 36px; height: 36px;
+  display: grid; place-items: center; border-radius: 50%;
+  cursor: pointer; font-size: 20px; font-weight: 500; color: var(--ink);
+  transition: background 180ms var(--ease), color 180ms var(--ease);
+}
+.stepper button:hover:not(:disabled) { background: var(--wyze); color: #fff; }
+.stepper button:active:not(:disabled) { transform: scale(0.9); transition-duration: 100ms; }
+.stepper button:disabled { color: var(--ink-3); opacity: 0.4; cursor: not-allowed; }
+.stepper .val {
+  min-width: 28px; text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600; font-size: 16px;
+  transition: color 280ms var(--ease), transform 280ms var(--ease);
+  display: inline-block;
+}
+.stepper .val.is-bumping { animation: digit-bump 340ms var(--ease); }
+@keyframes digit-bump {
+  0%   { transform: scale(1);    color: var(--ink); }
+  40%  { transform: scale(1.28); color: var(--wyze); }
+  100% { transform: scale(1);    color: var(--ink); }
+}
+
+.toggle {
+  position: relative; width: 52px; height: 32px;
+  border-radius: 999px; background: var(--line);
+  border: 0; cursor: pointer; padding: 0; flex-shrink: 0;
+  transition: background 240ms var(--ease);
+}
+.toggle::after {
+  content: ""; position: absolute; top: 3px; left: 3px;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  transition: transform 260ms var(--ease-quart);
+}
+.toggle.is-on { background: linear-gradient(135deg, var(--wyze), var(--wyze-bright)); box-shadow: 0 4px 12px rgba(0, 116, 228, 0.32); }
+.toggle.is-on::after { transform: translateX(20px); }
+.toggle:active::after { transform: scale(0.92); transition-duration: 120ms; }
+.toggle.is-on:active::after { transform: translateX(20px) scale(0.92); }
+
+/* Footer — pinned to bottom of the card so its y-position stays constant
+   across step transitions (prevents layout shift when card content varies). */
+.card-footer {
+  margin-top: auto;
+  padding-top: 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  flex-shrink: 0;
+}
+@media (min-width: 720px) {
+  .card-footer { padding-top: 40px; justify-content: center; }
+}
+.card-footer .btn-primary { flex: 1; }
+@media (min-width: 720px) {
+  .card-footer .btn-primary { flex: 0 0 auto; margin-left: 0; }
+}
+
+/* Property card: only a Back button — center it instead of left-aligning */
+.card[data-card="2"] .card-footer { justify-content: center; }
+
+.card-footer-back { justify-content: space-between; }
+.card-footer-hint {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-3);
+}
+.card-footer-hint { display: none; }
+
+/* Continue's enable state uses only the base CSS transition for a calm fade —
+   background, color, and shadow ease in over 220–340ms, no ring pulse. */
+.btn-primary {
+  transition:
+    transform 200ms var(--ease),
+    background-color 340ms var(--ease),
+    color 340ms var(--ease),
+    box-shadow 340ms var(--ease);
+}
+.card-footer-meta {
+  font-size: 12px; color: var(--ink-3);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: 0.05em;
+}
+.card-footer-meta kbd {
+  background: var(--paper-3); border: 1px solid var(--line);
+  padding: 1px 6px; border-radius: 4px; color: var(--ink-2); font-size: 11px;
+}
+.card-footer-meta { display: none; }
+
+/* ═════════════════════════════════════════════════════════
+   AI CHAT SHOPPING
+   ───────────────────────────────────────────────────────── */
+.chat {
+  position: relative;
+  background: var(--paper);
+  border-top: 1px solid var(--line-2);
+  padding: var(--pad-y) var(--pad-x) 0;
+  display: none;
+}
+.chat.is-open { display: block; }
+.chat-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  position: relative;
+  padding-bottom: 220px; /* room for composer + tray */
+}
+
+/* Header */
+.chat-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--line-2);
+  margin-bottom: 28px;
+}
+.ai-orb {
+  flex-shrink: 0;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 30%, var(--teal-bright), var(--teal-deep) 65%),
+    var(--teal);
+  box-shadow: 0 0 0 4px rgba(35, 196, 160, 0.18), 0 6px 18px rgba(35, 196, 160, 0.32);
+  position: relative;
+}
+.ai-orb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), transparent 50%);
+}
+.chat-title-block { flex: 1; min-width: 0; }
+.chat-title {
+  font-size: 22px; font-weight: 700; letter-spacing: -0.02em;
+  margin: 0 0 4px; line-height: 1.15;
+}
+.chat-context {
+  font-size: 13px; color: var(--ink-2);
+  margin: 0;
+  display: flex; flex-wrap: wrap; gap: 4px 8px;
+  align-items: center;
+}
+.chat-context .ctx-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11.5px;
+  background: var(--paper-3);
+  border: 1px solid var(--line);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.chat-context .ctx-chip .swatch {
+  width: 5px; height: 5px; border-radius: 50%; background: var(--wyze);
+}
+.chat-reset {
+  appearance: none; border: 0; background: transparent;
+  font-family: inherit; font-size: 12px;
+  color: var(--ink-3); cursor: pointer;
+  padding: 4px 8px; border-radius: 6px;
+  align-self: flex-start;
+  transition: color 200ms var(--ease), background 200ms var(--ease);
+}
+.chat-reset:hover { color: var(--ink); background: var(--paper-3); }
+
+/* Thread */
+.thread { display: flex; flex-direction: column; gap: 22px; }
+.msg { display: flex; gap: 12px; max-width: 100%; }
+.msg-ai { align-self: flex-start; width: 100%; }
+.msg-user { align-self: flex-end; max-width: 80%; }
+
+.msg-avatar {
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, var(--teal-bright), var(--teal-deep) 65%);
+  margin-top: 2px;
+}
+.msg-body { flex: 1; min-width: 0; }
+.msg-ai .msg-body p {
+  font-size: 15px; line-height: 1.55;
+  color: var(--ink); margin: 0 0 8px;
+}
+.msg-ai .msg-body p:last-child { margin-bottom: 0; }
+.msg-user { justify-content: flex-end; }
+.msg-user .msg-body {
+  background: var(--wyze);
+  color: #fff;
+  padding: 11px 16px;
+  border-radius: 18px 18px 4px 18px;
+  font-size: 15px;
+  line-height: 1.45;
+}
+.msg-user .msg-body p { margin: 0; }
+
+/* AI typing dots */
+.typing { display: inline-flex; align-items: center; gap: 4px; padding: 4px 0; }
+.typing span {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--ink-3);
+  animation: typing-bounce 1.2s var(--ease) infinite;
+}
+.typing span:nth-child(2) { animation-delay: 0.15s; }
+.typing span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30%           { transform: translateY(-4px); opacity: 1; }
+}
+
+/* Product block in AI message */
+.bundle-block {
+  margin-top: 14px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--paper-2);
+  overflow: hidden;
+}
+.bundle-block-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--line-2);
+}
+.bundle-block-header .tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--teal-deep);
+}
+.bundle-block-header .tag .swatch {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--teal);
+}
+.product-list { display: flex; flex-direction: column; }
+.product {
+  display: flex; align-items: stretch;
+  border-bottom: 1px solid var(--line-2);
+  transition: background 200ms var(--ease);
+}
+.product:last-child { border-bottom: 0; }
+.product:hover { background: var(--paper-3); }
+.product.is-removed { opacity: 0.45; pointer-events: none; }
+.product.is-removed .product-info::after {
+  content: "Removed";
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-3);
+  position: absolute;
+  top: 14px; right: 16px;
+}
+
+.product-media {
+  flex-shrink: 0;
+  width: 88px;
+  background: linear-gradient(180deg, var(--paper-3), var(--line-2));
+  display: grid; place-items: center;
+  border-right: 1px solid var(--line-2);
+  position: relative;
+}
+.product-media svg { width: 44px; height: 44px; color: var(--ink); opacity: 0.78; }
+@media (min-width: 600px) { .product-media { width: 108px; } }
+
+.product-info {
+  flex: 1; min-width: 0;
+  padding: 14px 16px;
+  display: flex; flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+.product-tag {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--wyze-deep);
+}
+.product-name {
+  font-size: 15px; font-weight: 700; letter-spacing: -0.012em;
+  margin: 0; line-height: 1.2;
+}
+.product-benefit {
+  font-size: 13px; color: var(--ink-2);
+  margin: 0; line-height: 1.4;
+}
+.product-meta {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 13px;
+  margin-top: 2px;
+}
+.product-price { font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.product-price .period { font-weight: 500; color: var(--ink-3); font-size: 12px; }
+.product-rating { color: var(--ink-3); display: inline-flex; align-items: center; gap: 4px; }
+.product-rating .star { color: var(--wyze); }
+
+.product-actions {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-top: 8px;
+}
+.chip {
+  appearance: none; border: 0;
+  font-family: inherit; font-size: 12.5px; font-weight: 500;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+  padding: 6px 11px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 180ms var(--ease), color 180ms var(--ease), border-color 180ms var(--ease);
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.chip:hover { border-color: var(--ink-3); color: var(--ink); }
+.chip[data-action="remove"]:hover { border-color: #DC3545; color: #DC3545; }
+.chip[data-action="compare"].is-on { background: var(--wyze); color: #fff; border-color: var(--wyze); }
+
+.product-details {
+  font-size: 13px; color: var(--ink-2);
+  background: var(--paper-3);
+  padding: 12px 16px;
+  border-top: 1px solid var(--line-2);
+  display: none;
+}
+.product-details.is-open { display: block; }
+.product-details ul { margin: 6px 0 0; padding-left: 18px; }
+.product-details li { margin-bottom: 4px; }
+
+/* Bundle footer in AI message */
+.bundle-block-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--paper-3);
+  border-top: 1px solid var(--line-2);
+  font-size: 13px;
+}
+.bundle-block-footer .total {
+  font-weight: 700; font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.bundle-block-footer .meta { color: var(--ink-3); font-size: 12px; }
+
+/* Suggestions row */
+.suggestions {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 8px 0 4px;
+  margin-top: 18px;
+  scrollbar-width: none;
+}
+.suggestions::-webkit-scrollbar { display: none; }
+.suggestion {
+  flex-shrink: 0;
+  appearance: none; border: 1px solid var(--line);
+  background: var(--paper-2);
+  color: var(--ink-2);
+  font-family: inherit; font-size: 13px; font-weight: 500;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 200ms var(--ease), color 200ms var(--ease), border-color 200ms var(--ease);
+}
+.suggestion:hover {
+  background: var(--wyze);
+  color: #fff;
+  border-color: var(--wyze);
+}
+
+/* Composer + tray (sticky bottom) */
+.dock {
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(250, 251, 252, 0), var(--paper) 18%, var(--paper) 100%);
+  padding: 12px 0 calc(16px + var(--safe-bottom));
+  margin: 18px calc(-1 * var(--pad-x)) 0;
+  padding-left: var(--pad-x);
+  padding-right: var(--pad-x);
+  z-index: 20;
+}
+.composer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--paper-2);
+  border: 1.5px solid var(--line);
+  border-radius: 28px;
+  padding: 4px 4px 4px 18px;
+  transition: border-color 200ms var(--ease), box-shadow 200ms var(--ease);
+}
+.composer:focus-within {
+  border-color: var(--wyze);
+  box-shadow: 0 0 0 4px var(--wyze-ring);
+}
+.composer-input {
+  flex: 1;
+  appearance: none; border: 0; background: transparent;
+  font-family: inherit; font-size: 15px;
+  padding: 12px 0;
+  outline: 0;
+  color: var(--ink);
+  min-width: 0;
+}
+.composer-input::placeholder { color: var(--ink-3); }
+.composer-send {
+  appearance: none; border: 0;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--wyze);
+  color: #fff;
+  display: grid; place-items: center;
+  cursor: pointer;
+  transition: background 200ms var(--ease), transform 200ms var(--ease), opacity 200ms var(--ease);
+  flex-shrink: 0;
+}
+.composer-send:hover { background: var(--wyze-bright); }
+.composer-send:disabled { opacity: 0.4; cursor: not-allowed; }
+.composer-send svg { width: 18px; height: 18px; }
+
+/* Bundle tray */
+.tray {
+  margin-top: 8px;
+  background: var(--paper-2);
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: border-color 220ms var(--ease);
+}
+.tray.is-open { border-color: var(--ink); }
+.tray-toggle {
+  appearance: none; border: 0; background: transparent;
+  width: 100%;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  gap: 12px;
+}
+.tray-summary { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+.tray-icon {
+  flex-shrink: 0;
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--wyze-tint); color: var(--wyze);
+  display: grid; place-items: center;
+}
+.tray-icon svg { width: 16px; height: 16px; }
+.tray-label {
+  display: flex; flex-direction: column; gap: 1px; min-width: 0;
+}
+.tray-label .count { font-size: 13px; font-weight: 600; color: var(--ink); }
+.tray-label .preview { font-size: 11.5px; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 28ch; }
+.tray-total {
+  font-weight: 700; font-size: 16px; color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  display: flex; align-items: center; gap: 8px;
+}
+.tray-chevron {
+  width: 24px; height: 24px;
+  display: grid; place-items: center;
+  color: var(--ink-3);
+  transition: transform 280ms var(--ease);
+}
+.tray.is-open .tray-chevron { transform: rotate(180deg); }
+.tray-body { display: none; padding: 4px 16px 16px; }
+.tray.is-open .tray-body { display: block; }
+.tray-list { display: flex; flex-direction: column; gap: 8px; }
+.tray-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  background: var(--paper-3);
+  border-radius: 12px;
+  font-size: 13.5px;
+}
+.tray-item .ti-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--paper-2); border: 1px solid var(--line);
+  display: grid; place-items: center; flex-shrink: 0;
+}
+.tray-item .ti-icon svg { width: 18px; height: 18px; color: var(--ink); opacity: 0.8; }
+.tray-item .ti-text { flex: 1; min-width: 0; }
+.tray-item .ti-name { font-weight: 600; color: var(--ink); }
+.tray-item .ti-qty { font-size: 11.5px; color: var(--ink-3); }
+.tray-item .ti-price { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); }
+.tray-item .ti-remove {
+  appearance: none; border: 0; background: transparent;
+  color: var(--ink-3); width: 28px; height: 28px;
+  border-radius: 50%; cursor: pointer;
+  display: grid; place-items: center;
+  transition: background 180ms var(--ease), color 180ms var(--ease);
+}
+.tray-item .ti-remove:hover { background: rgba(220, 53, 69, 0.1); color: #DC3545; }
+.tray-checkout {
+  margin-top: 12px;
+  width: 100%;
+}
+
+/* Compare drawer */
+.compare-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(11, 14, 19, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  opacity: 0; pointer-events: none;
+  transition: opacity 240ms var(--ease);
+}
+.compare-overlay.is-open { opacity: 1; pointer-events: auto; }
+.compare-panel {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 100%);
+  width: 100%;
+  max-width: 720px;
+  background: var(--paper-2);
+  border-radius: 24px 24px 0 0;
+  z-index: 201;
+  transition: transform 380ms var(--ease);
+  max-height: 86svh;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.compare-overlay.is-open + .compare-panel,
+.compare-panel.is-open { transform: translate(-50%, 0); }
+.compare-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line-2);
+}
+.compare-header h3 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -0.018em; }
+.compare-close {
+  appearance: none; border: 0; background: var(--paper-3);
+  width: 32px; height: 32px; border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px; line-height: 1;
+  color: var(--ink-2);
+}
+.compare-body {
+  overflow-y: auto;
+  padding: 16px 20px 24px;
+}
+.compare-table {
+  display: grid;
+  grid-template-columns: auto repeat(var(--cols, 2), 1fr);
+  gap: 0;
+  font-size: 13px;
+}
+.compare-table > div {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--line-2);
+}
+.compare-table .row-label {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding-left: 0;
+}
+.compare-table .product-col-header {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink);
+  text-align: center;
+  border-bottom: 2px solid var(--wyze);
+  padding-bottom: 12px;
+}
+.compare-table .cell { text-align: center; color: var(--ink); }
+.compare-table .cell.best { color: var(--teal-deep); font-weight: 600; }
+.compare-empty {
+  text-align: center;
+  color: var(--ink-3);
+  padding: 40px 20px;
+  font-size: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ═════════════ PLANS COMPARE (dropdown) ═════════════ */
+.plans-compare {
+  background: var(--night);
+  color: #fff;
+  overflow: hidden;
+  position: relative;
+}
+.plans-compare::before {
+  content: "";
+  position: absolute; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse at 18% 0%, rgba(30, 142, 255, 0.18), transparent 55%),
+    radial-gradient(ellipse at 82% 100%, rgba(35, 196, 160, 0.14), transparent 60%);
+  pointer-events: none;
+}
+.plans-compare-shell { position: relative; z-index: 1; }
+.plans-compare-inner {
+  padding: clamp(48px, 6vw, 88px) 0 clamp(56px, 7vw, 96px);
+}
+.plans-compare-head,
+.plans-matrix,
+.plans-compare-foot { padding-left: var(--pad-x); padding-right: var(--pad-x); }
+
+/* Heading */
+.plans-compare-head { max-width: 880px; margin: 0 auto clamp(28px, 4vw, 48px); text-align: center; }
+.plans-compare-eyebrow {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px; letter-spacing: 0.22em;
+  color: rgba(255,255,255,0.55);
+  margin: 0 0 14px;
+}
+.plans-compare-title {
+  font-size: clamp(28px, 4.4vw, 52px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+  margin: 0 0 18px;
+  color: #fff;
+}
+.plans-compare-title span {
+  background: linear-gradient(115deg, #5BC0FF 0%, #2DDDB3 55%, #5BC0FF 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.plans-compare-sub {
+  font-size: clamp(15px, 1.8vw, 19px);
+  line-height: 1.55;
+  color: rgba(255,255,255,0.72);
+  max-width: 62ch; margin: 0 auto;
+}
+
+/* Mobile: horizontal swipe carousel with snap.
+   Desktop (820+): 3-column grid, peeks/clones hidden, dots hidden. */
+.plans-grid-wrap { position: relative; }
+.plans-grid {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  overflow-y: visible;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding: 8px var(--pad-x) 22px;
+  margin: 0 calc(var(--pad-x) * -1);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.plans-grid::-webkit-scrollbar { display: none; width: 0; height: 0; }
+.plans-grid > .plan-card {
+  flex: 0 0 85%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  min-width: 0;
+}
+@media (min-width: 560px) and (max-width: 819px) {
+  .plans-grid > .plan-card { flex-basis: 62%; }
+}
+@media (min-width: 820px) {
+  .plans-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    overflow: visible;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 1200px;
+    align-items: stretch;
+  }
+  .plans-grid > .plan-card { flex: initial; }
+  .plans-grid > .plan-card.is-clone { display: none; }
+}
+
+.plans-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+.plans-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: background 240ms var(--ease), transform 240ms var(--ease), width 320ms var(--ease);
+}
+.plans-dot.is-active {
+  background: #2DDDB3;
+  width: 26px;
+  border-radius: 999px;
+}
+.plans-dot:hover { background: rgba(255,255,255,0.4); }
+.plans-dot.is-active:hover { background: #2DDDB3; }
+@media (min-width: 820px) { .plans-dots { display: none; } }
+
+.plan-card {
+  position: relative;
+  display: flex; flex-direction: column;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.015) 100%);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 22px;
+  overflow: hidden;
+  transition: transform 320ms var(--ease), border-color 240ms var(--ease), box-shadow 320ms var(--ease);
+}
+.plan-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,0.16);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.40);
+}
+
+/* Free — muted */
+.plan-card--free { background: linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.01) 100%); }
+
+/* Plus — blue accent */
+.plan-card--plus {
+  border-color: rgba(30,142,255,0.28);
+  background: linear-gradient(180deg, rgba(30,142,255,0.06) 0%, rgba(255,255,255,0.01) 60%);
+}
+.plan-card--plus:hover { border-color: rgba(30,142,255,0.46); box-shadow: 0 24px 60px rgba(0,116,228,0.22); }
+
+/* Unlimited — featured w/ animated gradient ring */
+.plan-card--unlimited {
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--night), var(--night)) padding-box,
+    linear-gradient(115deg, #1E8EFF 0%, #23C4A0 30%, #2DDDB3 55%, #1E8EFF 100%) border-box;
+  box-shadow: 0 18px 50px rgba(35,196,160,0.16), 0 0 0 1px rgba(45,221,179,0.20) inset;
+}
+.plan-card--unlimited:hover {
+  box-shadow: 0 28px 70px rgba(35,196,160,0.28), 0 0 0 1px rgba(45,221,179,0.32) inset;
+  transform: translateY(-4px);
+}
+@media (min-width: 820px) {
+  .plan-card--unlimited { transform: translateY(-6px); }
+  .plan-card--unlimited:hover { transform: translateY(-10px); }
+}
+
+.plan-card-ribbon {
+  position: absolute; top: 14px; right: 14px;
+  z-index: 3;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10.5px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: #0B0E13;
+  background: linear-gradient(115deg, #2DDDB3 0%, #5BC0FF 50%, #2DDDB3 100%);
+  background-size: 200% 100%;
+  padding: 7px 12px;
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(45,221,179,0.36);
+  animation: ribbonShimmer 6s linear infinite;
+}
+@keyframes ribbonShimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* Card media */
+.plan-card-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: linear-gradient(135deg, #14181F 0%, #0B0E13 100%);
+  display: flex; align-items: center; justify-content: center;
+}
+.plan-card-media-glow {
+  position: absolute; inset: -20%;
+  background: radial-gradient(ellipse at 50% 50%, rgba(30,142,255,0.18), transparent 60%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+.plan-card-media-glow--unlimited {
+  background:
+    radial-gradient(ellipse at 30% 30%, rgba(45,221,179,0.22), transparent 55%),
+    radial-gradient(ellipse at 70% 70%, rgba(91,192,255,0.22), transparent 60%);
+}
+.plan-card-media-img {
+  position: relative; z-index: 1;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.plan-card-media-img.is-broken { display: none; }
+.plan-card-media-fallback {
+  display: none;
+  position: absolute; inset: 0;
+  align-items: center; justify-content: center;
+  flex-direction: column;
+  padding: 18px;
+  z-index: 1;
+}
+.plan-card-media-img.is-broken ~ .plan-card-media-fallback { display: flex; }
+
+/* Free card has no real image — show its tile always */
+.plan-card--free .plan-card-media-tile {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+  position: relative; z-index: 1;
+  padding: 18px;
+}
+
+.plan-tile-frame {
+  width: 88%;
+  max-width: 280px;
+  aspect-ratio: 4 / 3;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  background:
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0 6px, transparent 6px 12px),
+    linear-gradient(160deg, #1B2129 0%, #0F141B 100%);
+  position: relative;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 10px;
+}
+.plan-tile-frame--plus { border-color: rgba(30,142,255,0.36); box-shadow: 0 0 0 1px rgba(30,142,255,0.18) inset; }
+.plan-tile-feed {
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 9px; letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.6);
+}
+.plan-tile-feed-label { color: #FF6B6B; }
+.plan-tile-frame--plus .plan-tile-feed-label { color: #FF6B6B; }
+.plan-tile-feed-time { color: rgba(255,255,255,0.55); }
+.plan-tile-caption {
+  margin: 12px 0 0;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.55);
+  text-align: center;
+}
+.plan-tile-chips {
+  display: flex; gap: 5px; flex-wrap: wrap; justify-content: center;
+}
+.plan-tile-chip {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 8.5px; letter-spacing: 0.08em;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(30,142,255,0.18);
+  color: #5BC0FF;
+  border: 1px solid rgba(30,142,255,0.32);
+}
+
+/* Unlimited fallback grid */
+.plan-tile--unlimited {
+  display: flex !important;
+  flex-direction: column;
+  gap: 10px;
+}
+.plan-tile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  width: 80%;
+  max-width: 240px;
+}
+.plan-tile-mini {
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(160deg, #1B2129 0%, #0F141B 100%);
+  border: 1px solid rgba(45,221,179,0.32);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 9px; letter-spacing: 0.12em;
+  color: #FF6B6B;
+  position: relative;
+}
+.plan-tile-mini::before {
+  content: "●";
+  font-size: 8px; color: #FF6B6B;
+  margin-right: 4px;
+}
+.plan-tile-mini--more { color: #2DDDB3; font-size: 16px; letter-spacing: 0; }
+.plan-tile-mini--more::before { display: none; }
+
+/* Card body */
+.plan-card-body {
+  padding: 22px 22px 24px;
+  display: flex; flex-direction: column;
+  flex: 1;
+  gap: 14px;
+}
+@media (min-width: 820px) { .plan-card-body { padding: 26px 24px 28px; } }
+
+.plan-card-tier-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; flex-wrap: wrap;
+}
+.plan-card-tier {
+  font-size: clamp(22px, 2.4vw, 28px);
+  font-weight: 700;
+  letter-spacing: -0.018em;
+  color: #fff;
+}
+.plan-card-tag {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.7);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+.plan-card-tag--plus { background: rgba(30,142,255,0.14); color: #5BC0FF; border-color: rgba(30,142,255,0.32); }
+.plan-card-tag--unlimited {
+  background: rgba(45,221,179,0.14);
+  color: #2DDDB3;
+  border-color: rgba(45,221,179,0.34);
+}
+
+.plan-card-price { display: flex; flex-direction: column; gap: 2px; margin-top: -2px; }
+.plan-card-price-amt {
+  font-size: clamp(32px, 4vw, 44px);
+  font-weight: 800;
+  letter-spacing: -0.024em;
+  color: #fff;
+  line-height: 1;
+}
+.plan-card-price-sub {
+  font-size: 13px;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: -0.005em;
+}
+
+.plan-card-pitch {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: rgba(255,255,255,0.78);
+  margin: 0;
+}
+
+.plan-feats { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.plan-feats li {
+  font-size: 14px;
+  line-height: 1.4;
+  display: flex; align-items: flex-start; gap: 10px;
+  color: rgba(255,255,255,0.82);
+}
+.plan-feats li strong { color: #fff; font-weight: 600; }
+.plan-feats li::before {
+  content: ""; flex-shrink: 0; margin-top: 4px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background-repeat: no-repeat; background-position: center;
+  background-size: 10px 10px;
+}
+.plan-feats li.ok::before {
+  background-color: rgba(45,221,179,0.18);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232DDDB3' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>");
+}
+.plan-feats li.meh {
+  color: rgba(255,255,255,0.55);
+}
+.plan-feats li.meh::before {
+  background-color: rgba(255,255,255,0.08);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A0A6B0' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'><line x1='5' y1='12' x2='19' y2='12'/></svg>");
+}
+.plan-feats li.no {
+  color: rgba(255,255,255,0.40);
+  text-decoration: line-through;
+  text-decoration-color: rgba(255,255,255,0.18);
+}
+.plan-feats li.no::before {
+  background-color: rgba(255,255,255,0.05);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23606770' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'><line x1='6' y1='6' x2='18' y2='18'/><line x1='18' y1='6' x2='6' y2='18'/></svg>");
+}
+
+/* Billing period toggle inside plan cards */
+.plan-billing-wrap {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 16px 0 4px;
+}
+.plan-billing-row {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.plan-billing-lbl {
+  font-size: 13px; font-weight: 500;
+  color: rgba(255,255,255,0.45);
+  cursor: pointer; user-select: none;
+  transition: color 0.18s;
+}
+.plan-billing-lbl.is-active { color: #fff; font-weight: 600; }
+.plan-billing-pill {
+  width: 44px; height: 24px; border-radius: 12px; flex-shrink: 0;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.18);
+  cursor: pointer; position: relative; appearance: none; outline: none;
+  transition: background 0.2s;
+}
+.plan-billing-pill::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 16px; height: 16px; border-radius: 50%; background: #fff;
+  transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
+}
+.plan-billing-pill.is-annual { background: linear-gradient(135deg, var(--wyze), var(--wyze-bright)); }
+.plan-billing-pill.is-annual::after { transform: translateX(20px); }
+.plan-save-badge {
+  font-size: 11px; font-weight: 600;
+  color: #2DDDB3;
+  background: rgba(45,221,179,0.12);
+  border-radius: 20px; padding: 2px 8px;
+  opacity: 0; transition: opacity 0.2s;
+}
+.plan-save-badge.is-visible { opacity: 1; }
+.plan-trial-btn {
+  display: block; width: 100%; box-sizing: border-box;
+  padding: 13px 20px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--wyze), var(--wyze-bright));
+  color: #fff; font-size: 15px; font-weight: 600; letter-spacing: -0.01em;
+  text-align: center; text-decoration: none; border: none; cursor: pointer;
+  transition: opacity 0.18s, transform 0.18s;
+}
+.plan-trial-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.plan-card--unlimited .plan-trial-btn {
+  background: linear-gradient(135deg, #6C5CE7, #8E7CF8);
+}
+
+.plan-card-foot {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px dashed rgba(255,255,255,0.10);
+  display: flex; flex-direction: column; gap: 3px;
+}
+.plan-card-foot-label {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+.plan-card-foot-text { font-size: 13.5px; color: rgba(255,255,255,0.78); line-height: 1.4; }
+
+/* Matrix table */
+.plans-matrix {
+  max-width: 1100px;
+  margin: clamp(40px, 5vw, 64px) auto 0;
+  border-radius: 22px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.08);
+  overflow: hidden;
+}
+.plans-matrix-head {
+  padding: 22px 24px 12px;
+  text-align: left;
+}
+.plans-matrix-title { font-size: 20px; font-weight: 700; margin: 0 0 4px; color: #fff; letter-spacing: -0.015em; }
+.plans-matrix-sub { font-size: 13.5px; color: rgba(255,255,255,0.55); margin: 0; }
+.plans-matrix-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.plans-matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+  font-size: 14px;
+}
+.plans-matrix-table thead th {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  font-weight: 600;
+  padding: 14px 16px;
+  text-align: left;
+  background: rgba(255,255,255,0.025);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.plans-matrix-table thead th.m-feat { width: 38%; }
+.plans-matrix-table thead th.m-unlim {
+  color: #2DDDB3;
+}
+.plans-matrix-table tbody th {
+  text-align: left;
+  font-weight: 500;
+  color: rgba(255,255,255,0.82);
+  padding: 13px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 13.5px;
+}
+.plans-matrix-table tbody td {
+  padding: 13px 16px;
+  color: rgba(255,255,255,0.72);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 13.5px;
+  vertical-align: middle;
+}
+.plans-matrix-table tbody td small { color: rgba(255,255,255,0.45); font-size: 11px; letter-spacing: 0; }
+.plans-matrix-table tbody tr:last-child th,
+.plans-matrix-table tbody tr:last-child td { border-bottom: 0; }
+.plans-matrix-table tbody tr:hover th,
+.plans-matrix-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+.plans-matrix-table td.m-yes { color: #2DDDB3; font-weight: 600; }
+.plans-matrix-table td.m-no { color: rgba(255,255,255,0.32); }
+.plans-matrix-table td.m-best { color: #fff; font-weight: 600; }
+.plans-matrix-table td.m-yes.m-best { color: #2DDDB3; }
+
+/* Footer */
+.plans-compare-foot {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+  gap: 16px;
+  margin-top: clamp(32px, 4vw, 52px);
+  padding-top: clamp(24px, 3vw, 36px);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  max-width: 1100px;
+  margin-left: auto; margin-right: auto;
+}
+.plans-compare-foot-text {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.55;
+}
+.plans-compare-foot-text span {
+  display: block;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.42);
+  margin-top: 4px;
+}
+.plans-jump .btn-arrow { transition: transform 320ms var(--ease); animation: plansJumpBob 2.6s ease-in-out infinite; }
+@keyframes plansJumpBob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(3px); }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════ NAV ════════════════ -->
+<nav class="nav is-dark" id="nav">
+  <a href="#top" class="nav-logo" aria-label="Wyze">
+    <svg viewBox="15 81 166 37" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M41.263 82.4922H34.6892L41.263 95.8191L35.5108 107.382L23.1851 82.4922H16.6113L33.4567 116.789H37.5653L44.5499 102.678L51.5345 116.789H55.6432L72.4886 82.4922H65.9148L53.5888 107.578L41.263 82.4922Z"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M103.714 82.4922L92.4151 99.7386L81.1165 82.4922H74.1318L89.539 105.814V116.593H95.4967V105.814L110.698 82.4922H103.714Z"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M147.471 116.789H178.696V110.91H147.471V116.789Z"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M147.471 88.3717H178.696V82.4922H147.471V88.3717Z"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M147.471 102.483H178.696V96.6035H147.471V102.483Z"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M112.548 82.4922V88.1757H133.091L110.083 116.789H143.568V111.106H122.409L145.623 82.4922H112.548Z"/>
+    </svg>
+  </a>
+  <div class="nav-menu" role="menubar">
+    <a href="https://www.wyze.com/" role="menuitem">Shop</a>
+    <a href="https://www.wyze.com/collections/cameras" role="menuitem">Cameras</a>
+    <a href="https://www.wyze.com/collections/services" role="menuitem">Subscriptions</a>
+    <a href="https://support.wyze.com/" role="menuitem">Support</a>
+    <a href="https://my.wyze.com/" role="menuitem">Sign In</a>
+  </div>
+  <button class="nav-toggle" id="nav-toggle" type="button"
+          aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile">
+    <span class="nav-toggle-bars" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </span>
+  </button>
+</nav>
+
+<!-- ════════════════ MOBILE MENU ════════════════ -->
+<div class="nav-mobile" id="nav-mobile" aria-hidden="true">
+  <div class="nav-mobile-inner">
+    <a href="https://www.wyze.com/">Shop</a>
+    <a href="https://www.wyze.com/collections/cameras">Cameras</a>
+    <a href="https://www.wyze.com/collections/services">Subscriptions</a>
+    <a href="https://support.wyze.com/">Support</a>
+    <a href="https://my.wyze.com/">Sign In</a>
+  </div>
+</div>
+
+<!-- ════════════════ HERO ════════════════ -->
+<section class="hero" id="top" aria-label="Featured Wyze products">
+  <div class="hero-gallery" role="list">
+
+    <a class="hero-card hero-card--windowcam"
+       href="https://www.wyze.com/products/wyze-window-cam"
+       target="_blank" rel="noopener" role="listitem">
+      <video class="hero-card-media"
+             autoplay muted loop playsinline preload="metadata"
+             aria-hidden="true">
+        <source src="assets/videos/windowcam.mp4" type="video/mp4">
+      </video>
+      <div class="hero-card-scrim" aria-hidden="true"></div>
+      <div class="hero-card-content">
+        <p class="hero-card-eyebrow">Indoor · No drill</p>
+        <h2 class="hero-card-title">Window Cam</h2>
+        <p class="hero-card-benefit">Suction-mount on glass. Watch the porch without drilling a hole.</p>
+        <span class="hero-card-cta">Shop now <span aria-hidden="true">→</span></span>
+      </div>
+    </a>
+
+    <a class="hero-card hero-card--batterycam"
+       href="https://www.wyze.com/products/wyze-battery-cam-pro"
+       target="_blank" rel="noopener" role="listitem">
+      <video class="hero-card-media"
+             autoplay muted loop playsinline preload="metadata"
+             aria-hidden="true">
+        <source src="assets/videos/batterycampro.mp4" type="video/mp4">
+      </video>
+      <div class="hero-card-scrim" aria-hidden="true"></div>
+      <div class="hero-card-content">
+        <p class="hero-card-eyebrow">Wire-free · Outdoor</p>
+        <h2 class="hero-card-title">Battery Cam Pro</h2>
+        <p class="hero-card-benefit">Mount anywhere. No wires. Months of battery.</p>
+        <span class="hero-card-cta">Shop now <span aria-hidden="true">→</span></span>
+      </div>
+    </a>
+
+    <a class="hero-card hero-card--doorbell"
+       href="https://www.wyze.com/products/wyze-battery-doorbell-pro"
+       target="_blank" rel="noopener" role="listitem">
+      <video class="hero-card-media"
+             autoplay muted loop playsinline preload="metadata"
+             aria-hidden="true">
+        <source src="assets/videos/batterydoorbell.mp4" type="video/mp4">
+      </video>
+      <div class="hero-card-scrim" aria-hidden="true"></div>
+      <div class="hero-card-content">
+        <p class="hero-card-eyebrow">Wire-free · Front door</p>
+        <h2 class="hero-card-title">Battery Video Doorbell</h2>
+        <p class="hero-card-benefit">Skip the wiring. See who's there from anywhere.</p>
+        <span class="hero-card-cta">Shop now <span aria-hidden="true">→</span></span>
+      </div>
+    </a>
+
+    <a class="hero-card hero-card--floodcampro"
+       href="https://www.wyze.com/products/wyze-cam-floodlight-pro"
+       target="_blank" rel="noopener" role="listitem">
+      <img class="hero-card-media"
+           src="assets/products/floodcampro.png"
+           alt="" aria-hidden="true" loading="lazy">
+      <div class="hero-card-scrim" aria-hidden="true"></div>
+      <div class="hero-card-content">
+        <p class="hero-card-eyebrow">Outdoor · Lighted</p>
+        <h2 class="hero-card-title">Flood Cam Pro</h2>
+        <p class="hero-card-benefit">Light up the yard the moment someone arrives.</p>
+        <span class="hero-card-cta">Shop now <span aria-hidden="true">→</span></span>
+      </div>
+    </a>
+
+    <a class="hero-card hero-card--scaleultra"
+       href="https://www.wyze.com/products/wyze-scale-ultra"
+       target="_blank" rel="noopener" role="listitem">
+      <img class="hero-card-media"
+           src="assets/products/scaleultrabs.png"
+           alt="" aria-hidden="true" loading="lazy">
+      <div class="hero-card-scrim" aria-hidden="true"></div>
+      <div class="hero-card-content">
+        <p class="hero-card-eyebrow">Health · In-home</p>
+        <h2 class="hero-card-title">Scale Ultra Body Scan</h2>
+        <p class="hero-card-benefit">See what's changing — beyond just the number on the scale.</p>
+        <span class="hero-card-cta">Shop now <span aria-hidden="true">→</span></span>
+      </div>
+    </a>
+
+  </div>
+  <button class="hero-arrow prev" type="button" aria-label="Previous products">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="hero-arrow next" type="button" aria-label="More products">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+</section>
+
+<!-- ════════════════ WELCOME BACK ════════════════ -->
+<section class="welcome" aria-label="Welcome back">
+  <div class="welcome-inner">
+    <h2 class="welcome-title">Welcome back, <span class="user-name">Owen!</span></h2>
+    <a href="/digest" class="btn-command">Command Center <span aria-hidden="true">→</span></a>
+  </div>
+</section>
+
+<!-- ════════════════ DESCRIPTIVE ALERTS ════════════════ -->
+<section class="alerts-spot" aria-labelledby="never-wonder">
+  <div class="alerts-spot-inner">
+    <div class="marquee-rotator" aria-live="polite" aria-atomic="true">
+      <span class="marquee-q is-active">Kids home from school?</span>
+      <span class="marquee-q">Package delivered?</span>
+      <span class="marquee-q">Dog let out?</span>
+      <span class="marquee-q">Mom got home safe?</span>
+      <span class="marquee-q">Garage door closed?</span>
+      <span class="marquee-q">What was that noise?</span>
+    </div>
+    <h1 class="marquee-anchor" id="never-wonder">Never Wonder.</h1>
+    <video class="alerts-spot-media"
+           muted loop playsinline preload="metadata"
+           aria-label="Demo of Wyze descriptive AI alerts">
+      <source src="assets/videos/descriptivealerts.mp4" type="video/mp4">
+    </video>
+    <p class="alerts-spot-caption">with <span>Wyze Descriptive Alerts</span></p>
+    <div class="alerts-spot-cta">
+      <a href="#plans-compare" class="btn btn-primary plans-jump" data-plans-jump>
+        Our Plans <span class="btn-arrow" aria-hidden="true">↓</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ PLANS COMPARE ════════════════ -->
+<section class="plans-compare" id="plans-compare" aria-labelledby="plans-compare-title">
+  <div class="plans-compare-shell">
+    <div class="plans-compare-inner">
+
+      <header class="plans-compare-head">
+        <h2 id="plans-compare-title" class="plans-compare-title">
+          Capable out of the box,<br>
+          <span>smarter with Cam Plan.</span>
+        </h2>
+        <p class="plans-compare-sub">
+          Free is capable. Cam Plus and Cam Unlimited unlock the AI alerts, 14&#8209;day recordings, and Friendly Faces that turn every clip into something you actually understand.
+        </p>
+      </header>
+
+      <div class="plans-grid-wrap">
+      <div class="plans-grid" role="list" data-carousel="plans">
+
+        <!-- ─── FREE ─── -->
+        <article class="plan-card plan-card--free" role="listitem">
+          <div class="plan-card-media">
+            <div class="plan-card-media-glow" aria-hidden="true"></div>
+            <div class="plan-card-media-tile plan-tile--free" aria-hidden="true">
+              <div class="plan-tile-frame">
+                <div class="plan-tile-feed">
+                  <div class="plan-tile-feed-label">LIVE</div>
+                  <div class="plan-tile-feed-time">12s</div>
+                </div>
+                <p class="plan-tile-caption">Motion detected</p>
+              </div>
+            </div>
+          </div>
+          <div class="plan-card-body">
+            <div class="plan-card-tier-row">
+              <span class="plan-card-tier">Free</span>
+              <span class="plan-card-tag plan-card-tag--free">Included with every cam</span>
+            </div>
+            <div class="plan-card-price">
+              <span class="plan-card-price-amt">$0</span>
+              <span class="plan-card-price-sub">forever</span>
+            </div>
+            <p class="plan-card-pitch">Live view, motion clips, the essentials. A capable starter if you only need to peek in once in a while.</p>
+            <ul class="plan-feats">
+              <li class="ok">Live view, anywhere on mobile</li>
+              <li class="ok">12-second motion thumbnails</li>
+              <li class="ok">Basic motion detection</li>
+              <li class="meh">5-minute cooldown between clips</li>
+              <li class="no">No video recording history</li>
+              <li class="no">No person/pet/package alerts</li>
+              <li class="no">No Friendly Faces</li>
+              <li class="no">No Web View on desktop</li>
+            </ul>
+            <div class="plan-card-foot">
+              <span class="plan-card-foot-label">Best for</span>
+              <span class="plan-card-foot-text">Indoor pet check-ins, an occasional look-in</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- ─── CAM PLUS ─── -->
+        <article class="plan-card plan-card--plus" role="listitem">
+          <div class="plan-card-media">
+            <div class="plan-card-media-glow" aria-hidden="true"></div>
+            <img class="plan-card-media-img"
+                 src="https://www.wyze.com/cdn/shop/files/Cam_Plus_Page_eventvideos.png?v=1715016049&width=900"
+                 alt="" loading="lazy"
+                 onerror="this.classList.add('is-broken')">
+            <div class="plan-card-media-fallback plan-tile--plus" aria-hidden="true">
+              <div class="plan-tile-frame plan-tile-frame--plus">
+                <div class="plan-tile-feed">
+                  <div class="plan-tile-feed-label">REC · 14d</div>
+                  <div class="plan-tile-feed-time">●</div>
+                </div>
+                <div class="plan-tile-chips">
+                  <span class="plan-tile-chip">Person</span>
+                  <span class="plan-tile-chip">Package</span>
+                  <span class="plan-tile-chip">Vehicle</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="plan-card-body">
+            <div class="plan-card-tier-row">
+              <span class="plan-card-tier">Cam Plus</span>
+              <span class="plan-card-tag plan-card-tag--plus">30-day free trial</span>
+            </div>
+            <div class="plan-card-price">
+              <span class="plan-card-price-amt">$2.99</span>
+              <span class="plan-card-price-sub">/mo per camera · or $29.99/yr</span>
+            </div>
+            <p class="plan-card-pitch">Power up one Wyze Cam with AI alerts and 14-day cloud video — the upgrade most people pick.</p>
+            <ul class="plan-feats">
+              <li class="ok"><strong>14-day video recordings</strong> in the cloud</li>
+              <li class="ok"><strong>Back-to-back recording</strong>, no cooldown</li>
+              <li class="ok">Person, Pet, Vehicle &amp; Package alerts</li>
+              <li class="ok">Sound detections (barking, glass, smoke)</li>
+              <li class="ok">Rich animated GIF notifications</li>
+              <li class="ok">Wyze Web View on desktop</li>
+              <li class="ok">AI Video Search</li>
+              <li class="ok">Friendly Faces (facial recognition)</li>
+            </ul>
+            <div class="plan-billing-wrap">
+              <div class="plan-billing-row">
+                <span class="plan-billing-lbl is-active" data-billing-monthly="plus">Monthly</span>
+                <button class="plan-billing-pill" type="button" id="plus-billing-pill" aria-pressed="false" aria-label="Switch to annual billing"></button>
+                <span class="plan-billing-lbl" data-billing-annual="plus">Annual</span>
+                <span class="plan-save-badge" id="plus-save-badge">Save 16%</span>
+              </div>
+              <a href="https://www.wyze.com/pages/service-plans" class="plan-trial-btn">Start free trial</a>
+            </div>
+            <div class="plan-card-foot">
+              <span class="plan-card-foot-label">Best for</span>
+              <span class="plan-card-foot-text">One camera you actually want to be smart</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- ─── CAM UNLIMITED ─── -->
+        <article class="plan-card plan-card--unlimited" role="listitem">
+          <div class="plan-card-ribbon" aria-label="Most popular">
+            <span>★ Most popular</span>
+          </div>
+          <div class="plan-card-media">
+            <div class="plan-card-media-glow plan-card-media-glow--unlimited" aria-hidden="true"></div>
+            <img class="plan-card-media-img"
+                 src="https://www.wyze.com/cdn/shop/files/Cam_Unlimited_-_Multi_Cam_New.webp?v=1715209587&width=900"
+                 alt="" loading="lazy"
+                 onerror="this.classList.add('is-broken')">
+            <div class="plan-card-media-fallback plan-tile--unlimited" aria-hidden="true">
+              <div class="plan-tile-grid">
+                <div class="plan-tile-mini">REC</div>
+                <div class="plan-tile-mini">REC</div>
+                <div class="plan-tile-mini">REC</div>
+                <div class="plan-tile-mini plan-tile-mini--more">+∞</div>
+              </div>
+              <p class="plan-tile-caption">All your cameras. One plan.</p>
+            </div>
+          </div>
+          <div class="plan-card-body">
+            <div class="plan-card-tier-row">
+              <span class="plan-card-tier">Cam Unlimited</span>
+              <span class="plan-card-tag plan-card-tag--unlimited">Covers every cam</span>
+            </div>
+            <div class="plan-card-price">
+              <span class="plan-card-price-amt">$9.99</span>
+              <span class="plan-card-price-sub">/mo · or $99/yr · unlimited cameras</span>
+            </div>
+            <p class="plan-card-pitch">One plan, every camera. Everything in Cam Plus, plus a multi-cam timeline, self-monitoring modes, and a Friendly Faces library worth building.</p>
+            <ul class="plan-feats">
+              <li class="ok"><strong>Unlimited cameras</strong> under one plan</li>
+              <li class="ok">Everything in Cam Plus, on every cam</li>
+              <li class="ok"><strong>Multi-camera timeline</strong> — jump across cams</li>
+              <li class="ok"><strong>Self-monitoring</strong> Home / Away / Disarm modes</li>
+              <li class="ok">My Day event insights &amp; Home Summary</li>
+              <li class="ok">Descriptive Alerts (AI-narrated)</li>
+              <li class="ok">Exclusive subscriber discounts</li>
+              <li class="ok">Share with up to 5 household members</li>
+            </ul>
+            <div class="plan-billing-wrap">
+              <div class="plan-billing-row">
+                <span class="plan-billing-lbl is-active" data-billing-monthly="unlimited">Monthly</span>
+                <button class="plan-billing-pill" type="button" id="unlimited-billing-pill" aria-pressed="false" aria-label="Switch to annual billing"></button>
+                <span class="plan-billing-lbl" data-billing-annual="unlimited">Annual</span>
+                <span class="plan-save-badge" id="unlimited-save-badge">Save 17%</span>
+              </div>
+              <a href="https://www.wyze.com/pages/service-plans" class="plan-trial-btn">Start free trial</a>
+            </div>
+            <div class="plan-card-foot">
+              <span class="plan-card-foot-label">Best for</span>
+              <span class="plan-card-foot-text">Two or more cams, a doorbell, a real setup</span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+      <div class="plans-dots" role="tablist" aria-label="Choose plan">
+        <button class="plans-dot is-active" type="button" data-dot="0" role="tab" aria-label="Free"></button>
+        <button class="plans-dot" type="button" data-dot="1" role="tab" aria-label="Cam Plus"></button>
+        <button class="plans-dot" type="button" data-dot="2" role="tab" aria-label="Cam Unlimited"></button>
+      </div>
+      </div>
+
+      <!-- ─── COMPACT MATRIX ─── -->
+      <div class="plans-matrix">
+        <header class="plans-matrix-head">
+          <h3 class="plans-matrix-title">Side-by-side</h3>
+          <p class="plans-matrix-sub">Every feature, every plan.</p>
+        </header>
+        <div class="plans-matrix-wrap">
+          <table class="plans-matrix-table" aria-label="Plan feature comparison">
+            <thead>
+              <tr>
+                <th scope="col" class="m-feat">Feature</th>
+                <th scope="col" class="m-free">Free</th>
+                <th scope="col" class="m-plus">Cam Plus</th>
+                <th scope="col" class="m-unlim">Cam Unlimited</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Cameras covered</th>
+                <td>Per device</td>
+                <td>1 per license <small>(max 3)</small></td>
+                <td class="m-best">Unlimited</td>
+              </tr>
+              <tr>
+                <th scope="row">Cloud video recording</th>
+                <td>Thumbnails only</td>
+                <td>14 days</td>
+                <td class="m-best">14 days · every cam</td>
+              </tr>
+              <tr>
+                <th scope="row">Delay between recordings</th>
+                <td>5 minutes</td>
+                <td class="m-best">Back-to-back</td>
+                <td class="m-best">Back-to-back</td>
+              </tr>
+              <tr>
+                <th scope="row">Person, Pet, Vehicle, Package detection</th>
+                <td class="m-no">—</td>
+                <td class="m-yes">✓</td>
+                <td class="m-yes">✓</td>
+              </tr>
+              <tr>
+                <th scope="row">Sound detections (barking, glass, smoke)</th>
+                <td class="m-no">—</td>
+                <td class="m-yes">✓</td>
+                <td class="m-yes">✓</td>
+              </tr>
+              <tr>
+                <th scope="row">Friendly Faces (facial recognition)</th>
+                <td class="m-no">—</td>
+                <td class="m-yes">✓</td>
+                <td class="m-yes">✓</td>
+              </tr>
+              <tr>
+                <th scope="row">Rich animated GIF notifications</th>
+                <td class="m-no">—</td>
+                <td class="m-yes">✓</td>
+                <td class="m-yes">✓</td>
+              </tr>
+              <tr>
+                <th scope="row">Wyze Web View on desktop</th>
+                <td class="m-no">—</td>
+                <td class="m-yes">✓</td>
+                <td class="m-yes">✓</td>
+              </tr>
+              <tr>
+                <th scope="row">AI Video Search</th>
+                <td class="m-no">—</td>
+                <td class="m-yes">✓</td>
+                <td class="m-yes">✓</td>
+              </tr>
+              <tr>
+                <th scope="row">Descriptive Alerts (AI-narrated)</th>
+                <td class="m-no">—</td>
+                <td class="m-yes">✓</td>
+                <td class="m-yes">✓</td>
+              </tr>
+              <tr>
+                <th scope="row">Multi-camera timeline</th>
+                <td class="m-no">—</td>
+                <td class="m-no">—</td>
+                <td class="m-yes m-best">✓</td>
+              </tr>
+              <tr>
+                <th scope="row">Self-monitoring modes (Home / Away)</th>
+                <td class="m-no">—</td>
+                <td class="m-no">—</td>
+                <td class="m-yes m-best">✓</td>
+              </tr>
+              <tr>
+                <th scope="row">My Day &amp; Home Summary</th>
+                <td class="m-no">—</td>
+                <td class="m-no">—</td>
+                <td class="m-yes m-best">✓</td>
+              </tr>
+              <tr>
+                <th scope="row">Subscriber discounts on hardware</th>
+                <td class="m-no">—</td>
+                <td class="m-yes">✓</td>
+                <td class="m-yes">✓</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ REVIEW HERO ════════════════ -->
+<section class="marquee marquee--reviews" aria-label="Customer reviews">
+  <div class="marquee-inner">
+    <p class="review-hero-trusted">Trusted by 12+ million households</p>
+    <div class="social-frame" id="social-frame">
+      <button class="social-nav prev" id="social-prev" type="button" aria-label="Previous review">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="social-rotator" id="social-rotator" role="region" aria-label="Customer reviews" tabindex="0">
+      <article class="review is-active">
+        <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+        <blockquote class="review-quote">"Best purchase ever. Safety at ease. I will definitely recommend Wyze security cameras."</blockquote>
+        <footer class="review-meta">
+          <strong>Verified Best Buy buyer</strong>
+          <span class="review-meta-dot">·</span>
+          <span>Wyze Cam Pan</span>
+        </footer>
+      </article>
+      <article class="review">
+        <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+        <blockquote class="review-quote">"Fantastic product. I've had Arlo, Canary, Samsung and Google cameras and the Wyze blows them away."</blockquote>
+        <footer class="review-meta">
+          <strong>Verified Amazon buyer</strong>
+          <span class="review-meta-dot">·</span>
+          <span>Wyze Cam OG</span>
+        </footer>
+      </article>
+      <article class="review">
+        <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+        <blockquote class="review-quote">"Both cameras have operated flawlessly. Wyze customer support was great, helpful, and patient."</blockquote>
+        <footer class="review-meta">
+          <strong>Robert Hott</strong>
+          <span class="review-meta-dot">·</span>
+          <span>Trustpilot</span>
+        </footer>
+      </article>
+      <article class="review">
+        <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+        <blockquote class="review-quote">"Very innovative and excellent home security system with clean and clear views day and night."</blockquote>
+        <footer class="review-meta">
+          <strong>Louise F.</strong>
+          <span class="review-meta-dot">·</span>
+          <span>Wyze Bulb Cam</span>
+          <span class="review-meta-dot">·</span>
+          <span>Trustpilot</span>
+        </footer>
+      </article>
+      <article class="review">
+        <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+        <blockquote class="review-quote">"Honestly amazing. Easy setup and awesome nighttime picture quality."</blockquote>
+        <footer class="review-meta">
+          <strong>Verified buyer</strong>
+          <span class="review-meta-dot">·</span>
+          <span>Wyze Doorbell</span>
+          <span class="review-meta-dot">·</span>
+          <span>Best Buy</span>
+        </footer>
+      </article>
+      </div>
+      <button class="social-nav next" id="social-next" type="button" aria-label="Next review">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ ONBOARDING ════════════════ -->
+<section class="onboard" id="start">
+  <div class="onboard-inner">
+
+    <div class="wyatt-greet">
+      <img class="wyatt-avatar" src="assets/wyatt.png" alt="Wyatt the Wyze mascot" width="140" height="140">
+      <h2 class="wyatt-title">Let Wyatt help!</h2>
+    </div>
+
+    <div class="card-stage" id="stage">
+
+      <!-- Card 1: Concerns -->
+      <div class="card is-active" data-card="1" id="card-1">
+        <h2 class="card-prompt">What keeps you<br class="br-mobile"> up at night?</h2>
+        <p class="card-help">Pick any that matter.</p>
+
+        <div class="tile-grid cols-2">
+          <button class="tile" data-concern="package" data-key="1" type="button">
+            <span class="tile-key">1</span>
+            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="m223.68 66.15l-88-48.15a15.88 15.88 0 0 0-15.36 0l-88 48.17a16 16 0 0 0-8.32 14v95.64a16 16 0 0 0 8.32 14l88 48.17a15.88 15.88 0 0 0 15.36 0l88-48.17a16 16 0 0 0 8.32-14V80.18a16 16 0 0 0-8.32-14.03M128 32l80.34 44l-29.77 16.3l-80.35-44Zm0 88L47.66 76l33.9-18.56l80.34 44ZM40 90l80 43.78v85.79l-80-43.75Zm176 85.78l-80 43.79v-85.75l32-17.51V152a8 8 0 0 0 16 0v-44.45L216 90v85.77Z"/></svg></span>
+            <span class="tile-text">
+              <span class="tile-label">Package theft</span>
+              <span class="tile-benefit">Catch porch pirates the moment they show up.</span>
+            </span>
+          </button>
+
+          <button class="tile" data-concern="intruders" data-key="2" type="button">
+            <span class="tile-key">2</span>
+            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M248 112h-27.92l-47.5-65.41a16 16 0 0 0-25.31-.72l-12.85 14.9l-.2.23a7.95 7.95 0 0 1-12.44 0l-.2-.23l-12.85-14.9a16 16 0 0 0-25.31.72L35.92 112H8a8 8 0 0 0 0 16h240a8 8 0 0 0 0-16M96.34 56l.19.23l12.85 14.89a24 24 0 0 0 37.24 0l12.85-14.89c.06-.08.1-.15.17-.23l40.66 56H55.69ZM180 144a36 36 0 0 0-35.77 32h-32.46a36 36 0 1 0-1.83 16h36.12A36 36 0 1 0 180 144M76 200a20 20 0 1 1 20-20a20 20 0 0 1-20 20m104 0a20 20 0 1 1 20-20a20 20 0 0 1-20 20"/></svg></span>
+            <span class="tile-text">
+              <span class="tile-label">Unwanted visitors</span>
+              <span class="tile-benefit">Know who's at the door before you open it.</span>
+            </span>
+          </button>
+
+          <button class="tile" data-concern="vacation" data-key="3" type="button">
+            <span class="tile-key">3</span>
+            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M238.25 229a8 8 0 0 1-11.25 1.25c-.37-.3-38.82-30.25-99-30.25s-98.64 30-99 30.26a8 8 0 0 1-10-12.51c1.63-1.3 38.52-30.26 98.29-33.45a120 120 0 0 1-3.29-37.93c1.74-21.71 10.92-50.63 43-72.48A64.7 64.7 0 0 0 140.26 72c-19 .62-30.94 11.71-36.5 33.92A8 8 0 0 1 96 112a7.6 7.6 0 0 1-1.94-.24a8 8 0 0 1-5.82-9.7c9.25-36.95 33.11-45.42 51.5-46a81.5 81.5 0 0 1 21.68 2.45c-3.83-6.33-9.43-12.93-17.21-16.25c-10-4.24-22.17-2.39-36.31 5.51a8 8 0 0 1-7.8-14c18.74-10.45 35.72-12.54 50.48-6.2c12.49 5.36 20.73 15.78 25.87 25c6.18-9.64 13.88-16.17 22.39-18.94c11.86-3.87 24.64-.72 38 9.37a8 8 0 0 1-9.64 12.76c-8.91-6.73-16.77-9.06-23.35-6.93c-7.29 2.35-12.87 10-16.37 16.61A70.5 70.5 0 0 1 208 73.07c14.61 8.35 32 26.05 32 62.94a8 8 0 0 1-16 0c0-23.46-8.07-40-24-49a51 51 0 0 0-5.75-2.8a55.64 55.64 0 0 1 5.06 33.06a59.4 59.4 0 0 1-8.86 23.41a8 8 0 0 1-13.09-9.2c.74-1.09 16.33-24.38-3.26-49.37c-27 15.21-41.89 37.25-44.16 65.59a104.3 104.3 0 0 0 3.83 36.44c62.65 1.81 101.52 32.33 103.2 33.66a8 8 0 0 1 1.28 11.2M24 140a28 28 0 1 1 28 28a28 28 0 0 1-28-28m16 0a12 12 0 1 0 12-12a12 12 0 0 0-12 12"/></svg></span>
+            <span class="tile-text">
+              <span class="tile-label">Away from home</span>
+              <span class="tile-benefit">Eyes on the house while you're on the road.</span>
+            </span>
+          </button>
+
+          <button class="tile" data-concern="family" data-key="4" type="button">
+            <span class="tile-key">4</span>
+            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M212 80a28 28 0 1 0 28 28a28 28 0 0 0-28-28m0 40a12 12 0 1 1 12-12a12 12 0 0 1-12 12M72 108a28 28 0 1 0-28 28a28 28 0 0 0 28-28m-28 12a12 12 0 1 1 12-12a12 12 0 0 1-12 12m48-32a28 28 0 1 0-28-28a28 28 0 0 0 28 28m0-40a12 12 0 1 1-12 12a12 12 0 0 1 12-12m72 40a28 28 0 1 0-28-28a28 28 0 0 0 28 28m0-40a12 12 0 1 1-12 12a12 12 0 0 1 12-12m23.12 100.86a35.3 35.3 0 0 1-16.87-21.14a44 44 0 0 0-84.5 0A35.25 35.25 0 0 1 69 148.82A40 40 0 0 0 88 224a39.5 39.5 0 0 0 15.52-3.13a64.1 64.1 0 0 1 48.87 0a40 40 0 0 0 34.73-72ZM168 208a24 24 0 0 1-9.45-1.93a80.14 80.14 0 0 0-61.19 0a24 24 0 0 1-20.71-43.26a51.22 51.22 0 0 0 24.46-30.67a28 28 0 0 1 53.78 0a51.27 51.27 0 0 0 24.53 30.71A24 24 0 0 1 168 208"/></svg></span>
+            <span class="tile-text">
+              <span class="tile-label">Kids &amp; pets</span>
+              <span class="tile-benefit">Check on the people who matter, from anywhere.</span>
+            </span>
+          </button>
+
+        </div>
+
+        <div class="card-footer">
+          <button class="btn btn-primary" id="next-1" disabled type="button">Continue <span class="btn-arrow" aria-hidden="true">→</span></button>
+        </div>
+      </div>
+
+      <!-- Card 2: Property -->
+      <div class="card" data-card="2" id="card-2">
+        <h2 class="card-prompt">Where are we setting this up?</h2>
+        <p class="card-help">Pick one.</p>
+        <div class="tile-grid cols-3">
+          <button class="tile" data-property="home" data-key="1" type="button">
+            <span class="tile-key">1</span>
+            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M240 208h-16v-72l2.34 2.34A8 8 0 0 0 237.66 127l-98.35-98.32a16 16 0 0 0-22.62 0L18.34 127a8 8 0 0 0 11.32 11.31L32 136v72H16a8 8 0 0 0 0 16h224a8 8 0 0 0 0-16M48 120l80-80l80 80v88h-48v-56a8 8 0 0 0-8-8h-48a8 8 0 0 0-8 8v56H48Zm96 88h-32v-48h32Z"/></svg></span>
+            <span class="tile-text"><span class="tile-label">Single-family home</span><span class="tile-benefit">Front door, back yard, the whole footprint.</span></span>
+          </button>
+          <button class="tile" data-property="apartment" data-key="2" type="button">
+            <span class="tile-key">2</span>
+            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M240 208h-16V96a16 16 0 0 0-16-16h-64V32a16 16 0 0 0-24.88-13.32L39.12 72A16 16 0 0 0 32 85.34V208H16a8 8 0 0 0 0 16h224a8 8 0 0 0 0-16M208 96v112h-64V96ZM48 85.34L128 32v176H48ZM112 112v16a8 8 0 0 1-16 0v-16a8 8 0 1 1 16 0m-32 0v16a8 8 0 0 1-16 0v-16a8 8 0 1 1 16 0m0 56v16a8 8 0 0 1-16 0v-16a8 8 0 0 1 16 0m32 0v16a8 8 0 0 1-16 0v-16a8 8 0 0 1 16 0"/></svg></span>
+            <span class="tile-text"><span class="tile-label">Apartment or condo</span><span class="tile-benefit">Smaller space, plug-and-play, no wiring.</span></span>
+          </button>
+          <button class="tile" data-property="business" data-key="3" type="button">
+            <span class="tile-key">3</span>
+            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M232 96a8 8 0 0 0-.3-2.2l-14.35-50.2A16.07 16.07 0 0 0 202 32H54a16.07 16.07 0 0 0-15.35 11.6L24.31 93.8A8 8 0 0 0 24 96v16a40 40 0 0 0 16 32v72a8 8 0 0 0 8 8h160a8 8 0 0 0 8-8v-72a40 40 0 0 0 16-32zM54 48h148l11.42 40H42.61Zm50 56h48v8a24 24 0 0 1-48 0Zm-16 0v8a24 24 0 0 1-35.12 21.26a8 8 0 0 0-1.82-1.06A24 24 0 0 1 40 112v-8Zm112 104H56v-56.8a40.6 40.6 0 0 0 8 .8a40 40 0 0 0 32-16a40 40 0 0 0 64 0a40 40 0 0 0 32 16a40.6 40.6 0 0 0 8-.8Zm4.93-75.8a8 8 0 0 0-1.8 1.05A24 24 0 0 1 168 112v-8h48v8a24 24 0 0 1-11.07 20.2"/></svg></span>
+            <span class="tile-text"><span class="tile-label">Office or storefront</span><span class="tile-benefit">Coverage that watches the till and back door.</span></span>
+          </button>
+        </div>
+        <div class="card-footer card-footer-back">
+          <button class="btn btn-ghost" id="back-2" type="button"><span style="display:inline-block;transform:rotate(180deg);">→</span> Back</button>
+          <span class="card-footer-hint">Tap to choose</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Space -->
+      <div class="card" data-card="3" id="card-3">
+        <h2 class="card-prompt">Tell me about the space.</h2>
+        <p class="card-help">Rough numbers are fine. We round up so you're never short on coverage.</p>
+        <div class="space-grid">
+          <div class="space-row" data-row="entrances">
+            <div class="space-left">
+              <span class="space-icon" aria-hidden="true"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M232 216h-24V40a16 16 0 0 0-16-16H64a16 16 0 0 0-16 16v176H24a8 8 0 0 0 0 16h208a8 8 0 0 0 0-16m-40 0h-16V40h16ZM64 40h96v176H64Zm80 92a12 12 0 1 1-12-12a12 12 0 0 1 12 12"/></svg></span>
+              <div class="space-label"><span class="lbl">Entrances</span><span class="sub">Doors that lead outside</span></div>
+            </div>
+            <div class="stepper" role="group" aria-label="Entrances">
+              <button type="button" data-step="entrances" data-delta="-1" aria-label="Decrease">−</button>
+              <span class="val" id="val-entrances">1</span>
+              <button type="button" data-step="entrances" data-delta="1" aria-label="Increase">+</button>
+            </div>
+          </div>
+          <div class="space-row" data-row="rooms">
+            <div class="space-left">
+              <span class="space-icon" aria-hidden="true"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M240 106.17V72a16 16 0 0 0-16-16H32a16 16 0 0 0-16 16v34.17A16 16 0 0 0 8 120v48a16 16 0 0 0 16 16h8v16a8 8 0 0 0 16 0v-16h160v16a8 8 0 0 0 16 0v-16h8a16 16 0 0 0 16-16v-48a16 16 0 0 0-8-13.83M224 104h-8a16 16 0 0 0-16 16v16h-64V72h88ZM120 72v64H56v-16a16 16 0 0 0-16-16h-8V72Zm112 96H24v-48h16v24a8 8 0 0 0 8 8h160a8 8 0 0 0 8-8v-24h16Z"/></svg></span>
+              <div class="space-label"><span class="lbl">Rooms to cover</span><span class="sub">Indoor spaces you want eyes on</span></div>
+            </div>
+            <div class="stepper" role="group" aria-label="Rooms">
+              <button type="button" data-step="rooms" data-delta="-1" aria-label="Decrease">−</button>
+              <span class="val" id="val-rooms">2</span>
+              <button type="button" data-step="rooms" data-delta="1" aria-label="Increase">+</button>
+            </div>
+          </div>
+          <div class="space-row" data-row="garage">
+            <div class="space-left">
+              <span class="space-icon" aria-hidden="true"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M240 192h-8V98.67a16 16 0 0 0-7.12-13.31l-88-58.67a16 16 0 0 0-17.75 0l-88 58.67A16 16 0 0 0 24 98.67V192h-8a8 8 0 0 0 0 16h224a8 8 0 0 0 0-16M40 98.67L128 40l88 58.66V192h-24v-56a8 8 0 0 0-8-8H72a8 8 0 0 0-8 8v56H40ZM176 144v16h-40v-16Zm-56 16H80v-16h40Zm-40 16h40v16H80Zm56 0h40v16h-40Z"/></svg></span>
+              <div class="space-label"><span class="lbl">Garage</span><span class="sub">Detached or attached</span></div>
+            </div>
+            <button class="toggle" type="button" data-toggle="garage" aria-pressed="false" aria-label="Garage"></button>
+          </div>
+          <div class="space-row" data-row="yard">
+            <div class="space-left">
+              <span class="space-icon" aria-hidden="true"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M247.63 47.89a8 8 0 0 0-7.52-7.52c-51.76-3-93.32 12.74-111.18 42.22c-11.8 19.49-11.78 43.16-.16 65.74a71.3 71.3 0 0 0-14.17 27L98.33 159c7.82-16.33 7.52-33.35-1-47.49c-13.2-21.79-43.67-33.47-81.5-31.25a8 8 0 0 0-7.52 7.52c-2.23 37.83 9.46 68.3 31.25 81.5A45.8 45.8 0 0 0 63.44 176A54.6 54.6 0 0 0 87 170.33l25 25V224a8 8 0 0 0 16 0v-29.49a55.6 55.6 0 0 1 12.27-35a73.9 73.9 0 0 0 33.31 8.4a60.9 60.9 0 0 0 31.83-8.86c29.48-17.84 45.26-59.4 42.22-111.16M47.81 155.6C32.47 146.31 23.79 124.32 24 96c28.32-.24 50.31 8.47 59.6 23.81c4.85 8 5.64 17.33 2.46 26.94l-24.41-24.41a8 8 0 0 0-11.31 11.31l24.41 24.41c-9.61 3.18-18.93 2.39-26.94-2.46m149.31-10.22c-13.4 8.11-29.15 8.73-45.15 2l53.69-53.7a8 8 0 0 0-11.31-11.31L140.65 136c-6.76-16-6.15-31.76 2-45.15c13.94-23 47-35.82 89.33-34.83c.96 42.32-11.84 75.42-34.86 89.36"/></svg></span>
+              <div class="space-label"><span class="lbl">Yard or driveway</span><span class="sub">Anywhere outdoors that matters</span></div>
+            </div>
+            <button class="toggle" type="button" data-toggle="yard" aria-pressed="false" aria-label="Yard"></button>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-ghost" id="back-3" type="button"><span style="display:inline-block;transform:rotate(180deg);">→</span> Back</button>
+          <button class="btn btn-primary" id="next-3" type="button">Build my setup <span class="btn-arrow" aria-hidden="true">→</span></button>
+        </div>
+      </div>
+
+    </div>
+
+    <aside class="persistent-chat" id="persistent-chat">
+      <h3 class="pc-title">Or just tell me what you need!</h3>
+      <form class="pc-composer" id="pc-composer">
+        <img class="pc-wyatt" src="assets/wyatt.png" alt="" aria-hidden="true" width="32" height="32">
+        <input class="pc-input" id="pc-input" type="text" autocomplete="off" placeholder="Describe your situation…">
+        <button class="pc-send" type="submit" aria-label="Send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>
+        </button>
+      </form>
+      <div class="pc-browse">
+      <header class="pc-browse-header">
+        <h3 class="pc-browse-title">Our Products</h3>
+      </header>
+      <nav class="pc-collections" aria-label="Shop by category">
+        <a class="pc-collection" href="https://www.wyze.com/collections/cameras">
+          <div class="pc-collection-media"><img src="assets/products/categories/cat-cameras.jpg" alt="" loading="lazy"></div>
+          <div class="pc-collection-content">
+            <h4 class="pc-collection-title">Cameras</h4>
+            <p class="pc-collection-tag">Eyes on what matters.</p>
+            <span class="pc-collection-cta">Home security cams</span>
+          </div>
+        </a>
+        <a class="pc-collection" href="https://www.wyze.com/collections/doorbells-locks">
+          <div class="pc-collection-media"><img src="assets/products/categories/cat-monitoring.jpg" alt="" loading="lazy"></div>
+          <div class="pc-collection-content">
+            <h4 class="pc-collection-title">Doorbells &amp; Locks</h4>
+            <p class="pc-collection-tag">See who's there. Let them in from anywhere.</p>
+            <span class="pc-collection-cta">Front-door security</span>
+          </div>
+        </a>
+        <a class="pc-collection" href="https://www.wyze.com/collections/lighting">
+          <div class="pc-collection-media"><img src="assets/products/categories/cat-smart-homes.jpg" alt="" loading="lazy"></div>
+          <div class="pc-collection-content">
+            <h4 class="pc-collection-title">Lighting</h4>
+            <p class="pc-collection-tag">Set the mood. Save on power.</p>
+            <span class="pc-collection-cta">Smart lighting</span>
+          </div>
+        </a>
+        <a class="pc-collection" href="https://www.wyze.com/collections/health-lifestyle">
+          <div class="pc-collection-media"><img src="assets/products/categories/cat-health.jpg" alt="" loading="lazy"></div>
+          <div class="pc-collection-content">
+            <h4 class="pc-collection-title">Health &amp; Lifestyle</h4>
+            <p class="pc-collection-tag">Reach your goals.</p>
+            <span class="pc-collection-cta">Smart everyday gear</span>
+          </div>
+        </a>
+      </nav>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ════════════════ AI CHAT SHOPPING ════════════════ -->
+<section class="chat" id="chat">
+  <div class="chat-inner">
+
+    <header class="chat-header">
+      <div class="ai-orb" aria-hidden="true"></div>
+      <div class="chat-title-block">
+        <h2 class="chat-title" id="chat-title">Your AI setup</h2>
+        <div class="chat-context" id="chat-context"></div>
+      </div>
+      <button class="chat-reset" id="chat-reset" type="button">Start over</button>
+    </header>
+
+    <div class="thread" id="thread"></div>
+
+    <div class="suggestions" id="suggestions"></div>
+
+    <div class="dock">
+      <form class="composer" id="composer">
+        <input class="composer-input" id="composer-input" type="text" placeholder="Ask anything…" autocomplete="off">
+        <button class="composer-send" id="composer-send" type="submit" aria-label="Send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>
+        </button>
+      </form>
+
+      <aside class="tray" id="tray">
+        <button class="tray-toggle" id="tray-toggle" type="button" aria-expanded="false">
+          <span class="tray-summary">
+            <span class="tray-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-1.5 9H7.5z"/><path d="M6 6 4 3H2"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>
+            </span>
+            <span class="tray-label">
+              <span class="count" id="tray-count">Your bundle is empty</span>
+              <span class="preview" id="tray-preview">Add a product to get started</span>
+            </span>
+          </div>
+          <span class="tray-total" id="tray-total">$0.00</span>
+          <span class="tray-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg></span>
+        </button>
+        <div class="tray-body">
+          <div class="tray-list" id="tray-list"></div>
+          <button class="btn btn-primary tray-checkout" id="tray-checkout" type="button" disabled>Checkout · <span id="tray-checkout-total">$0.00</span></button>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- Compare drawer -->
+<div class="compare-overlay" id="compare-overlay"></div>
+<div class="compare-panel" id="compare-panel">
+  <div class="compare-header">
+    <h3>Compare products</h3>
+    <button class="compare-close" id="compare-close" aria-label="Close">×</button>
+  </div>
+  <div class="compare-body" id="compare-body"></div>
+</div>
+
+<script>
+(() => {
+  // ─────────────────────────────────────────────────────────
+  // WYATT AI ENDPOINT — wyzeos /api/wyatt-chat (DeepSeek-backed)
+  // Override at runtime via <meta name="wyatt-api" content="https://…">
+  // or window.WYATT_API_URL. Falls back to local intent matcher on failure.
+  // ─────────────────────────────────────────────────────────
+  const WYATT_API_URL = (() => {
+    const meta = document.querySelector('meta[name="wyatt-api"]');
+    if (meta && meta.getAttribute('content')) return meta.getAttribute('content');
+    if (typeof window !== 'undefined' && window.WYATT_API_URL) return window.WYATT_API_URL;
+    return 'http://localhost:3100/api/wyatt-chat';
+  })();
+
+  // ─────────────────────────────────────────────────────────
+  // CATALOG — mock Wyze SKUs with benefit-led copy
+  // ─────────────────────────────────────────────────────────
+  const ICONS = {
+    'cam-v4':       '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="20" width="36" height="22" rx="4"/><circle cx="32" cy="31" r="6"/><path d="M48 24h4M48 38h4M32 42v6M22 48h20"/></svg>',
+    'battery-cam':  '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="18" width="32" height="26" rx="6"/><circle cx="32" cy="31" r="7"/><path d="M22 14h4M38 14h4M28 50h8M30 44v6M34 44v6"/></svg>',
+    'doorbell':     '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="12" width="24" height="40" rx="6"/><circle cx="32" cy="26" r="5"/><circle cx="32" cy="42" r="2.5"/></svg>',
+    'cam-pan':      '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="32" r="14"/><circle cx="32" cy="32" r="6"/><path d="M32 14v-4M32 54v-4M14 32h-4M54 32h-4"/></svg>',
+    'floodlight':   '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="14" width="36" height="14" rx="3"/><path d="M20 28v6M32 28v6M44 28v6"/><rect x="22" y="36" width="20" height="12" rx="3"/><circle cx="32" cy="42" r="3"/></svg>',
+    'cam-plus':     '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M32 8 14 16v14c0 12 8 22 18 26 10-4 18-14 18-26V16Z"/><path d="M24 32l6 6 12-12"/></svg>',
+  };
+
+  const CATALOG = {
+    'cam-v4': {
+      id: 'cam-v4', name: 'Wyze Cam v4', price: 35.98,
+      tag: 'Outdoor · Wired',
+      benefit: "2.5K clarity, color night vision, weatherproof. Reads license plates from the driveway.",
+      rating: 4.7,
+      details: [
+        "2.5K QHD video with color night vision",
+        "IP65 weatherproof, indoor or outdoor",
+        "Built-in spotlight you can trigger from the app",
+        "Wired power, 25 ft cable included",
+      ],
+      specs: { resolution: '2.5K', power: 'Wired', weatherproof: 'IP65', spotlight: 'Yes', battery: '—' },
+    },
+    'battery-cam': {
+      id: 'battery-cam', name: 'Battery Cam Pro', price: 89.98,
+      tag: 'Outdoor · Wire-free',
+      benefit: "Wire-free install in minutes. Months of battery. Mounts anywhere.",
+      rating: 4.6,
+      details: [
+        "Up to 6 months on a single charge",
+        "Wire-free magnetic mount, no drilling needed",
+        "2.5K resolution with color night vision",
+        "IP65 weatherproof",
+      ],
+      specs: { resolution: '2.5K', power: 'Battery', weatherproof: 'IP65', spotlight: 'Yes', battery: '6 months' },
+    },
+    'doorbell': {
+      id: 'doorbell', name: 'Video Doorbell Pro', price: 109.98,
+      tag: 'Doorbell',
+      benefit: "See and talk to whoever's at the door, from anywhere.",
+      rating: 4.7,
+      details: [
+        "1440p HD head-to-toe view",
+        "2-way audio with noise cancellation",
+        "Smart package detection",
+        "Wired install, replaces existing doorbell",
+      ],
+      specs: { resolution: '1440p', power: 'Wired', weatherproof: 'IP65', spotlight: '—', battery: '—' },
+    },
+    'cam-pan': {
+      id: 'cam-pan', name: 'Cam Pan v3', price: 45.98,
+      tag: 'Indoor · Pan/tilt',
+      benefit: "Pans 360°. Tracks motion automatically. Quiet enough for nurseries.",
+      rating: 4.5,
+      details: [
+        "Pans 360°, tilts 180°, follows motion",
+        "1080p HD with IR night vision",
+        "Privacy mode hides lens with one tap",
+        "Indoor / covered outdoor use",
+      ],
+      specs: { resolution: '1080p', power: 'Wired', weatherproof: 'IP64', spotlight: '—', battery: '—' },
+    },
+    'floodlight': {
+      id: 'floodlight', name: 'Floodlight v2', price: 94.98,
+      tag: 'Outdoor · Lighted',
+      benefit: "Triggers light + camera the moment someone arrives. Stops trouble before it starts.",
+      rating: 4.6,
+      details: [
+        "2,600 lumen floodlight + 2.5K camera in one",
+        "105 dB siren you can trigger remotely",
+        "Wired, replaces existing porch light",
+        "IP65 weatherproof",
+      ],
+      specs: { resolution: '2.5K', power: 'Wired', weatherproof: 'IP65', spotlight: '2600 lm', battery: '—' },
+    },
+    'cam-plus': {
+      id: 'cam-plus', name: 'Cam Plus Unlimited', price: 99,
+      period: '/year',
+      tag: 'Subscription',
+      benefit: "Smart AI detection on every camera. Full event recording. No clip limits.",
+      rating: 4.8,
+      details: [
+        "Covers unlimited cameras on one account",
+        "Person, package, pet, vehicle detection",
+        "Full-length event recording (vs 12-sec clips)",
+        "Cancel anytime",
+      ],
+      specs: { resolution: '—', power: '—', weatherproof: '—', spotlight: '—', battery: '—' },
+    },
+  };
+
+  const COMPARE_ROWS = [
+    { key: 'resolution',   label: 'Resolution',   best: 'higher' },
+    { key: 'power',        label: 'Power',        best: null },
+    { key: 'weatherproof', label: 'Weatherproof', best: null },
+    { key: 'spotlight',    label: 'Spotlight',    best: null },
+    { key: 'battery',      label: 'Battery life', best: null },
+    { key: 'price',        label: 'Price',        best: 'lower' },
+  ];
+
+  // ─────────────────────────────────────────────────────────
+  // STATE
+  // ─────────────────────────────────────────────────────────
+  const state = {
+    step: 1,
+    mode: null, // 'guided' or 'open'
+    concerns: new Set(),
+    property: null,
+    space: { entrances: 1, rooms: 2, garage: false, yard: false },
+    messages: [],
+    bundle: new Map(), // sku -> qty
+    compareSet: new Set(),
+    productEls: new Map(), // sku -> DOM nodes for "is-removed" toggling
+  };
+
+  // ─────────────────────────────────────────────────────────
+  // DOM refs
+  // ─────────────────────────────────────────────────────────
+  const $stepNum    = document.getElementById('step-num');
+  const $progress   = document.getElementById('progress-fill');
+  const $progressBar= document.querySelector('.progress');
+  const $cards      = document.querySelectorAll('.card');
+  const $nav        = document.getElementById('nav');
+  const $start      = document.getElementById('start');
+  const $chat       = document.getElementById('chat');
+  const $thread     = document.getElementById('thread');
+  const $suggest    = document.getElementById('suggestions');
+  const $context    = document.getElementById('chat-context');
+  const $composer   = document.getElementById('composer');
+  const $input      = document.getElementById('composer-input');
+  const $trayBtn    = document.getElementById('tray-toggle');
+  const $tray       = document.getElementById('tray');
+  const $trayList   = document.getElementById('tray-list');
+  const $trayCount  = document.getElementById('tray-count');
+  const $trayPrev   = document.getElementById('tray-preview');
+  const $trayTotal  = document.getElementById('tray-total');
+  const $trayCO     = document.getElementById('tray-checkout');
+  const $trayCOTot  = document.getElementById('tray-checkout-total');
+  const $cmpOverlay = document.getElementById('compare-overlay');
+  const $cmpPanel   = document.getElementById('compare-panel');
+  const $cmpBody    = document.getElementById('compare-body');
+  const $cmpClose   = document.getElementById('compare-close');
+  const $chatReset  = document.getElementById('chat-reset');
+
+  // ─────────────────────────────────────────────────────────
+  // NAV
+  // ─────────────────────────────────────────────────────────
+  const onScroll = () => {
+    const past = window.scrollY > 60;
+    $nav.classList.toggle('is-scrolled', past);
+    $nav.classList.toggle('is-dark', !past);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  // Mobile hamburger menu
+  const $navToggle = document.getElementById('nav-toggle');
+  const $navMobile = document.getElementById('nav-mobile');
+  if ($navToggle && $navMobile) {
+    const setMenu = (open) => {
+      $navToggle.setAttribute('aria-expanded', String(open));
+      $navToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      $navMobile.classList.toggle('is-open', open);
+      $navMobile.setAttribute('aria-hidden', String(!open));
+      document.body.classList.toggle('nav-open', open);
+    };
+    $navToggle.addEventListener('click', () => {
+      const open = $navToggle.getAttribute('aria-expanded') !== 'true';
+      setMenu(open);
+    });
+    $navMobile.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => setMenu(false));
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && $navMobile.classList.contains('is-open')) setMenu(false);
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // ONBOARDING — step navigation
+  // ─────────────────────────────────────────────────────────
+  const $onboard = document.querySelector('.onboard');
+
+  function goTo(step) {
+    state.step = step;
+    $cards.forEach(c => c.classList.toggle('is-active', +c.dataset.card === step));
+    if (step <= 3 && $stepNum) $stepNum.textContent = step;
+    if ($progress) {
+      const pct = step >= 4 ? 100 : Math.max(0, Math.min(100, (step / 3) * 100));
+      $progress.style.width = pct + '%';
+    }
+    if ($progressBar) $progressBar.setAttribute('aria-valuenow', Math.min(3, step));
+    $onboard.classList.remove('step-1', 'step-2', 'step-3');
+    if (step <= 3) $onboard.classList.add(`step-${step}`);
+    // No scroll-into-view: the cards crossfade in place; preserving the
+    // user's existing scroll position keeps the transition calm.
+  }
+  $onboard.classList.add('step-1');
+
+  // Tile ripple — origin follows the click point so it feels tactile
+  function rippleAt(tile, ev) {
+    const r = tile.getBoundingClientRect();
+    const x = ev ? ((ev.clientX - r.left) / r.width) * 100 : 50;
+    const y = ev ? ((ev.clientY - r.top) / r.height) * 100 : 50;
+    tile.style.setProperty('--rx', x + '%');
+    tile.style.setProperty('--ry', y + '%');
+    tile.classList.remove('is-rippling');
+    void tile.offsetWidth;
+    tile.classList.add('is-rippling');
+    setTimeout(() => tile.classList.remove('is-rippling'), 720);
+  }
+  // Plain disabled-state toggle. The base CSS transition handles the visual
+  // change smoothly when it flips between disabled and enabled.
+  function setNextDisabled(id, disabled) {
+    const btn = document.getElementById(id);
+    if (btn) btn.disabled = disabled;
+  }
+
+  document.querySelectorAll('[data-concern]').forEach(tile => {
+    tile.addEventListener('click', (ev) => {
+      const k = tile.dataset.concern;
+      if (state.concerns.has(k)) state.concerns.delete(k);
+      else state.concerns.add(k);
+      tile.classList.toggle('is-selected', state.concerns.has(k));
+      rippleAt(tile, ev);
+      setNextDisabled('next-1', state.concerns.size === 0);
+    });
+  });
+  document.getElementById('next-1').addEventListener('click', () => goTo(2));
+
+  // Persistent chat launcher — composer carries the typed text into the AI experience
+  document.getElementById('pc-composer').addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const $pcInput = document.getElementById('pc-input');
+    const text = $pcInput.value.trim();
+    state.mode = 'open';
+    openChat(text || null);
+    $pcInput.value = '';
+  });
+
+  // Property tiles auto-advance to step 3. A short transition lock prevents
+  // double-tap during the hand-off, but releases so returning via Back keeps
+  // the selector fully clickable (user can pick a different property).
+  let propertyAdvancing = false;
+  document.querySelectorAll('[data-property]').forEach(tile => {
+    tile.addEventListener('click', (ev) => {
+      if (propertyAdvancing) return;
+      propertyAdvancing = true;
+      state.property = tile.dataset.property;
+      document.querySelectorAll('[data-property]').forEach(t =>
+        t.classList.toggle('is-selected', t === tile)
+      );
+      rippleAt(tile, ev);
+      setTimeout(() => {
+        propertyAdvancing = false;
+        if (state.step === 2) goTo(3);
+      }, 320);
+    });
+  });
+  document.getElementById('back-2').addEventListener('click', () => goTo(1));
+
+  document.querySelectorAll('[data-step]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.step;
+      const delta = +btn.dataset.delta;
+      const prev = state.space[key];
+      const v = Math.max(0, Math.min(20, prev + delta));
+      if (v === prev) return;
+      state.space[key] = v;
+      const valEl = document.getElementById(`val-${key}`);
+      valEl.textContent = v;
+      valEl.classList.remove('is-bumping');
+      void valEl.offsetWidth;
+      valEl.classList.add('is-bumping');
+      setTimeout(() => valEl.classList.remove('is-bumping'), 360);
+      document.querySelector(`[data-step="${key}"][data-delta="-1"]`).disabled = v === 0;
+    });
+  });
+  // Toggle rows — entire container is clickable, not just the visible toggle.
+  // Click on the row (or anywhere inside) flips state once.
+  document.querySelectorAll('.space-row[data-row="garage"], .space-row[data-row="yard"]').forEach(row => {
+    row.addEventListener('click', () => {
+      const key = row.dataset.row;
+      state.space[key] = !state.space[key];
+      const toggle = row.querySelector('.toggle');
+      toggle.classList.toggle('is-on', state.space[key]);
+      toggle.setAttribute('aria-pressed', state.space[key]);
+      row.classList.toggle('is-on', state.space[key]);
+    });
+  });
+  document.getElementById('next-3').addEventListener('click', () => {
+    state.mode = 'guided';
+    openChat();
+  });
+  document.getElementById('back-3').addEventListener('click', () => goTo(2));
+
+  // ─────────────────────────────────────────────────────────
+  // OPEN CHAT — entry from either path
+  // ─────────────────────────────────────────────────────────
+  function openChat(initialText) {
+    $chat.classList.add('is-open');
+    document.body.classList.add('chat-active');
+    renderContext();
+    seedConversation();
+    requestAnimationFrame(() => {
+      $chat.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (initialText) {
+        // Send the user's launcher text into the conversation as their first message
+        setTimeout(() => handleUserMessage(initialText), 720);
+      } else {
+        setTimeout(() => $input.focus({ preventScroll: true }), 600);
+      }
+    });
+  }
+
+  function renderContext() {
+    const labels = {
+      package: 'Package theft', intruders: 'Unwanted visitors',
+      vacation: 'Away from home', family: 'Kids & pets',
+      home: 'Home', apartment: 'Apartment', business: 'Business',
+    };
+    const chips = [];
+    if (state.mode === 'guided') {
+      if (state.property)   chips.push(labels[state.property]);
+      state.concerns.forEach(c => chips.push(labels[c]));
+      if (state.space.entrances) chips.push(`${state.space.entrances} entrance${state.space.entrances === 1 ? '' : 's'}`);
+      if (state.space.rooms)     chips.push(`${state.space.rooms} rooms`);
+      if (state.space.garage)    chips.push('Garage');
+      if (state.space.yard)      chips.push('Yard');
+    } else {
+      chips.push('Open chat');
+    }
+    $context.innerHTML = chips.map(c => `<span class="ctx-chip"><span class="swatch"></span>${c}</span>`).join('');
+  }
+
+  function seedConversation() {
+    $thread.innerHTML = '';
+    state.bundle.clear();
+    state.compareSet.clear();
+    state.productEls.clear();
+    state.messages = [];
+
+    if (state.mode === 'open') {
+      pushAI({
+        text: `Hey, glad you're here. Tell me what's going on. A package keeps disappearing? Worried about the kids while you're at work? Just describe the situation in your own words and I'll figure out the right cameras with you.`,
+      });
+      setSuggestions([
+        "I'm getting packages stolen",
+        "I want to check on my dog",
+        "Coverage for a small rental",
+        "I just want a doorbell",
+      ]);
+    } else {
+      const concerns = [...state.concerns];
+      const propLabel = { home: 'home', apartment: 'apartment', business: 'business' }[state.property] || 'space';
+      const concernPhrase = concerns.length
+        ? concerns.map(c => ({
+            package: 'package theft',
+            intruders: 'unwanted visitors',
+            vacation: 'coverage while you\'re away',
+            family: 'keeping eyes on family',
+          }[c])).filter(Boolean).join(', ').replace(/, ([^,]*)$/, ' and $1')
+        : 'general security';
+
+      const initialBundle = pickInitialBundle();
+      pushAI({
+        text: `Based on ${concernPhrase} in your ${propLabel}, here's where I'd start. This covers your ${state.space.entrances} entrance${state.space.entrances === 1 ? '' : 's'}${state.space.yard ? ', the yard' : ''}${state.space.garage ? ', the garage' : ''}, and ${state.space.rooms} indoor room${state.space.rooms === 1 ? '' : 's'}.`,
+        bundle: { title: 'Recommended setup', items: initialBundle, note: 'Free shipping. 30-day returns.' },
+      });
+      initialBundle.forEach(({ sku, qty }) => addToBundle(sku, qty, false));
+      setSuggestions([
+        "Make it cheaper",
+        "Add a doorbell",
+        "Why Cam Plus?",
+        "Compare these cameras",
+        "I want wire-free",
+      ]);
+    }
+
+    renderTray();
+  }
+
+  function pickInitialBundle() {
+    const items = [];
+    // Outdoor coverage: one cam per entrance (cap 3)
+    const outdoorCount = Math.min(3, Math.max(1, state.space.entrances));
+    items.push({ sku: 'cam-v4', qty: outdoorCount });
+    // Doorbell if there's a front entrance
+    if (state.concerns.has('package') || state.concerns.has('intruders')) {
+      items.push({ sku: 'doorbell', qty: 1 });
+    }
+    // Indoor for family / pets
+    if (state.concerns.has('family') || state.space.rooms >= 2) {
+      items.push({ sku: 'cam-pan', qty: Math.min(2, state.space.rooms || 1) });
+    }
+    // Floodlight if yard
+    if (state.space.yard) {
+      items.push({ sku: 'floodlight', qty: 1 });
+    }
+    // Battery cam for vacation (wire-free remote install)
+    if (state.concerns.has('vacation') && !state.space.garage) {
+      items.push({ sku: 'battery-cam', qty: 1 });
+    }
+    // Cam Plus always (subscription is the strategy)
+    items.push({ sku: 'cam-plus', qty: 1 });
+    return items;
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // MESSAGE RENDERING
+  // ─────────────────────────────────────────────────────────
+  function pushAI({ text, bundle }) {
+    const msg = el('div', 'msg msg-ai');
+    msg.appendChild(el('div', 'msg-avatar'));
+    const body = el('div', 'msg-body');
+    if (text) {
+      const paras = text.split('\n').filter(Boolean);
+      paras.forEach(p => {
+        const pEl = el('p');
+        pEl.textContent = p;
+        body.appendChild(pEl);
+      });
+    }
+    if (bundle) {
+      body.appendChild(renderBundleBlock(bundle));
+    }
+    msg.appendChild(body);
+    $thread.appendChild(msg);
+    scrollThreadIntoView();
+  }
+
+  function pushUser(text) {
+    const msg = el('div', 'msg msg-user');
+    const body = el('div', 'msg-body');
+    const p = el('p'); p.textContent = text;
+    body.appendChild(p);
+    msg.appendChild(body);
+    $thread.appendChild(msg);
+    scrollThreadIntoView();
+  }
+
+  function pushTyping() {
+    const msg = el('div', 'msg msg-ai');
+    msg.id = 'typing-msg';
+    msg.appendChild(el('div', 'msg-avatar'));
+    const body = el('div', 'msg-body');
+    body.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+    msg.appendChild(body);
+    $thread.appendChild(msg);
+    scrollThreadIntoView();
+  }
+  function removeTyping() {
+    const t = document.getElementById('typing-msg');
+    if (t) t.remove();
+  }
+
+  function renderBundleBlock({ title, items, note }) {
+    const wrap = el('div', 'bundle-block');
+    const hdr = el('div', 'bundle-block-header');
+    hdr.innerHTML = `<span>${title}</span><span class="tag"><span class="swatch"></span>AI selected</span>`;
+    wrap.appendChild(hdr);
+
+    const list = el('div', 'product-list');
+    items.forEach(({ sku, qty }) => list.appendChild(renderProduct(sku, qty)));
+    wrap.appendChild(list);
+
+    const sub = items.reduce((s, { sku, qty }) => s + (CATALOG[sku].period ? 0 : CATALOG[sku].price * qty), 0);
+    const sub_sub = items.filter(i => CATALOG[i.sku].period).map(i => `${money(CATALOG[i.sku].price)}${CATALOG[i.sku].period}`).join(' · ');
+    const ftr = el('div', 'bundle-block-footer');
+    ftr.innerHTML = `
+      <span class="meta">${items.length} item${items.length === 1 ? '' : 's'}${sub_sub ? ' + ' + sub_sub : ''}${note ? ' · ' + note : ''}</span>
+      <span class="total">${money(sub)}</span>
+    `;
+    wrap.appendChild(ftr);
+    return wrap;
+  }
+
+  function renderProduct(sku, qty = 1) {
+    const p = CATALOG[sku];
+    const wrap = el('div', 'product');
+    wrap.dataset.sku = sku;
+    wrap.innerHTML = `
+      <div class="product-media">${ICONS[sku]}</div>
+      <div class="product-info">
+        <span class="product-tag">${p.tag}</span>
+        <h3 class="product-name">${p.name}${qty > 1 ? ' <span style="color:var(--ink-3);font-weight:500;">× ' + qty + '</span>' : ''}</h3>
+        <p class="product-benefit">${p.benefit}</p>
+        <div class="product-meta">
+          <span class="product-price">${money(p.price)}${p.period ? '<span class="period">' + p.period + '</span>' : ''}</span>
+          <span class="product-rating"><span class="star">★</span> ${p.rating}</span>
+        </div>
+        <div class="product-actions">
+          <button class="chip" data-action="learn">Learn more</button>
+          <button class="chip" data-action="compare">Compare</button>
+          <button class="chip" data-action="remove">Remove</button>
+        </div>
+        <div class="product-details">
+          <ul>${p.details.map(d => `<li>${d}</li>`).join('')}</ul>
+        </div>
+      </div>
+    `;
+
+    wrap.querySelector('[data-action="learn"]').addEventListener('click', () => {
+      const d = wrap.querySelector('.product-details');
+      const isOpen = d.classList.toggle('is-open');
+      wrap.querySelector('[data-action="learn"]').textContent = isOpen ? 'Hide details' : 'Learn more';
+    });
+    wrap.querySelector('[data-action="compare"]').addEventListener('click', (e) => {
+      toggleCompare(sku, e.currentTarget);
+    });
+    wrap.querySelector('[data-action="remove"]').addEventListener('click', () => {
+      removeFromBundle(sku);
+      wrap.classList.add('is-removed');
+    });
+
+    // Track DOM so we can sync "is-removed" if removed from tray
+    if (!state.productEls.has(sku)) state.productEls.set(sku, []);
+    state.productEls.get(sku).push(wrap);
+
+    return wrap;
+  }
+
+  function scrollThreadIntoView() {
+    requestAnimationFrame(() => {
+      const last = $thread.lastElementChild;
+      if (last) last.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // BUNDLE / TRAY
+  // ─────────────────────────────────────────────────────────
+  function addToBundle(sku, qty = 1, render = true) {
+    state.bundle.set(sku, (state.bundle.get(sku) || 0) + qty);
+    if (render) renderTray();
+  }
+  function removeFromBundle(sku) {
+    state.bundle.delete(sku);
+    // Mark all on-screen instances as removed
+    (state.productEls.get(sku) || []).forEach(node => node.classList.add('is-removed'));
+    renderTray();
+  }
+
+  function renderTray() {
+    const entries = [...state.bundle.entries()];
+    const totalItems = entries.reduce((s, [, q]) => s + q, 0);
+    const totalHardware = entries
+      .filter(([sku]) => !CATALOG[sku].period)
+      .reduce((s, [sku, q]) => s + CATALOG[sku].price * q, 0);
+    const sub = entries.filter(([sku]) => CATALOG[sku].period).map(([sku]) => `${money(CATALOG[sku].price)}${CATALOG[sku].period}`).join(' · ');
+
+    $trayCount.textContent = totalItems === 0
+      ? 'Your bundle is empty'
+      : `${totalItems} item${totalItems === 1 ? '' : 's'} in your bundle`;
+    $trayPrev.textContent = totalItems === 0
+      ? 'Add a product to get started'
+      : entries.map(([sku, q]) => `${CATALOG[sku].name}${q > 1 ? ' ×' + q : ''}`).join(' · ');
+    $trayTotal.textContent = money(totalHardware) + (sub ? '' : '');
+    $trayCOTot.textContent = money(totalHardware);
+    $trayCO.disabled = totalItems === 0;
+
+    $trayList.innerHTML = '';
+    entries.forEach(([sku, q]) => {
+      const p = CATALOG[sku];
+      const row = el('div', 'tray-item');
+      row.innerHTML = `
+        <span class="ti-icon">${ICONS[sku]}</span>
+        <span class="ti-text">
+          <div class="ti-name">${p.name}</div>
+          <div class="ti-qty">${p.tag}${q > 1 ? ' · ×' + q : ''}${p.period ? ' · ' + p.period : ''}</div>
+        </span>
+        <span class="ti-price">${money(p.price * q)}</span>
+        <button class="ti-remove" type="button" aria-label="Remove">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+        </button>
+      `;
+      row.querySelector('.ti-remove').addEventListener('click', () => removeFromBundle(sku));
+      $trayList.appendChild(row);
+    });
+  }
+
+  $trayBtn.addEventListener('click', () => {
+    const open = $tray.classList.toggle('is-open');
+    $trayBtn.setAttribute('aria-expanded', open);
+  });
+
+  // ─────────────────────────────────────────────────────────
+  // COMPARE
+  // ─────────────────────────────────────────────────────────
+  function toggleCompare(sku, btnEl) {
+    if (state.compareSet.has(sku)) state.compareSet.delete(sku);
+    else if (state.compareSet.size < 3) state.compareSet.add(sku);
+    else return; // cap at 3
+    // Sync all compare chips for this sku visually
+    document.querySelectorAll(`.product[data-sku="${sku}"] [data-action="compare"]`).forEach(c => {
+      c.classList.toggle('is-on', state.compareSet.has(sku));
+    });
+    if (state.compareSet.size >= 2) openCompare();
+  }
+  function openCompare() {
+    const skus = [...state.compareSet];
+    $cmpBody.style.setProperty('--cols', skus.length);
+    if (skus.length < 2) {
+      $cmpBody.innerHTML = '<div class="compare-empty">Pick at least two products to compare.</div>';
+    } else {
+      const head = '<div class="row-label"></div>' + skus.map(s => `<div class="product-col-header">${CATALOG[s].name}</div>`).join('');
+      const rows = COMPARE_ROWS.map(r => {
+        const cells = skus.map(s => {
+          const v = r.key === 'price' ? money(CATALOG[s].price) : (CATALOG[s].specs[r.key] || '—');
+          return v;
+        });
+        let bestIdx = -1;
+        if (r.best === 'lower') {
+          const nums = skus.map(s => CATALOG[s].price);
+          bestIdx = nums.indexOf(Math.min(...nums));
+        }
+        return `<div class="row-label">${r.label}</div>` + cells.map((v, i) =>
+          `<div class="cell${i === bestIdx ? ' best' : ''}">${v}</div>`).join('');
+      }).join('');
+      $cmpBody.innerHTML = `<div class="compare-table" style="--cols:${skus.length}">${head}${rows}</div>`;
+    }
+    $cmpOverlay.classList.add('is-open');
+    $cmpPanel.classList.add('is-open');
+  }
+  function closeCompare() {
+    $cmpOverlay.classList.remove('is-open');
+    $cmpPanel.classList.remove('is-open');
+  }
+  $cmpOverlay.addEventListener('click', closeCompare);
+  $cmpClose.addEventListener('click', closeCompare);
+
+  // ─────────────────────────────────────────────────────────
+  // COMPOSER + INTENT ROUTING
+  // ─────────────────────────────────────────────────────────
+  function setSuggestions(items) {
+    $suggest.innerHTML = '';
+    items.forEach(s => {
+      const b = el('button', 'suggestion');
+      b.type = 'button';
+      b.textContent = s;
+      b.addEventListener('click', () => handleUserMessage(s));
+      $suggest.appendChild(b);
+    });
+  }
+
+  $composer.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const v = $input.value.trim();
+    if (!v) return;
+    $input.value = '';
+    handleUserMessage(v);
+  });
+
+  async function handleUserMessage(text) {
+    pushUser(text);
+    state.messages.push({ role: 'user', content: text });
+    setSuggestions([]); // hide while AI thinks
+    pushTyping();
+    try {
+      await respondTo(text);
+    } finally {
+      removeTyping();
+    }
+  }
+
+  const INTENTS = [
+    {
+      match: /(cheap|afford|budget|save|less|lower price)/i,
+      run: () => {
+        // Swap pricier picks for cheaper alternatives
+        const swaps = [];
+        if (state.bundle.has('battery-cam')) {
+          removeFromBundle('battery-cam'); addToBundle('cam-v4', 1); swaps.push('Battery Cam Pro → wired Cam v4');
+        }
+        if (state.bundle.has('floodlight')) {
+          removeFromBundle('floodlight'); addToBundle('cam-v4', 1); swaps.push('Floodlight v2 → Cam v4 with built-in spotlight');
+        }
+        if (state.bundle.has('doorbell')) {
+          removeFromBundle('doorbell'); swaps.push('Removed the doorbell — your front Cam v4 already covers the door');
+        }
+        const items = currentBundleItems();
+        pushAI({
+          text: swaps.length
+            ? `Done. Trimmed the setup:\n${swaps.map(s => '• ' + s).join('\n')}\n\nSame coverage on the essentials, lower upfront cost.`
+            : `You're already on a tight build. The biggest lever left is dropping Cam Plus and using free 12-second clips instead, but you'd lose AI alerts.`,
+          bundle: items.length ? { title: 'Budget setup', items } : null,
+        });
+        setSuggestions(["Drop Cam Plus", "Add a doorbell back", "Compare cameras", "I want better night vision"]);
+      },
+    },
+    {
+      match: /(indoor|inside|room|nursery|kid|pet|dog|cat|baby)/i,
+      run: () => {
+        if (!state.bundle.has('cam-pan')) addToBundle('cam-pan', 2);
+        pushAI({
+          text: `Added 2 Cam Pan v3 for indoor coverage. They follow motion automatically, so you don't need one in every corner. Quiet enough for a nursery, with privacy mode for when you want the lens off.`,
+          bundle: { title: 'Indoor add-on', items: [{ sku: 'cam-pan', qty: 2 }] },
+        });
+        setSuggestions(["Just one Cam Pan", "What about night vision?", "Add a doorbell", "Make it cheaper"]);
+      },
+    },
+    {
+      match: /(doorbell|door)/i,
+      run: () => {
+        if (!state.bundle.has('doorbell')) addToBundle('doorbell', 1);
+        pushAI({
+          text: `Video Doorbell Pro it is. Replaces your existing doorbell (wired), gives you a head-to-toe 1440p view, and pings your phone the moment someone steps on the porch. It also flags packages automatically.`,
+          bundle: { title: 'Doorbell pick', items: [{ sku: 'doorbell', qty: 1 }] },
+        });
+        setSuggestions(["Wire-free options?", "Does it work without Cam Plus?", "Compare with Cam v4", "Checkout"]);
+      },
+    },
+    {
+      match: /(flood|outdoor light|porch light|deter)/i,
+      run: () => {
+        if (!state.bundle.has('floodlight')) addToBundle('floodlight', 1);
+        pushAI({
+          text: `Added Floodlight v2. 2,600 lumens of light plus a 2.5K camera in one fixture. It triggers the moment something moves, which scares off most opportunists before they get close.`,
+          bundle: { title: 'Floodlight add-on', items: [{ sku: 'floodlight', qty: 1 }] },
+        });
+        setSuggestions(["Compare with Cam v4 spotlight", "Add a doorbell", "Make it cheaper", "Checkout"]);
+      },
+    },
+    {
+      match: /(wire.?free|battery|wireless)/i,
+      run: () => {
+        // Swap wired cam-v4 for battery cam
+        let n = state.bundle.get('cam-v4') || 0;
+        if (n > 0) {
+          removeFromBundle('cam-v4');
+          addToBundle('battery-cam', Math.min(n, 2));
+        } else if (!state.bundle.has('battery-cam')) {
+          addToBundle('battery-cam', 1);
+        }
+        pushAI({
+          text: `Switched to Battery Cam Pro. Six months on a single charge, magnetic mount, no drilling. Same 2.5K resolution as Cam v4. Worth it if you're renting or don't want to run cables.`,
+          bundle: { title: 'Wire-free setup', items: [{ sku: 'battery-cam', qty: state.bundle.get('battery-cam') || 1 }] },
+        });
+        setSuggestions(["How long does the battery last?", "What about cold weather?", "Add a doorbell", "Compare"]);
+      },
+    },
+    {
+      match: /(compare|differ|which.+better|vs)/i,
+      run: () => {
+        const skus = [...state.bundle.keys()].filter(s => !CATALOG[s].period).slice(0, 3);
+        skus.forEach(s => state.compareSet.add(s));
+        document.querySelectorAll('.product').forEach(p => {
+          const sku = p.dataset.sku;
+          const chip = p.querySelector('[data-action="compare"]');
+          if (chip) chip.classList.toggle('is-on', state.compareSet.has(sku));
+        });
+        pushAI({ text: `Here's a side-by-side of the cameras in your bundle. Best in each row is highlighted.` });
+        openCompare();
+        setSuggestions(["Show me cheaper", "Add wire-free", "Why Cam Plus?", "Checkout"]);
+      },
+    },
+    {
+      match: /(cam plus|subscription|plan|why pay|monthly)/i,
+      run: () => {
+        if (!state.bundle.has('cam-plus')) addToBundle('cam-plus', 1);
+        pushAI({
+          text: `Cam Plus turns the cameras from "motion clip recorder" into "smart assistant." It adds person, package, pet, and vehicle detection, and lets you record the full event instead of a 12-second clip. One subscription covers every camera on your account. Cancel anytime.`,
+          bundle: { title: 'Why Cam Plus', items: [{ sku: 'cam-plus', qty: 1 }] },
+        });
+        setSuggestions(["Drop Cam Plus", "What does it cost?", "What about free tier?", "Checkout"]);
+      },
+    },
+    {
+      match: /(drop|remove|skip).*cam.?plus/i,
+      run: () => {
+        removeFromBundle('cam-plus');
+        pushAI({
+          text: `Dropped Cam Plus. You'll still get 12-second event clips on free, just without the AI alerts and full-length recording. You can add it back any time from the app.`,
+        });
+        setSuggestions(["Add Cam Plus back", "What do I lose?", "Make it cheaper", "Checkout"]);
+      },
+    },
+    {
+      match: /(night|dark|low.?light)/i,
+      run: () => {
+        pushAI({
+          text: `Every camera in your bundle has color night vision — meaning you see actual color, not green ghost-vision. Cam v4 and Floodlight v2 add a built-in spotlight that auto-triggers when someone gets close, so you can read plates and clothing in pitch dark.`,
+        });
+        setSuggestions(["Compare resolution", "Add a Floodlight", "What about IR?", "Checkout"]);
+      },
+    },
+    {
+      match: /(install|setup|hard to install|drilling|wire|electrician)/i,
+      run: () => {
+        pushAI({
+          text: `Most of this is DIY. The wired cameras need a power outlet within 25 ft. Battery Cam Pro and most indoor cams just need wifi and a flat surface. The doorbell and floodlight replace your existing fixtures, which is screwdriver-level if you're comfortable, or 15 minutes for a handyman.`,
+        });
+        setSuggestions(["I want wire-free", "Add a Floodlight", "Compare doorbells", "Checkout"]);
+      },
+    },
+    {
+      match: /(steal|stolen|theft|porch pirate|amazon)/i,
+      run: () => {
+        if (!state.bundle.has('doorbell')) addToBundle('doorbell', 1);
+        if (!state.bundle.has('cam-plus')) addToBundle('cam-plus', 1);
+        pushAI({
+          text: `Sorry about that. Two changes: I added Video Doorbell Pro — it has smart package detection and pings your phone the second something is dropped off (or picked up by the wrong person). And I made sure Cam Plus is in, since the AI package alerts only work with it.`,
+          bundle: { title: 'Anti-theft additions', items: [{ sku: 'doorbell', qty: 1 }, { sku: 'cam-plus', qty: 1 }] },
+        });
+        setSuggestions(["Add a floodlight too", "Compare doorbells", "What about hiding it?", "Checkout"]);
+      },
+    },
+    {
+      match: /(checkout|buy|purchase|order)/i,
+      run: () => {
+        pushAI({ text: `Hit the checkout button in the bundle below and we'll take it from there. Free shipping over $50, 30-day returns on hardware, cancel Cam Plus any time.` });
+        $tray.classList.add('is-open');
+        $trayBtn.setAttribute('aria-expanded', 'true');
+        setSuggestions(["Add anything else?", "What about a warranty?", "Compare what's in here", "Make it cheaper"]);
+      },
+    },
+  ];
+
+  // Map a single bundle_ops entry from the AI into our existing tray helpers.
+  function applyBundleOp({ op, sku, qty }) {
+    if (!CATALOG[sku]) return;
+    if (op === 'remove') return removeFromBundle(sku);
+    if (op === 'set') {
+      if (state.bundle.has(sku)) removeFromBundle(sku);
+      if ((qty ?? 0) > 0) addToBundle(sku, qty, false);
+      return;
+    }
+    // default: add (or merge qty)
+    addToBundle(sku, qty || 1, false);
+  }
+
+  // Snapshot the live bundle for the server.
+  function bundleSnapshot() {
+    return [...state.bundle.entries()].map(([sku, qty]) => ({ sku, qty }));
+  }
+
+  // Snapshot the user's context (guided answers OR open-chat marker).
+  function contextSnapshot() {
+    if (state.mode === 'guided') {
+      return {
+        mode: 'guided',
+        concerns: [...state.concerns],
+        property: state.property,
+        space: { ...state.space },
+      };
+    }
+    return { mode: 'open' };
+  }
+
+  async function respondTo(text) {
+    // Try the wyzeos AI endpoint first. Fall back to local INTENTS if it 404s,
+    // times out, CORS-rejects, or returns malformed payload.
+    try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 12000);
+      const res = await fetch(WYATT_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: state.messages,
+          context: contextSnapshot(),
+          bundle: bundleSnapshot(),
+        }),
+        signal: ctrl.signal,
+      });
+      clearTimeout(timer);
+      if (!res.ok) throw new Error('Wyatt API returned ' + res.status);
+      const data = await res.json();
+      if (!data || typeof data.reply !== 'string') throw new Error('Bad Wyatt payload');
+
+      // Apply bundle changes, collect SKUs added so we can render a fresh bundle block.
+      const skusTouched = new Set();
+      (data.bundleOps || []).forEach(op => {
+        applyBundleOp(op);
+        if (op && op.op !== 'remove' && op.sku) skusTouched.add(op.sku);
+      });
+      renderTray();
+
+      const items = [...skusTouched]
+        .filter(sku => state.bundle.has(sku))
+        .map(sku => ({ sku, qty: state.bundle.get(sku) }));
+
+      pushAI({
+        text: data.reply,
+        bundle: items.length ? { title: 'Updated picks', items } : null,
+      });
+
+      const suggestions = Array.isArray(data.suggestions) && data.suggestions.length
+        ? data.suggestions.slice(0, 4)
+        : ['Make it cheaper', 'Add a doorbell', 'Why Cam Plus?', 'Checkout'];
+      setSuggestions(suggestions);
+
+      // Record assistant turn for the next round.
+      state.messages.push({ role: 'assistant', content: data.reply });
+      return;
+    } catch (err) {
+      // Quiet — fall through to local intents.
+      console.warn('[wyatt] falling back to local intents:', err && err.message);
+    }
+
+    // Local fallback (preserves the original demo flow).
+    const intent = INTENTS.find(i => i.match.test(text));
+    if (intent) {
+      intent.run();
+    } else {
+      pushAI({
+        text: `Got it. I can help with the setup — try things like "make it cheaper," "add a doorbell," "I want wire-free," or "what is Cam Plus."`,
+      });
+      setSuggestions(["Make it cheaper", "Add a doorbell", "What is Cam Plus?", "I want wire-free"]);
+    }
+    // Record a generic assistant turn so the transcript still grows.
+    state.messages.push({ role: 'assistant', content: '(local fallback response)' });
+  }
+
+  function currentBundleItems() {
+    return [...state.bundle.entries()].map(([sku, qty]) => ({ sku, qty }));
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // RESET
+  // ─────────────────────────────────────────────────────────
+  $chatReset.addEventListener('click', () => {
+    $chat.classList.remove('is-open');
+    document.body.classList.remove('chat-active');
+    state.concerns.clear();
+    state.property = null;
+    state.space = { entrances: 1, rooms: 2, garage: false, yard: false };
+    state.bundle.clear();
+    state.compareSet.clear();
+    state.productEls.clear();
+    state.messages = [];
+    state.mode = null;
+    document.querySelectorAll('.tile.is-selected').forEach(t => t.classList.remove('is-selected'));
+    document.querySelectorAll('[data-property]').forEach(t => { t.style.pointerEvents = ''; });
+    document.querySelectorAll('.toggle.is-on').forEach(t => { t.classList.remove('is-on'); t.closest('.space-row').classList.remove('is-on'); });
+    document.getElementById('val-entrances').textContent = '1';
+    document.getElementById('val-rooms').textContent = '2';
+    document.getElementById('next-1').disabled = true;
+    goTo(1);
+    $start.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // ─────────────────────────────────────────────────────────
+  // KEYBOARD
+  // ─────────────────────────────────────────────────────────
+  document.addEventListener('keydown', (e) => {
+    if ($chat.classList.contains('is-open')) return; // chat owns the input
+    if (state.step > 3) return;
+    if (e.key === 'Enter') {
+      const next = document.getElementById(`next-${state.step}`);
+      if (next && !next.disabled) next.click();
+      return;
+    }
+    if (e.key === 'Backspace' || e.key === 'Escape') {
+      const back = document.getElementById(`back-${state.step}`);
+      if (back) back.click();
+      return;
+    }
+    if (state.step === 1) {
+      const tile = document.querySelector(`[data-concern][data-key="${e.key}"]`);
+      if (tile) tile.click();
+    } else if (state.step === 2) {
+      const tile = document.querySelector(`[data-property][data-key="${e.key}"]`);
+      if (tile) tile.click();
+    }
+  });
+
+  // ─────────────────────────────────────────────────────────
+  // PLANS — smooth scroll from "Our Plans" CTA + infinite swipe carousel
+  // ─────────────────────────────────────────────────────────
+  document.querySelectorAll('[data-plans-jump]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      const sec = document.getElementById('plans-compare');
+      if (!sec) return;
+      const top = sec.getBoundingClientRect().top + window.pageYOffset - 8;
+      window.scrollTo({ top, behavior: 'smooth' });
+    });
+  });
+
+  (function setupPlansCarousel() {
+    const track = document.querySelector('[data-carousel="plans"]');
+    if (!track) return;
+    const dotsWrap = document.querySelector('.plans-dots');
+    const cards = Array.from(track.querySelectorAll('.plan-card'));
+    if (cards.length < 2) return;
+
+    const firstClone = cards[0].cloneNode(true);
+    const lastClone = cards[cards.length - 1].cloneNode(true);
+    firstClone.classList.add('is-clone');
+    lastClone.classList.add('is-clone');
+    firstClone.setAttribute('aria-hidden', 'true');
+    lastClone.setAttribute('aria-hidden', 'true');
+    track.appendChild(firstClone);
+    track.insertBefore(lastClone, cards[0]);
+
+    const allCards = Array.from(track.querySelectorAll('.plan-card'));
+    const realCount = cards.length;
+    const isMobile = () => window.matchMedia('(max-width: 819.98px)').matches;
+
+    const getCardCenter = (card) => {
+      const r = card.getBoundingClientRect();
+      const tr = track.getBoundingClientRect();
+      return track.scrollLeft + (r.left - tr.left) + r.width / 2;
+    };
+    const scrollToCard = (idx, smooth) => {
+      const card = allCards[idx];
+      if (!card) return;
+      const center = getCardCenter(card);
+      const target = Math.max(0, center - track.clientWidth / 2);
+      try { track.scrollTo({ left: target, behavior: smooth ? 'smooth' : 'auto' }); }
+      catch (_) { track.scrollLeft = target; }
+    };
+    const findCenteredIndex = () => {
+      const vc = track.scrollLeft + track.clientWidth / 2;
+      let nearest = 1, bestDist = Infinity;
+      allCards.forEach((c, i) => {
+        const d = Math.abs(getCardCenter(c) - vc);
+        if (d < bestDist) { bestDist = d; nearest = i; }
+      });
+      return nearest;
+    };
+    const setActiveDot = (realIdx) => {
+      if (!dotsWrap) return;
+      dotsWrap.querySelectorAll('.plans-dot').forEach((d, i) => {
+        d.classList.toggle('is-active', i === realIdx);
+      });
+    };
+
+    let scrollIdle = null;
+    track.addEventListener('scroll', () => {
+      const idx = findCenteredIndex();
+      let realIdx = idx - 1;
+      if (idx === 0) realIdx = realCount - 1;
+      else if (idx === allCards.length - 1) realIdx = 0;
+      setActiveDot(realIdx);
+      if (scrollIdle) clearTimeout(scrollIdle);
+      scrollIdle = setTimeout(() => {
+        const settled = findCenteredIndex();
+        if (settled === 0) scrollToCard(realCount, false);
+        else if (settled === allCards.length - 1) scrollToCard(1, false);
+      }, 140);
+    }, { passive: true });
+
+    if (dotsWrap) {
+      dotsWrap.querySelectorAll('.plans-dot').forEach((dot) => {
+        dot.addEventListener('click', () => {
+          const target = parseInt(dot.dataset.dot || '0', 10);
+          scrollToCard(target + 1, true);
+        });
+      });
+    }
+
+    let wasMobile = isMobile();
+    window.addEventListener('resize', () => {
+      const nowMobile = isMobile();
+      if (nowMobile !== wasMobile) {
+        wasMobile = nowMobile;
+        if (nowMobile) scrollToCard(1, false);
+      } else if (nowMobile) {
+        const idx = findCenteredIndex();
+        scrollToCard(idx, false);
+      }
+    });
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (isMobile()) scrollToCard(1, false);
+    }));
+    track.querySelectorAll('img').forEach(img => {
+      if (!img.complete) {
+        img.addEventListener('load', () => { if (isMobile()) scrollToCard(1, false); }, { once: true });
+      }
+    });
+  })();
+
+  // ─────────────────────────────────────────────────────────
+  // ALERTS VIDEO — play when scrolled into view, controls on hover/tap
+  // ─────────────────────────────────────────────────────────
+  const alertsVid = document.querySelector('.alerts-spot-media');
+  if (alertsVid) {
+    // Start muted from frame 0 on every entry so the user always sees the full demo
+    let userInteracted = false;
+    const playFromStart = () => {
+      if (userInteracted) { alertsVid.play().catch(() => {}); return; }
+      try { alertsVid.currentTime = 0; } catch (_) {}
+      alertsVid.play().catch(() => {});
+    };
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            playFromStart();
+          } else if (!userInteracted) {
+            alertsVid.pause();
+          }
+        });
+      }, { threshold: 0.25 });
+      io.observe(alertsVid);
+    } else {
+      // Fallback: just start it once metadata is ready
+      alertsVid.addEventListener('loadedmetadata', playFromStart, { once: true });
+    }
+    // Any direct user interaction (click/scrub/fullscreen) takes over from auto-pause
+    ['play', 'seeking', 'volumechange'].forEach((evt) => {
+      alertsVid.addEventListener(evt, () => { userInteracted = true; });
+    });
+
+    const showControls = () => {
+      if (alertsVid.controls) return;
+      alertsVid.controls = true;
+      alertsVid.setAttribute('controlsList', 'nodownload');
+    };
+    const hideControls = () => {
+      if (!alertsVid.controls) return;
+      // Don't hide while fullscreen, paused, or actively interacted with
+      if (document.fullscreenElement === alertsVid) return;
+      if (alertsVid.paused) return;
+      alertsVid.controls = false;
+    };
+    // Mouse/pen: hover reveals, leave hides (browser also auto-hides during playback)
+    alertsVid.addEventListener('pointerenter', (e) => {
+      if (e.pointerType !== 'touch') showControls();
+    });
+    alertsVid.addEventListener('pointerleave', (e) => {
+      if (e.pointerType !== 'touch') hideControls();
+    });
+    // Touch / click fallback
+    alertsVid.addEventListener('click', showControls);
+    alertsVid.addEventListener('touchstart', showControls, { passive: true });
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // HERO GALLERY ARROWS — visible only when the rail is scrollable;
+  // sit over the peek strip on either side and snap one card at a time.
+  // ─────────────────────────────────────────────────────────
+  (function setupHeroArrows() {
+    const gallery = document.querySelector('.hero-gallery');
+    const prev = document.querySelector('.hero-arrow.prev');
+    const next = document.querySelector('.hero-arrow.next');
+    if (!gallery || !prev || !next) return;
+    const cardWidth = () => {
+      const card = gallery.querySelector('.hero-card');
+      return card ? card.getBoundingClientRect().width : gallery.clientWidth;
+    };
+    // How many cards make a "page" — 1 at mobile single-col, 2 at the medium 2-up,
+    // derived from how many cards (mostly) fit in the gallery viewport.
+    const pageStep = () => {
+      const w = cardWidth();
+      if (!w) return gallery.clientWidth;
+      const n = Math.max(1, Math.floor(gallery.clientWidth / w + 0.1));
+      return n * w;
+    };
+    const update = () => {
+      const max = gallery.scrollWidth - gallery.clientWidth;
+      const scrollable = max > 2;
+      const atStart = gallery.scrollLeft < 4;
+      const atEnd = gallery.scrollLeft > max - 4;
+      prev.classList.toggle('is-visible', scrollable && !atStart);
+      next.classList.toggle('is-visible', scrollable && !atEnd);
+    };
+    prev.addEventListener('click', () => gallery.scrollBy({ left: -pageStep(), behavior: 'smooth' }));
+    next.addEventListener('click', () => gallery.scrollBy({ left:  pageStep(), behavior: 'smooth' }));
+    gallery.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
+
+  // ─────────────────────────────────────────────────────────
+  // NEVER WONDER ROTATOR
+  // ─────────────────────────────────────────────────────────
+  const rotator = document.querySelector('.marquee-rotator');
+  if (rotator) {
+    const items = Array.from(rotator.querySelectorAll('.marquee-q'));
+    if (items.length > 1) {
+      let idx = 0;
+      setInterval(() => {
+        items[idx].classList.remove('is-active');
+        idx = (idx + 1) % items.length;
+        items[idx].classList.add('is-active');
+      }, 2400);
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // REVIEW ROTATOR (manual: arrows + swipe + keyboard)
+  // ─────────────────────────────────────────────────────────
+  const socialRot = document.getElementById('social-rotator');
+  const socialFrame = document.getElementById('social-frame');
+  if (socialRot && socialFrame) {
+    const reviews = Array.from(socialRot.querySelectorAll('.review'));
+    const prevBtn = document.getElementById('social-prev');
+    const nextBtn = document.getElementById('social-next');
+    let sIdx = Math.max(0, reviews.findIndex(r => r.classList.contains('is-active')));
+    if (sIdx < 0) sIdx = 0;
+
+    const goTo = (i) => {
+      if (!reviews.length) return;
+      reviews[sIdx].classList.remove('is-active');
+      sIdx = (i + reviews.length) % reviews.length;
+      reviews[sIdx].classList.add('is-active');
+    };
+    const next = () => goTo(sIdx + 1);
+    const prev = () => goTo(sIdx - 1);
+
+    if (prevBtn) prevBtn.addEventListener('click', prev);
+    if (nextBtn) nextBtn.addEventListener('click', next);
+
+    socialRot.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); prev(); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+    });
+
+    // Swipe (mobile/touch) — fade arrows on first swipe gesture
+    let touchStartX = 0, touchStartY = 0, touchActive = false, swipedOnce = false;
+    socialRot.addEventListener('touchstart', (e) => {
+      const t = e.changedTouches[0];
+      touchStartX = t.clientX; touchStartY = t.clientY;
+      touchActive = true;
+    }, { passive: true });
+    socialRot.addEventListener('touchmove', (e) => {
+      if (!touchActive || swipedOnce) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - touchStartX;
+      const dy = t.clientY - touchStartY;
+      if (Math.abs(dx) > 16 && Math.abs(dx) > Math.abs(dy)) {
+        swipedOnce = true;
+        socialFrame.classList.add('swiped');
+      }
+    }, { passive: true });
+    socialRot.addEventListener('touchend', (e) => {
+      if (!touchActive) return;
+      touchActive = false;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - touchStartX;
+      const dy = t.clientY - touchStartY;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+        (dx < 0) ? next() : prev();
+      }
+    }, { passive: true });
+    socialRot.addEventListener('touchcancel', () => { touchActive = false; }, { passive: true });
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // BILLING TOGGLE
+  // ─────────────────────────────────────────────────────────
+  (function() {
+    var configs = [
+      {
+        pillId: 'plus-billing-pill', badgeId: 'plus-save-badge',
+        monthlyAttr: 'plus', annualAttr: 'plus',
+        monthlyAmt: '$2.99', monthlySub: '/mo per camera',
+        annualAmt: '$29.99', annualSub: '/yr per camera · ~$2.50/mo'
+      },
+      {
+        pillId: 'unlimited-billing-pill', badgeId: 'unlimited-save-badge',
+        monthlyAttr: 'unlimited', annualAttr: 'unlimited',
+        monthlyAmt: '$9.99', monthlySub: '/mo · unlimited cameras',
+        annualAmt: '$99', annualSub: '/yr · unlimited cameras · ~$8.25/mo'
+      }
+    ];
+    configs.forEach(function(cfg) {
+      var pill = document.getElementById(cfg.pillId);
+      var badge = document.getElementById(cfg.badgeId);
+      if (!pill) return;
+      var card = pill.closest('.plan-card');
+      var priceAmt = card.querySelector('.plan-card-price-amt');
+      var priceSub = card.querySelector('.plan-card-price-sub');
+      var lblMonthly = card.querySelector('[data-billing-monthly]');
+      var lblAnnual = card.querySelector('[data-billing-annual]');
+      pill.addEventListener('click', function() {
+        var isAnnual = pill.classList.toggle('is-annual');
+        pill.setAttribute('aria-pressed', isAnnual);
+        priceAmt.textContent = isAnnual ? cfg.annualAmt : cfg.monthlyAmt;
+        priceSub.textContent = isAnnual ? cfg.annualSub : cfg.monthlySub;
+        if (lblMonthly) lblMonthly.classList.toggle('is-active', !isAnnual);
+        if (lblAnnual) lblAnnual.classList.toggle('is-active', isAnnual);
+        if (badge) badge.classList.toggle('is-visible', isAnnual);
+      });
+    });
+  })();
+
+  // ─────────────────────────────────────────────────────────
+  // UTILITIES
+  // ─────────────────────────────────────────────────────────
+  function el(tag, cls) { const e = document.createElement(tag); if (cls) e.className = cls; return e; }
+  function money(n) { return '$' + n.toFixed(2).replace(/\.00$/, ''); }
+})();
+</script>
+</body>
+</html>
