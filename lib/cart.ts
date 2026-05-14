@@ -87,7 +87,14 @@ export function parseActionToCartItem(label: string): CartItem | null {
     };
   }
 
-  // License reassignment
+  // Plan switch / upgrade — distinct from trial. "Move to Cam Unlimited" /
+  // "Switch to Cam Unlimited Pro" / "Upgrade to Cam Unlimited". Must come
+  // BEFORE the license-reassignment match because that regex also starts
+  // with /move .*to .../ but is a different intent ("Move X to Y").
+  const planSwitchTarget = matchPlanSwitch(l);
+  if (planSwitchTarget) return planSwitchTarget;
+
+  // License reassignment (Move [plan] from [cam A] to [cam B])
   const move = /move .*from (.*?) to (.*)/.exec(l);
   if (move) {
     const from = move[1].trim();
@@ -132,6 +139,54 @@ export function parseActionToCartItem(label: string): CartItem | null {
     };
   }
 
+  return null;
+}
+
+/**
+ * Detects "Move to X" / "Switch to X" / "Upgrade to X" plan-switch labels
+ * and returns the matching subscription cart item. The trailing parenthetical
+ * (e.g. "($9.99/mo)") is allowed and ignored. Returns null if the label is
+ * a license reassignment ("Move X from A to B") or unrelated.
+ */
+function matchPlanSwitch(l: string): CartItem | null {
+  // License reassignments include "from ... to ..." — leave those for the
+  // dedicated handler below.
+  if (/move .* from .* to /.test(l)) return null;
+
+  if (!/^(?:move|switch|upgrade)\b/.test(l)) return null;
+
+  // Detect plan target. Order matters — check Pro before Unlimited so the
+  // longer match wins.
+  if (/unlimited pro/.test(l)) {
+    return {
+      id: 'plan-cam-unlimited-pro',
+      kind: 'plan',
+      name: 'Cam Unlimited Pro',
+      detail: '$19.99/mo · 24/7 emergency dispatch + AI Video Search + 60-day history',
+      monthly: 19.99,
+      badge: 'UPGRADE',
+    };
+  }
+  if (/unlimited/.test(l)) {
+    return {
+      id: 'plan-cam-unlimited',
+      kind: 'plan',
+      name: 'Cam Unlimited',
+      detail: '$9.99/mo · covers unlimited cameras + facial recognition',
+      monthly: 9.99,
+      badge: 'UPGRADE',
+    };
+  }
+  if (/cam plus/.test(l)) {
+    return {
+      id: 'plan-cam-plus',
+      kind: 'plan',
+      name: 'Cam Plus',
+      detail: '$2.99/mo per camera · full clips + 14-day history',
+      monthly: 2.99,
+      badge: 'UPGRADE',
+    };
+  }
   return null;
 }
 

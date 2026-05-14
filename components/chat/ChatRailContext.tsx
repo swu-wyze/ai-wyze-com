@@ -50,6 +50,15 @@ interface ProviderProps {
   initialMode?: RailMode;
 }
 
+// Action labels that map to UI control commands rather than chat queries or
+// cart adds. Keeps "Continue to checkout" from being routed to the AI as if
+// it were a question (and from being parsed into another cart-add).
+const CONTROL_ACTIONS = new Set([
+  'continue to checkout',
+  'continue shopping',
+  'apply this now',
+]);
+
 export function ChatRailProvider({ children, home, openingMessage, initialMode = 'default' }: ProviderProps) {
   const [mode, setMode] = useState<RailMode>(initialMode);
   const [tab, setTab] = useState<RailTab>('chat');
@@ -60,12 +69,25 @@ export function ChatRailProvider({ children, home, openingMessage, initialMode =
   const [isTyping, setIsTyping] = useState(false);
   const [hasNewMessages, setHasNewMessages] = useState(true);
 
+  /** Formats the current cart as a system-prompt fragment for cart-aware AI replies. */
+  const buildCartSummary = useCallback((items: CartItem[]): string => {
+    if (items.length === 0) return '';
+    const lines = items.map((i) => {
+      if (i.kind === 'plan') {
+        return `- ${i.name} ($${(i.monthly ?? 0).toFixed(2)}/mo subscription, will replace any current plan)`;
+      }
+      if (i.kind === 'plan-change') {
+        return `- ${i.name} (license reassignment, no billing change)`;
+      }
+      return `- ${i.name} ($${(i.oneTime ?? 0).toFixed(2)} hardware)`;
+    });
+    return lines.join('\n');
+  }, []);
+
   const sendMessage = useCallback(
     async (raw: string) => {
       const prompt = raw.trim();
       if (!prompt || isTyping) return;
-      // Any send is treated as commitment — escalate the rail into takeover so
-      // the conversation dominates the UI (and the cart canvas is visible).
       setMode('takeover');
       setTab('chat');
       const nextTurns: Turn[] = [...turns, { role: 'user', content: prompt }];
@@ -74,43 +96,32 @@ export function ChatRailProvider({ children, home, openingMessage, initialMode =
       const minDelay = new Promise((r) => setTimeout(r, 650));
       try {
         const apiMessages = nextTurns.map((t) => ({ role: t.role, content: t.content }));
-        const [{ text, mode: replyMode }] = await Promise.all([chat(apiMessages), minDelay]);
+        const cartSummary = buildCartSummary(cart);
+        const [{ text, mode: replyMode }] = await Promise.all([
+          chat(apiMessages, cartSummary || undefined),
+          minDelay,
+        ]);
         setTurns([...nextTurns, { role: 'assistant', content: text, mode: replyMode }]);
         setHasNewMessages(true);
       } finally {
         setIsTyping(false);
       }
     },
-    [turns, isTyping]
+    [turns, isTyping, cart, buildCartSummary]
   );
 
   /**
-   * Three behaviors depending on what the action label looks like:
-   *   1. Maps to a cart item (plan trial / hardware / license reassignment) →
-   *      add to cart, pop the canvas open on first commit.
-   *   2. Already in cart → ignore the second tap (no double-add).
-   *   3. Anything else (navigational, comparative, "see X" / "compare X" /
-   *      "show me X") → treat as a chat query so the AI handles it.
+   * Inserts a deterministic confirmation message after a successful cart-add so
+   * the user gets immediate acknowledgment in the chat thread (instead of the
+   * AI hallucinating "Done" or the click being silent).
    */
-  const applyAction = useCallback(
-    (label: string) => {
-      const item = parseActionToCartItem(label);
-      if (item) {
-        const isAlreadyIn = cart.some((p) => p.id === item.id);
-        if (isAlreadyIn) return;
-        const wasEmpty = cart.length === 0;
-        setCart((prev) => [...prev, item]);
-        if (wasEmpty) {
-          setMode('takeover');
-          setTab('chat');
-        }
-        return;
-      }
-      // No cart match — route the action label into the chat as a user message
-      // so the AI explains, compares, or pulls up the requested clip.
-      void sendMessage(label);
+  const insertCartConfirmation = useCallback(
+    (item: CartItem) => {
+      const msg = buildItemConfirmation(item, home);
+      setTurns((prev) => [...prev, { role: 'assistant', content: msg, mode: 'scripted' }]);
+      setHasNewMessages(true);
     },
-    [cart, sendMessage]
+    [home]
   );
 
   /**
@@ -123,9 +134,11 @@ export function ChatRailProvider({ children, home, openingMessage, initialMode =
 
     const lines = cart.map((item) => {
       if (item.kind === 'plan') {
-        return `• Started **${item.name}**${
-          item.badge === 'TRIAL' ? ' (30-day free trial — you won\'t be charged until day 31)' : ''
-        }`;
+        const trialNote =
+          item.badge === 'TRIAL'
+            ? ' (30-day free trial — you won\'t be charged until day 31)'
+            : '';
+        return `• ${item.badge === 'UPGRADE' ? 'Switched to' : 'Started'} **${item.name}**${trialNote}`;
       }
       if (item.kind === 'plan-change') {
         return `• ${item.name} — no billing change`;
@@ -134,7 +147,7 @@ export function ChatRailProvider({ children, home, openingMessage, initialMode =
       return `• Added **${item.name}**${price} to your order`;
     });
 
-    const confirmation = `**Done.** Here's what changed:\n\n${lines.join('\n')}\n\nA confirmation email is on its way. Anything else?`;
+    const confirmation = `**Order placed.** Here's what changed:\n\n${lines.join('\n')}\n\nA confirmation email is on its way. Anything else?`;
 
     setTurns((prev) => [...prev, { role: 'assistant', content: confirmation, mode: 'scripted' }]);
     setCart([]);
@@ -144,9 +157,65 @@ export function ChatRailProvider({ children, home, openingMessage, initialMode =
   }, [cart]);
 
   /**
+   * Click handler for any [ACTION:] or [CHIP:] button in chat. Routes the
+   * label to the right destination:
+   *   1. Control actions (Continue to checkout, etc.) → UI handlers
+   *   2. Cart-mappable labels                          → add to cart + confirm
+   *   3. Already in cart                               → no double-add
+   *   4. Anything else                                 → send as user message
+   */
+  const applyAction = useCallback(
+    (label: string) => {
+      const normalized = label.trim().toLowerCase();
+
+      // 1. Control actions
+      if (CONTROL_ACTIONS.has(normalized)) {
+        if (normalized === 'continue to checkout' || normalized === 'apply this now') {
+          applyChanges();
+        }
+        // "continue shopping" — close cart, do nothing else
+        if (normalized === 'continue shopping') {
+          setTab('chat');
+        }
+        return;
+      }
+
+      // 2/3. Cart-mappable
+      const item = parseActionToCartItem(label);
+      if (item) {
+        const isAlreadyIn = cart.some((p) => p.id === item.id);
+        if (isAlreadyIn) {
+          // Tell the user it's already there instead of doing nothing.
+          setTurns((prev) => [
+            ...prev,
+            {
+              role: 'assistant',
+              content: `**${item.name}** is already in your cart. Want me to walk through what changes when you check out?\n\n[CHIP: Walk me through the changes]\n[ACTION: Continue to checkout]`,
+              mode: 'scripted',
+            },
+          ]);
+          setHasNewMessages(true);
+          return;
+        }
+        const wasEmpty = cart.length === 0;
+        setCart((prev) => [...prev, item]);
+        insertCartConfirmation(item);
+        if (wasEmpty) {
+          setMode('takeover');
+          setTab('chat');
+        }
+        return;
+      }
+
+      // 4. Route to chat
+      void sendMessage(label);
+    },
+    [cart, sendMessage, applyChanges, insertCartConfirmation]
+  );
+
+  /**
    * Adds a catalog product to the cart by slug. Used by inline product cards
-   * rendered in chat — clicking the card's "Add to cart" button calls this
-   * with the product's slug.
+   * rendered in chat — clicking the card's "Add to cart" button calls this.
    */
   const addProductToCart = useCallback(
     (slug: string) => {
@@ -157,12 +226,13 @@ export function ChatRailProvider({ children, home, openingMessage, initialMode =
       if (isAlreadyIn) return;
       const wasEmpty = cart.length === 0;
       setCart((prev) => [...prev, item]);
+      insertCartConfirmation(item);
       if (wasEmpty) {
         setMode('takeover');
         setTab('chat');
       }
     },
-    [cart]
+    [cart, insertCartConfirmation]
   );
 
   const removeFromCart = useCallback((id: string) => {
@@ -195,4 +265,37 @@ export function ChatRailProvider({ children, home, openingMessage, initialMode =
   );
 
   return <ChatRailCtx.Provider value={value}>{children}</ChatRailCtx.Provider>;
+}
+
+// ============================================================================
+// Per-item confirmation messages — deterministic, no AI round trip.
+// ============================================================================
+
+function buildItemConfirmation(item: CartItem, home: Home): string {
+  if (item.kind === 'plan') {
+    const replacesNote =
+      home.subs.currentMonthly > 0
+        ? ` Replaces your current ${home.subs.planName} ($${home.subs.currentMonthly.toFixed(2)}/mo).`
+        : '';
+    const trialNote = item.badge === 'TRIAL' ? ' 30-day free trial — no charge until day 31.' : '';
+    return `✓ **${item.name}** added to your cart.${replacesNote}${trialNote}
+
+[CHIP: What's included?]
+[CHIP: Walk me through the changes]
+[ACTION: Continue to checkout]`;
+  }
+
+  if (item.kind === 'plan-change') {
+    return `✓ Queued: **${item.name}**. No billing change — applies on checkout.
+
+[CHIP: Why is this better?]
+[ACTION: Apply this now]`;
+  }
+
+  const price = item.oneTime !== undefined ? ` ($${item.oneTime.toFixed(2)})` : '';
+  return `✓ **${item.name}**${price} added to your cart.
+
+[CHIP: What else pairs well?]
+[CHIP: Help me set it up]
+[ACTION: Continue to checkout]`;
 }
