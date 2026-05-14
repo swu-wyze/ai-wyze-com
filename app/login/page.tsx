@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getCurrentUserId } from '@/lib/auth';
+import { BrandLogo } from '@/components/chrome/BrandLogo';
 import { LoginForm } from './LoginForm';
 
 export default async function LoginPage() {
@@ -10,10 +11,8 @@ export default async function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center px-6 bg-bg-base">
       <div className="w-full max-w-[400px]">
-        <div className="text-center mb-8">
-          <div className="text-[18px] font-semibold tracking-[3px] bg-brand-gradient bg-clip-text text-transparent mb-2">
-            WYZE
-          </div>
+        <div className="flex flex-col items-center text-center mb-8">
+          <BrandLogo size="lg" sloganMobileHidden={false} className="mb-6" />
           <h1 className="text-[22px] font-semibold tracking-[-0.01em] text-text-primary">
             Sign in to your home
           </h1>

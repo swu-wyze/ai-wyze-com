@@ -1,4 +1,5 @@
 import { Search, ShoppingCart } from 'lucide-react';
+import { BrandLogo } from './BrandLogo';
 import { ThemeToggle } from './ThemeToggle';
 import { UserMenu } from './UserMenu';
 import type { User } from '@/lib/types';
@@ -19,9 +20,7 @@ export function TopNav({ user }: { user: User }) {
   return (
     <nav className="h-14 flex justify-between items-center px-4 sm:px-8 bg-bg-base sticky top-0 z-[100]">
       <div className="flex items-center gap-6 lg:gap-9 min-w-0">
-        <span className="text-base font-semibold tracking-[2px] bg-brand-gradient bg-clip-text text-transparent shrink-0">
-          WYZE
-        </span>
+        <BrandLogo size="sm" />
         {NAV_ITEMS.map((item) => (
           <a
             key={item.label}
