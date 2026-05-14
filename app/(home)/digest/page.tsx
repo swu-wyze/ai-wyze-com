@@ -2,10 +2,12 @@ import { Shield } from 'lucide-react';
 import { FleetRibbon } from '@/components/chrome/FleetRibbon';
 import { SectionLabel } from '@/components/ui/Eyebrow';
 import { StatsStrip } from '@/components/surfaces/digest/StatsStrip';
+import { BriefingSection } from '@/components/surfaces/digest/BriefingSection';
 import { ProductCard } from '@/components/ui/ProductCard';
 import { getCurrentHome } from '@/lib/home-data';
 import { getRecommendations } from '@/lib/recommendations';
 import { getHighlightBanner, resolveIllustration } from '@/lib/highlight-banner';
+import { getBriefing } from '@/lib/briefing';
 import { findProduct } from '@/lib/product-catalog';
 
 /**
@@ -17,7 +19,8 @@ import { findProduct } from '@/lib/product-catalog';
  */
 export default async function DigestPage() {
   const home = await getCurrentHome();
-  const [recommendations, highlight] = await Promise.all([
+  const [briefing, recommendations, highlight] = await Promise.all([
+    getBriefing(home),
     getRecommendations(home),
     getHighlightBanner(home),
   ]);
@@ -35,6 +38,8 @@ export default async function DigestPage() {
 
   return (
     <div className="surface space-y-12">
+      <BriefingSection briefing={briefing} />
+
       <FleetRibbon />
 
       <section>

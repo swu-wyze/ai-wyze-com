@@ -3,7 +3,7 @@ import { TopNav } from '@/components/chrome/TopNav';
 import { SecondaryNav } from '@/components/chrome/SecondaryNav';
 import { ChatRail } from '@/components/chrome/ChatRail';
 import { ChatRailProvider } from '@/components/chat/ChatRailContext';
-import { buildAgentOpening } from '@/lib/agent-opening';
+import { chatOpenerFromBriefing, getBriefing } from '@/lib/briefing';
 import { getCurrentHome } from '@/lib/home-data';
 import { getCurrentUserId } from '@/lib/auth';
 
@@ -12,7 +12,9 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
   if (!userId) redirect('/login');
 
   const home = await getCurrentHome();
-  const opening = await buildAgentOpening(home);
+  // Same cached briefing the Digest page reads — no extra round trip.
+  const briefing = await getBriefing(home);
+  const opening = chatOpenerFromBriefing(briefing, home.user.name);
 
   return (
     <ChatRailProvider home={home} openingMessage={opening}>
