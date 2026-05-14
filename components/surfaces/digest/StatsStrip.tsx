@@ -14,7 +14,7 @@ interface StatProps {
  */
 function Stat({ label, value, meta, metaTone = 'default' }: StatProps) {
   return (
-    <div className="px-3 sm:px-4 py-2.5 flex flex-col gap-0.5 min-w-0">
+    <div className="flex flex-col gap-1 min-w-0">
       <div className="text-[9px] font-bold tracking-[1.3px] uppercase text-text-faint truncate">{label}</div>
       <div className="flex items-baseline gap-2 min-w-0">
         <span className="text-[18px] font-semibold tabular-nums leading-none text-text-primary">{value}</span>
@@ -33,7 +33,9 @@ export async function StatsStrip() {
   const deltaArrow = tw.eventsDelta < 0 ? '↓' : '↑';
   const deltaPositive = tw.eventsDelta <= 0;
   return (
-    <div className="bg-surface-1 border border-faint rounded-xl grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-faint overflow-hidden">
+    // Open row, no boxes. A single faint top + bottom hairline gives the bar
+    // its identity without carving the page into a grid.
+    <div className="border-y border-faint py-4 grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-4 md:gap-x-10">
       <Stat
         label="Events this week"
         value={tw.totalEvents.toLocaleString()}
