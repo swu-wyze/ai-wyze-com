@@ -1,6 +1,5 @@
 import { Search, ShoppingCart } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
-import { ThemeToggle } from './ThemeToggle';
 import { UserMenu } from './UserMenu';
 import type { User } from '@/lib/types';
 
@@ -43,7 +42,6 @@ export function TopNav({ user }: { user: User }) {
       <div className="flex items-center gap-3 sm:gap-[14px]">
         <Search size={16} className="hidden sm:block text-text-muted hover:text-text-primary cursor-pointer" />
         <ShoppingCart size={16} className="text-text-muted hover:text-text-primary cursor-pointer" />
-        <ThemeToggle />
         <UserMenu user={user} />
       </div>
     </nav>
