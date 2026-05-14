@@ -31,5 +31,7 @@ export async function signInAction(
 
 export async function signOutAction(): Promise<void> {
   await clearSession();
-  redirect('/login');
+  // Land back on the public marketing page (rewritten from '/' to
+  // /wyzeai.html), not the login form. Users can re-enter the app from there.
+  redirect('/');
 }
