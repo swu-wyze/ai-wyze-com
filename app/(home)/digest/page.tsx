@@ -40,12 +40,10 @@ export default async function DigestPage() {
     <div className="surface space-y-12">
       <BriefingSection briefing={briefing} />
 
-      <FleetRibbon />
+      {/* This-week bar — sits as a thin divider between Briefing and Fleet. */}
+      <StatsStrip />
 
-      <section>
-        <SectionLabel>This week</SectionLabel>
-        <StatsStrip />
-      </section>
+      <FleetRibbon />
 
       <section className="space-y-8">
         <div>
