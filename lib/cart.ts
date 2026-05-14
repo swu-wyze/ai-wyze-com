@@ -141,3 +141,22 @@ function capitalize(s: string): string {
     .map((w) => (w.length === 0 ? w : w[0].toUpperCase() + w.slice(1)))
     .join(' ');
 }
+
+/**
+ * Builds a cart line directly from a catalog slug (used by inline product
+ * cards rendered in chat — clicking "Add to cart" on the card calls this).
+ */
+export function cartItemFromProductSlug(
+  slug: string,
+  product: { name: string; price: string; strikePrice?: string; pitch: string }
+): CartItem {
+  const oneTime = parseFloat(product.price.replace(/[^\d.]/g, '')) || 0;
+  return {
+    id: `hw-${slug}`,
+    kind: 'hardware',
+    name: product.name,
+    detail: product.pitch,
+    oneTime,
+    badge: product.strikePrice ? '-25%' : undefined,
+  };
+}

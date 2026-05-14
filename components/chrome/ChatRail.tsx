@@ -35,6 +35,7 @@ export function ChatRail() {
     setTab,
     sendMessage,
     applyAction,
+    addProductToCart,
     markRead,
   } = useChatRail();
 
@@ -165,7 +166,7 @@ export function ChatRail() {
                         <Sparkles size={14} className="text-[#0a0a0a]" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <AssistantContent text={t.content} mode={t.mode ?? 'scripted'} onAction={applyAction} />
+                        <AssistantContent text={t.content} mode={t.mode ?? 'scripted'} onAction={applyAction} onAddProduct={addProductToCart} />
                       </div>
                     </div>
                   )
@@ -261,7 +262,7 @@ export function ChatRail() {
                     <Sparkles size={12} className="text-[#0a0a0a]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <AssistantContent text={t.content} mode={t.mode ?? 'scripted'} onAction={applyAction} />
+                    <AssistantContent text={t.content} mode={t.mode ?? 'scripted'} onAction={applyAction} onAddProduct={addProductToCart} />
                   </div>
                 </div>
               )

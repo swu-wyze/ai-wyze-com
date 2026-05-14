@@ -10,7 +10,7 @@ import { useChatRail } from './ChatRailContext';
  *  - LiveCanvas pane when the rail is in takeover mode (sits beside the chat)
  */
 export function CartPanel({ variant = 'rail' }: { variant?: 'rail' | 'canvas' }) {
-  const { home, cart, removeFromCart, clearCart } = useChatRail();
+  const { home, cart, removeFromCart, clearCart, applyChanges } = useChatRail();
   const totals = cartTotals(cart, home.subs.currentMonthly);
 
   return (
@@ -92,39 +92,63 @@ export function CartPanel({ variant = 'rail' }: { variant?: 'rail' | 'canvas' })
       </div>
 
       <div className="px-4 py-3 border-t border-faint bg-surface-1 flex flex-col gap-1.5">
-        <div className="flex justify-between text-[11px]">
-          <span className="text-text-muted">Monthly</span>
+        {totals.oneTime > 0 && (
+          <>
+            <div className="flex justify-between text-[12px]">
+              <span className="text-text-muted">Hardware</span>
+              <span className="tabular-nums text-text-secondary">${totals.oneTime.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-[12px]">
+              <span className="text-text-muted">Shipping</span>
+              <span className="tabular-nums text-wyze-green font-semibold">Free</span>
+            </div>
+          </>
+        )}
+        <div className="flex justify-between text-[12px] items-baseline pt-1.5 mt-1.5 border-t border-faint">
+          <span className="text-[10px] font-bold tracking-[1.5px] uppercase text-text-faint">
+            {totals.oneTime > 0 ? 'Today' : 'Monthly'}
+          </span>
           <span
-            className={`tabular-nums ${
-              totals.monthlySavings > 0 ? 'text-wyze-green font-semibold' : 'text-text-secondary'
+            className={`tabular-nums text-[18px] font-semibold ${
+              totals.monthlySavings > 0 ? 'text-accent-green' : 'text-text-primary'
             }`}
           >
-            ${totals.monthly.toFixed(2)}/mo
-            {totals.monthlySavings > 0 && (
-              <span className="text-text-faint ml-2 text-[10px]">(save ${totals.monthlySavings.toFixed(2)}/mo)</span>
-            )}
+            {totals.oneTime > 0
+              ? `$${totals.oneTime.toFixed(2)}`
+              : `$${totals.monthly.toFixed(2)}/mo`}
           </span>
         </div>
-        {totals.oneTime > 0 && (
-          <div className="flex justify-between text-[11px]">
-            <span className="text-text-muted">One-time</span>
-            <span className="tabular-nums text-text-secondary">${totals.oneTime.toFixed(2)}</span>
+        {totals.monthly > 0 && totals.oneTime > 0 && (
+          <div className="flex justify-between text-[10.5px] text-text-faint">
+            <span>Plan</span>
+            <span className="tabular-nums">${totals.monthly.toFixed(2)}/mo starts after free trial</span>
+          </div>
+        )}
+        {totals.monthlySavings > 0 && (
+          <div className="text-[10.5px] text-accent-green text-right">
+            Save ${totals.monthlySavings.toFixed(2)}/mo
           </div>
         )}
         <button
+          onClick={applyChanges}
           disabled={cart.length === 0}
-          className="mt-2 w-full bg-wyze-green text-[#0a0a0a] px-3 py-2.5 rounded-md font-semibold text-[12px] hover:bg-[#4dffd0] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+          className="mt-2 w-full bg-wyze-green text-[#0a0a0a] px-3 py-2.5 rounded-md font-semibold text-[12.5px] hover:bg-[#4dffd0] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
         >
-          Apply changes
+          Continue to checkout
           <ArrowRight size={14} />
         </button>
         {cart.length > 0 && (
-          <button
-            onClick={clearCart}
-            className="text-[10.5px] text-text-faint hover:text-text-secondary self-center mt-1"
-          >
-            Clear cart
-          </button>
+          <>
+            <div className="text-[10.5px] text-text-muted text-center mt-2 px-2 leading-relaxed">
+              Plan starts when your camera does. <span className="text-text-primary font-medium">Pause anytime</span> · <span className="text-text-primary font-medium">30-day money back</span>.
+            </div>
+            <button
+              onClick={clearCart}
+              className="text-[10.5px] text-text-faint hover:text-text-secondary self-center mt-1"
+            >
+              Clear cart
+            </button>
+          </>
         )}
       </div>
     </div>

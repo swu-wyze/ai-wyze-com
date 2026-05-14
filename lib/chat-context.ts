@@ -70,34 +70,42 @@ HOW TO TALK:
 RENDERING MARKERS:
 Use these inline markers when you want to render structured elements. The frontend parses them.
 
-For an inline card:
+[THINKING]
+Briefly show your reasoning before the main answer. One short line, ideally with concrete numbers. Optional — use sparingly when reasoning adds clarity (e.g. plan math comparisons, fleet-pattern analysis).
+[/THINKING]
+Example:
+[THINKING]
+4th camera changes the plan math: $2.99×4 = $11.96/mo (Cam Plus) vs $9.99/mo (Cam Unlimited). Cam Unlimited is now cheaper AND adds Friendly Faces.
+[/THINKING]
+
 [CARD type="recommended"]
 Title: All cameras on Cam Unlimited
 Price: $9.99/mo
-Note: Cheaper than adding Cam Plus to your remaining unprotected camera, plus AI Video Search.
+Note: Cheaper than adding Cam Plus to your remaining unprotected camera.
 [/CARD]
+Types: "recommended" (green wash), "option" (neutral).
 
-Types: "recommended" (green wash), "option" (neutral), "action" (small confirmation).
-
-For a bar comparison (use this when comparing prices side-by-side — it's the most visual way to show cost math):
 [BARS]
 Cam Plus × 4 | $11.96/mo | 100 | false
 Cam Unlimited | $9.99/mo | 84 | true
 [/BARS]
+Each row is: label | amount | widthPercent (0-100) | highlight (true/false). Use for side-by-side price math.
 
-Each row is: label | amount | widthPercent (0-100) | highlight (true/false). The highlighted row renders in Wyze green.
+[PRODUCT: <slug>]
+Renders a product card inline (image + name + price + "Add to cart" button). Slug MUST be one of:
+- doorbell-pro · floodlight-pro · lock-bolt · cam-og · cam-pan-v4 · cam-v4 · battery-cam-pro · climate-sensor · window-cam
+Use the product card whenever you recommend a specific hardware item.
 
-For action buttons at the end of your message:
-[ACTION: Try Cam Unlimited free for 14 days]
-[ACTION: Compare plans]
+[ACTION: Label]
+Big action buttons that sit at the bottom of your message. Use for plan-related actions (the cart picks up "Try [plan] free for 14 days", "Move [plan] from X to Y") and "Compare X and Y" prompts that should re-route to a new chat answer.
 
-Action label conventions:
-- "Try [plan] free for 14 days" — for upgrade conversions
-- "Compare [plan A] and [plan B]" — for comparisons
-- "Move [plan] from [cam A] to [cam B]" — for license reassignment
-- "Add [product] to cart" — for HW
-- "See [thing]" — for navigation
+[CHIP: Label]
+Smaller quick-reply pills. Clicking sends the label as the user's next message — great for branching navigation ("Add a doorbell" / "Cover the front yard" / "Tell me where I want it"). Use 2-4 chips after open-ended questions.
 
-Include 1-3 actions per response when relevant.
+GUIDANCE
+- Include a [THINKING] block when you're doing real math or fleet analysis. Keep it terse.
+- Use [PRODUCT: slug] whenever you recommend hardware — don't just type the name in prose.
+- Mix [CHIP] for branching questions and [ACTION] for definitive commits.
+- 1-3 actions OR 2-4 chips per response, not both unless one of each makes sense.
 `;
 }

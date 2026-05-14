@@ -4,7 +4,8 @@ import { createContext, useCallback, useContext, useMemo, useState } from 'react
 import type { ReactNode } from 'react';
 import { chat } from '@/app/actions/chat';
 import type { CartItem } from '@/lib/cart';
-import { parseActionToCartItem } from '@/lib/cart';
+import { cartItemFromProductSlug, parseActionToCartItem } from '@/lib/cart';
+import { findProduct } from '@/lib/product-catalog';
 import type { Home } from '@/lib/types';
 
 export type RailMode = 'collapsed' | 'default' | 'takeover';
@@ -24,6 +25,8 @@ interface ChatRailValue {
   setTab: (t: RailTab) => void;
   sendMessage: (prompt: string) => Promise<void>;
   applyAction: (label: string) => void;
+  addProductToCart: (slug: string) => void;
+  applyChanges: () => void;
   removeFromCart: (id: string) => void;
   clearCart: () => void;
   markRead: () => void;
@@ -77,20 +80,79 @@ export function ChatRailProvider({ children, home, openingMessage, initialMode =
     [turns, isTyping]
   );
 
+  /**
+   * Three behaviors depending on what the action label looks like:
+   *   1. Maps to a cart item (plan trial / hardware / license reassignment) →
+   *      add to cart, pop the canvas open on first commit.
+   *   2. Already in cart → ignore the second tap (no double-add).
+   *   3. Anything else (navigational, comparative, "see X" / "compare X" /
+   *      "show me X") → treat as a chat query so the AI handles it.
+   */
   const applyAction = useCallback(
     (label: string) => {
       const item = parseActionToCartItem(label);
-      if (!item) {
-        // Navigational or unrecognized action — just log for now.
-        console.log('[chat action — navigational]', label);
+      if (item) {
+        const isAlreadyIn = cart.some((p) => p.id === item.id);
+        if (isAlreadyIn) return;
+        const wasEmpty = cart.length === 0;
+        setCart((prev) => [...prev, item]);
+        if (wasEmpty) {
+          setMode('takeover');
+          setTab('chat');
+        }
         return;
       }
+      // No cart match — route the action label into the chat as a user message
+      // so the AI explains, compares, or pulls up the requested clip.
+      void sendMessage(label);
+    },
+    [cart, sendMessage]
+  );
+
+  /**
+   * Apply Changes — the "checkout" CTA in the cart canvas. Simulates committing
+   * the cart: drops a confirmation assistant message into the thread, clears
+   * the cart, and returns the rail to default mode so the user sees the result.
+   */
+  const applyChanges = useCallback(() => {
+    if (cart.length === 0) return;
+
+    const lines = cart.map((item) => {
+      if (item.kind === 'plan') {
+        return `• Started **${item.name}**${
+          item.badge === 'TRIAL' ? ' (14-day free trial — you won\'t be charged until day 15)' : ''
+        }`;
+      }
+      if (item.kind === 'plan-change') {
+        return `• ${item.name} — no billing change`;
+      }
+      const price = item.oneTime !== undefined ? ` for $${item.oneTime.toFixed(2)}` : '';
+      return `• Added **${item.name}**${price} to your order`;
+    });
+
+    const confirmation = `**Done.** Here's what changed:\n\n${lines.join('\n')}\n\nA confirmation email is on its way. Anything else?`;
+
+    setTurns((prev) => [...prev, { role: 'assistant', content: confirmation, mode: 'scripted' }]);
+    setCart([]);
+    setTab('chat');
+    setMode('default');
+    setHasNewMessages(true);
+  }, [cart]);
+
+  /**
+   * Adds a catalog product to the cart by slug. Used by inline product cards
+   * rendered in chat — clicking the card's "Add to cart" button calls this
+   * with the product's slug.
+   */
+  const addProductToCart = useCallback(
+    (slug: string) => {
+      const product = findProduct(slug);
+      if (!product) return;
+      const item = cartItemFromProductSlug(slug, product);
       const isAlreadyIn = cart.some((p) => p.id === item.id);
       if (isAlreadyIn) return;
       const wasEmpty = cart.length === 0;
       setCart((prev) => [...prev, item]);
-      // The first commit pops the canvas open so the user sees the cart appear.
-      // Subsequent adds just update the cart in place.
       if (wasEmpty) {
         setMode('takeover');
         setTab('chat');
@@ -119,11 +181,13 @@ export function ChatRailProvider({ children, home, openingMessage, initialMode =
       setTab,
       sendMessage,
       applyAction,
+      addProductToCart,
+      applyChanges,
       removeFromCart,
       clearCart,
       markRead,
     }),
-    [home, mode, tab, turns, cart, isTyping, hasNewMessages, sendMessage, applyAction, removeFromCart, clearCart, markRead]
+    [home, mode, tab, turns, cart, isTyping, hasNewMessages, sendMessage, applyAction, addProductToCart, applyChanges, removeFromCart, clearCart, markRead]
   );
 
   return <ChatRailCtx.Provider value={value}>{children}</ChatRailCtx.Provider>;
