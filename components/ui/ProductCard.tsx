@@ -26,9 +26,9 @@ export function ProductCard({
   imageBg = 'light',
 }: Props) {
   return (
-    <div className="bg-surface-1 rounded-[10px] overflow-hidden hover:bg-surface-2 hover:-translate-y-0.5 transition-all cursor-pointer">
+    <div className="bg-surface-1 border border-faint rounded-[10px] overflow-hidden hover:bg-surface-2 hover:-translate-y-0.5 transition-all cursor-pointer">
       <div
-        className={`relative flex items-center justify-center ${
+        className={`relative flex items-center justify-center border-b border-faint ${
           imageBg === 'light' ? 'bg-[#f4f4f4]' : 'bg-black/20'
         }`}
         style={{ height: imageHeight }}

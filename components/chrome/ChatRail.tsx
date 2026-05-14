@@ -56,7 +56,7 @@ export function ChatRail() {
     return (
       <>
         <MobileFab onOpen={() => setMode('takeover')} hasNewMessages={hasNewMessages} cartCount={cart.length} />
-        <aside className="hidden md:flex w-[64px] shrink-0 bg-bg-sunken flex-col items-center pt-4 pb-4 gap-3">
+        <aside className="hidden md:flex w-[64px] shrink-0 bg-bg-base/[0.6] border-r border-faint flex-col items-center pt-4 pb-4 gap-3 backdrop-blur-sm">
         <button
           onClick={() => setMode('default')}
           className="w-9 h-9 rounded-full bg-brand-gradient flex items-center justify-center hover:scale-105 transition-all relative"
@@ -107,7 +107,7 @@ export function ChatRail() {
         />
         <div className="fixed inset-0 md:inset-x-4 md:top-4 md:bottom-4 z-[151] grid grid-cols-1 md:grid-cols-[1fr_380px] grid-rows-[56px_1fr] bg-bg-base md:rounded-[16px] md:border md:border-subtle overflow-hidden md:shadow-[0_24px_80px_rgba(0,0,0,0.4)]">
           {/* header */}
-          <header className="md:col-span-2 px-4 md:px-5 flex items-center gap-2 md:gap-3 bg-bg-base">
+          <header className="md:col-span-2 px-4 md:px-5 flex items-center gap-2 md:gap-3 border-b border-faint bg-bg-base">
             <div className="w-8 h-8 rounded-full bg-brand-gradient flex items-center justify-center shrink-0">
               <Sparkles size={14} className="text-[#0a0a0a]" />
             </div>
@@ -149,7 +149,7 @@ export function ChatRail() {
           </header>
 
           {/* chat pane — full row on mobile when tab=chat; left pane on desktop */}
-          <div className={`${tab === 'cart' ? 'hidden md:flex' : 'flex'} flex-col min-h-0 md:bg-bg-sunken`}>
+          <div className={`${tab === 'cart' ? 'hidden md:flex' : 'flex'} flex-col min-h-0 md:border-r md:border-faint`}>
             <div ref={threadRef} className="flex-1 overflow-y-auto min-h-0">
               <div className="max-w-[680px] mx-auto px-4 sm:px-6 py-4 sm:py-6 flex flex-col gap-5">
                 {turns.map((t, i) =>
@@ -199,8 +199,8 @@ export function ChatRail() {
   return (
     <>
       <MobileFab onOpen={() => setMode('takeover')} hasNewMessages={hasNewMessages} cartCount={cart.length} />
-      <aside className="hidden md:flex w-[380px] shrink-0 bg-bg-sunken flex-col sticky top-[100px] self-start h-[calc(100vh-100px)]">
-      <header className="px-4 py-3 flex items-center gap-2.5">
+      <aside className="hidden md:flex w-[380px] shrink-0 bg-bg-base/[0.85] border-r border-faint flex-col backdrop-blur-sm sticky top-[100px] self-start h-[calc(100vh-100px)]">
+      <header className="px-4 py-3 border-b border-faint flex items-center gap-2.5">
         <div className="w-8 h-8 rounded-full bg-brand-gradient flex items-center justify-center">
           <Sparkles size={14} className="text-[#0a0a0a]" />
         </div>
@@ -229,7 +229,7 @@ export function ChatRail() {
       </header>
 
       {/* Tabs */}
-      <div className="flex px-2 pt-1 pb-2 gap-1">
+      <div className="flex border-b border-faint px-2 pt-2 gap-1">
         <RailTabBtn
           active={tab === 'chat'}
           onClick={() => setTab('chat')}
@@ -380,7 +380,7 @@ function Composer({
   isTyping: boolean;
 }) {
   return (
-    <div className="px-3 py-3 flex items-center gap-2 bg-bg-sunken shadow-[0_-8px_16px_-12px_rgba(0,0,0,0.45)]">
+    <div className="border-t border-faint px-3 py-3 flex items-center gap-2 bg-bg-base/[0.5]">
       <input
         type="text"
         value={value}
