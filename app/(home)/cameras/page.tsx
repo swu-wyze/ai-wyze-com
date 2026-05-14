@@ -19,10 +19,10 @@ export default async function CamerasPage() {
           return (
             <div
               key={cam.id}
-              className="bg-surface-1 rounded-[10px] overflow-hidden hover:bg-surface-2 transition-all"
+              className="bg-surface-1 border border-faint rounded-[10px] overflow-hidden hover:bg-surface-2 transition-all"
             >
               {/* Preview */}
-              <div className="relative h-[220px] overflow-hidden bg-gradient-to-br from-bg-elevated to-bg-sunken">
+              <div className="relative h-[220px] overflow-hidden bg-gradient-to-br from-bg-elevated to-bg-sunken border-b border-faint">
                 {cam.online ? (
                   <>
                     {cam.previewSrc && (

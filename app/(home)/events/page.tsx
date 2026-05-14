@@ -42,7 +42,7 @@ export default async function EventsPage() {
             className={`text-[11px] px-3 py-1.5 rounded-full transition-all ${
               i === 0
                 ? 'bg-wyze-green/15 text-wyze-green border border-wyze-green/30'
-                : 'bg-surface-2 text-text-secondary hover:bg-surface-3'
+                : 'bg-surface-2 text-text-secondary border border-faint hover:bg-surface-2'
             }`}
           >
             {f}
@@ -53,7 +53,7 @@ export default async function EventsPage() {
       {EVENTS.map((day) => (
         <div key={day.day} className="mb-7">
           <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-text-faint mb-3">{day.day}</div>
-          <div className="rounded-[10px] overflow-hidden">
+          <div className="rounded-[10px] border border-faint overflow-hidden">
             {day.items.map((ev, i) => {
               const Icon = ICON_MAP[ev.icon] ?? Eye;
               return (

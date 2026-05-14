@@ -32,7 +32,7 @@ export default async function PlansPage() {
       />
 
       {/* Current plan card */}
-      <div className="bg-surface-1 rounded-[10px] p-5 mb-7">
+      <div className="bg-surface-1 border border-faint rounded-[10px] p-5 mb-7">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
           <div>
             <div className="text-[15px] font-semibold mb-1">{home.subs.planName}</div>
@@ -55,7 +55,7 @@ export default async function PlansPage() {
               <div
                 key={cam.id}
                 className={`px-3 py-2 rounded-md flex items-center justify-between ${
-                  isCP ? 'bg-wyze-green/[0.06] border border-wyze-green/15' : 'bg-surface-2'
+                  isCP ? 'bg-wyze-green/[0.06] border border-wyze-green/15' : 'bg-surface-1 border border-faint'
                 }`}
               >
                 <span className="text-[12px] font-medium truncate">{cam.name}</span>
@@ -81,7 +81,7 @@ export default async function PlansPage() {
       {hasPlan && (
         <>
           <SectionLabel>Billing & payment</SectionLabel>
-          <div className="rounded-[10px] overflow-hidden bg-surface-1">
+          <div className="rounded-[10px] border border-faint overflow-hidden">
             {[
               ['Next charge', nextChargeStr],
               ['Payment method', 'Visa ending in 3403 · Update →'],

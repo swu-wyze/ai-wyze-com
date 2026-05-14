@@ -29,16 +29,14 @@ function PlanCard({ option, onSelect }: { option: SimulatorOption; onSelect: () 
       ? 'text-accent-green'
       : 'text-text-muted';
 
-  // Only the recommended card gets an edge — the colored ring is the page's
-  // single visual focal point. Current + other options ride on bg tone alone.
   const wrapperClass = option.isRecommended
-    ? 'bg-hero-gradient border border-wyze-green/30'
+    ? 'bg-hero-gradient border-wyze-green/30'
     : option.isCurrent
-    ? 'bg-surface-2'
-    : 'bg-surface-1 hover:bg-surface-2 transition-all';
+    ? 'bg-surface-2 border-subtle'
+    : 'bg-surface-1 border-faint hover:bg-surface-2 transition-all';
 
   return (
-    <div className={`rounded-[10px] p-5 ${wrapperClass}`}>
+    <div className={`rounded-[10px] p-5 border ${wrapperClass}`}>
       {/* Tag row — shows CURRENT, RECOMMENDED, both, or just the category */}
       <div className="flex items-center justify-between gap-2 mb-3 min-h-[14px]">
         <span className={`text-[10px] font-semibold tracking-[1.5px] uppercase ${tagColor}`}>
