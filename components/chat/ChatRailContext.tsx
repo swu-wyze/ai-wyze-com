@@ -64,6 +64,10 @@ export function ChatRailProvider({ children, home, openingMessage, initialMode =
     async (raw: string) => {
       const prompt = raw.trim();
       if (!prompt || isTyping) return;
+      // Any send is treated as commitment — escalate the rail into takeover so
+      // the conversation dominates the UI (and the cart canvas is visible).
+      setMode('takeover');
+      setTab('chat');
       const nextTurns: Turn[] = [...turns, { role: 'user', content: prompt }];
       setTurns(nextTurns);
       setIsTyping(true);
