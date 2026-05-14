@@ -1,5 +1,10 @@
 import type { Plan } from './types';
 
+// Source of truth: https://www.wyze.com/pages/service-plans
+// Note: there is NO "Cam Plus Pro" plan. Three tiers only:
+//   Cam Plus (per camera) → Cam Unlimited (flat fleet) → Cam Unlimited Pro (flat fleet, premium).
+// AI Video Search, 60-day history, and Direct Emergency Dispatch are
+// EXCLUSIVE to Cam Unlimited Pro.
 export const PLANS: Plan[] = [
   {
     id: 'cam-plus',
@@ -14,27 +19,15 @@ export const PLANS: Plan[] = [
     ],
   },
   {
-    id: 'cam-plus-pro',
-    name: 'Cam Plus Pro',
-    monthly: 8.99,
-    annual: 89.99,
-    features: [
-      'Everything in Cam Plus',
-      '24/7 professional monitoring',
-      'Cellular backup',
-      'Direct Emergency Dispatch',
-    ],
-  },
-  {
     id: 'cam-unlimited',
     name: 'Cam Unlimited',
     monthly: 9.99,
     annual: 99.99,
     features: [
-      'Unlimited cameras',
+      'Unlimited cameras under one plan',
       'Everything in Cam Plus',
-      'AI Video Search',
-      '60-day cloud history',
+      'Multi-camera timeline + smart modes',
+      'Facial recognition',
     ],
   },
   {
@@ -44,7 +37,10 @@ export const PLANS: Plan[] = [
     annual: 199.99,
     features: [
       'Everything in Cam Unlimited',
-      'Everything in Cam Plus Pro',
+      'Descriptive alerts',
+      'AI Video Search',
+      '60-day cloud history',
+      '24/7 emergency dispatch',
     ],
   },
 ];

@@ -1,7 +1,10 @@
 // All TypeScript types for the Wyze Home OS.
 // Stage A: hard-coded data. Stage B: same shapes, async fetchers.
 
-export type CameraTier = 'free' | 'cam-plus' | 'cam-plus-pro';
+// 'cam-plus' means the camera is COVERED (whether via Cam Plus per-camera, Cam
+// Unlimited, or Cam Unlimited Pro — all give it the full feature set). The
+// subscription type is captured at the home level via subs.planName.
+export type CameraTier = 'free' | 'cam-plus';
 
 export interface Camera {
   id: string;
@@ -13,9 +16,14 @@ export interface Camera {
   eventsToday: number;
   missedEvents?: number;
   aiHighlight: string;
+  /** Faux live-feed image rendered in FleetRibbon + Cameras surface. */
+  previewSrc?: string;
 }
 
+export type UserId = 'owen' | 'bob' | 'sunny';
+
 export interface User {
+  id: UserId;
   name: string;
   initial: string;
   location: string;
@@ -52,12 +60,16 @@ export interface Home {
   subs: {
     currentMonthly: number;
     currentAnnualEq: number;
+    /** Human-readable plan name, e.g. "No plan", "Cam Plus × 1", "Cam Unlimited". */
+    planName: string;
   };
   thisWeek: WeekSummary;
   session: SessionContext;
+  /** Per-user event timeline (for the Events surface). */
+  events: EventDay[];
 }
 
-export type PlanId = 'cam-plus' | 'cam-plus-pro' | 'cam-unlimited' | 'cam-unlimited-pro';
+export type PlanId = 'cam-plus' | 'cam-unlimited' | 'cam-unlimited-pro';
 
 export interface Plan {
   id: PlanId;

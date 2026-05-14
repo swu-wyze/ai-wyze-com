@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import { chat } from '@/app/actions/chat';
 import type { CartItem } from '@/lib/cart';
 import { parseActionToCartItem } from '@/lib/cart';
+import type { Home } from '@/lib/types';
 
 export type RailMode = 'collapsed' | 'default' | 'takeover';
 export type RailTab = 'chat' | 'cart';
@@ -12,6 +13,7 @@ export type RailTab = 'chat' | 'cart';
 type Turn = { role: 'user' | 'assistant'; content: string; mode?: 'ai' | 'scripted' };
 
 interface ChatRailValue {
+  home: Home;
   mode: RailMode;
   tab: RailTab;
   turns: Turn[];
@@ -37,13 +39,15 @@ export function useChatRail(): ChatRailValue {
 
 interface ProviderProps {
   children: ReactNode;
+  /** Active user's home (drives cart math + anything client-side that needs it). */
+  home: Home;
   /** Pre-typed assistant opening message (rendered as if Claude spoke first). */
   openingMessage: string;
   /** Default starting mode for the rail. */
   initialMode?: RailMode;
 }
 
-export function ChatRailProvider({ children, openingMessage, initialMode = 'default' }: ProviderProps) {
+export function ChatRailProvider({ children, home, openingMessage, initialMode = 'default' }: ProviderProps) {
   const [mode, setMode] = useState<RailMode>(initialMode);
   const [tab, setTab] = useState<RailTab>('chat');
   const [turns, setTurns] = useState<Turn[]>([
@@ -104,6 +108,7 @@ export function ChatRailProvider({ children, openingMessage, initialMode = 'defa
 
   const value = useMemo<ChatRailValue>(
     () => ({
+      home,
       mode,
       tab,
       turns,
@@ -118,7 +123,7 @@ export function ChatRailProvider({ children, openingMessage, initialMode = 'defa
       clearCart,
       markRead,
     }),
-    [mode, tab, turns, cart, isTyping, hasNewMessages, sendMessage, applyAction, removeFromCart, clearCart, markRead]
+    [home, mode, tab, turns, cart, isTyping, hasNewMessages, sendMessage, applyAction, removeFromCart, clearCart, markRead]
   );
 
   return <ChatRailCtx.Provider value={value}>{children}</ChatRailCtx.Provider>;

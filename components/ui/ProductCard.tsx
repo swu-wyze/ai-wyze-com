@@ -1,7 +1,6 @@
-import type { ReactNode } from 'react';
-
 interface Props {
-  illustration: ReactNode;
+  imageSrc: string;
+  imageAlt?: string;
   because?: string;
   becauseVariant?: 'green' | 'purple';
   name: string;
@@ -9,27 +8,39 @@ interface Props {
   strikePrice?: string;
   badge?: string;
   imageHeight?: number;
+  /** Light vs dark behind the product. Wyze product photos are shot on near-white;
+   *  we mirror that on both themes so the products always read crisply. */
+  imageBg?: 'neutral' | 'light';
 }
 
 export function ProductCard({
-  illustration,
+  imageSrc,
+  imageAlt,
   because,
   becauseVariant = 'green',
   name,
   price,
   strikePrice,
   badge,
-  imageHeight = 180,
+  imageHeight = 200,
+  imageBg = 'light',
 }: Props) {
   return (
-    <div className="bg-white/[0.03] border border-white/[0.05] rounded-[10px] overflow-hidden hover:bg-white/[0.05] hover:-translate-y-0.5 transition-all cursor-pointer">
+    <div className="bg-surface-1 border border-faint rounded-[10px] overflow-hidden hover:bg-surface-2 hover:-translate-y-0.5 transition-all cursor-pointer">
       <div
-        className="relative flex items-center justify-center bg-black/30 border-b border-white/[0.04]"
+        className={`relative flex items-center justify-center border-b border-faint ${
+          imageBg === 'light' ? 'bg-[#f4f4f4]' : 'bg-black/20'
+        }`}
         style={{ height: imageHeight }}
       >
-        {illustration}
+        <img
+          src={imageSrc}
+          alt={imageAlt ?? name}
+          className="max-h-[85%] max-w-[80%] object-contain"
+          loading="lazy"
+        />
         {badge && (
-          <span className="absolute top-3 right-3 text-[9px] font-semibold tracking-[1px] px-2 py-1 rounded bg-wyze-green text-bg-base">
+          <span className="absolute top-3 right-3 text-[9px] font-semibold tracking-[1px] px-2 py-1 rounded bg-wyze-green text-[#0a0a0a]">
             {badge}
           </span>
         )}
@@ -38,7 +49,7 @@ export function ProductCard({
         {because && (
           <div
             className={`text-[9px] font-semibold tracking-[1.5px] uppercase mb-2 ${
-              becauseVariant === 'purple' ? 'text-wyze-purple-light' : 'text-wyze-green'
+              becauseVariant === 'purple' ? 'text-accent-purple' : 'text-wyze-green'
             }`}
           >
             {because}

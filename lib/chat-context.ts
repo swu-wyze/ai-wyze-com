@@ -11,8 +11,7 @@ export function buildSystemPrompt(home: Home): string {
   const cams = home.cameras
     .map((c, i) => {
       const tier =
-        c.tier === 'cam-plus' ? 'Cam Plus' :
-        c.tier === 'cam-plus-pro' ? 'Cam Plus Pro' :
+        c.tier === 'cam-plus' ? 'Covered (full clips, AI detection)' :
         'NO PLAN (free tier, 12-second clips only)';
       const online = c.online ? '' : ' [OFFLINE]';
       const missed = c.missedEvents
@@ -36,8 +35,8 @@ THEIR CAMERA FLEET (${home.cameras.length} cameras):
 ${cams}
 
 THEIR SUBSCRIPTIONS:
-- Currently paying $${home.subs.currentMonthly.toFixed(2)}/mo on Cam Plus across cameras tagged "Cam Plus" above
-- They do NOT have Cam Unlimited, Cam Plus Pro, or Cam Unlimited Pro
+- Current plan: ${home.subs.planName}${home.subs.currentMonthly > 0 ? ` ($${home.subs.currentMonthly.toFixed(2)}/mo)` : ' (no charge)'}
+- Cameras marked "Cam Plus" above are protected under this plan; cameras marked "NO PLAN" are still on free-tier 12-second clips.
 
 THIS WEEK (${home.thisWeek.range}):
 - ${home.thisWeek.totalEvents} total events (${home.thisWeek.eventsDelta > 0 ? '+' : ''}${home.thisWeek.eventsDelta}% vs last week)
@@ -51,11 +50,10 @@ THIS SESSION (cadence context — use this when ${home.user.name} asks about "si
 - ${home.session.windowMissedEvents} of those were clipped short on free-tier cameras
 - Default to this window when phrasing recent-time references. Fall back to weekly for trend questions.
 
-WYZE PLAN CATALOG (use these exact prices):
-- Cam Plus: $2.99/mo per camera, or $29.99/yr per camera. Person/Package/Vehicle/Pet detection, full event recording, 14-day cloud history.
-- Cam Plus Pro: Cam Plus PLUS 24/7 professional monitoring, cellular backup, Direct Emergency Dispatch. ~$8.99/mo per camera.
-- Cam Unlimited: $9.99/mo or $99.99/yr. Covers UNLIMITED cameras. Includes everything in Cam Plus plus AI Video Search and 60-day cloud history.
-- Cam Unlimited Pro: $19.99/mo or $199.99/yr. Cam Unlimited PLUS everything Cam Plus Pro has.
+WYZE PLAN CATALOG (use these EXACT prices and features — there is NO "Cam Plus Pro" plan):
+- Cam Plus: $2.99/mo or $29.99/yr per camera. Person/Package/Vehicle/Pet detection, full-length event recording, 14-day cloud history.
+- Cam Unlimited: $9.99/mo or $99/yr — covers UNLIMITED cameras. Everything in Cam Plus, plus multi-camera timeline, smart modes, and facial recognition.
+- Cam Unlimited Pro: $19.99/mo — covers UNLIMITED cameras. Everything in Cam Unlimited, PLUS descriptive alerts, AI Video Search, 60-day cloud history, and 24/7 emergency dispatch. (AI Video Search, 60-day history, and emergency dispatch are PRO-ONLY.)
 
 HOW TO TALK:
 - Be direct and brief. ${home.user.name} is a power user — no hand-holding, no marketing fluff.

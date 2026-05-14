@@ -16,7 +16,7 @@ export function BarComparison({ rows }: { rows: Row[] }) {
               {row.amount}
             </span>
           </div>
-          <div className="bg-white/[0.08] rounded h-2.5 overflow-hidden">
+          <div className="bg-surface-3 rounded h-2.5 overflow-hidden">
             <div
               className={`h-full rounded transition-[width] duration-700 ease-out ${
                 row.highlight ? 'bg-wyze-green' : 'bg-text-muted/70'

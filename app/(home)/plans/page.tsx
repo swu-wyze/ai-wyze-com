@@ -1,39 +1,43 @@
 import { Eyebrow, SectionLabel } from '@/components/ui/Eyebrow';
 import { PageTitle } from '@/components/ui/PageTitle';
-import { getHome } from '@/lib/home-data';
+import { getCurrentHome } from '@/lib/home-data';
 
-export default function PlansPage() {
-  const home = getHome();
+export default async function PlansPage() {
+  const home = await getCurrentHome();
   const onPlanCount = home.cameras.filter((c) => c.tier === 'cam-plus').length;
   return (
     <div className="surface">
       <Eyebrow className="mb-2">PLANS · YOUR SUBSCRIPTIONS</Eyebrow>
       <PageTitle
         title={`${onPlanCount} of ${home.cameras.length} cameras protected.`}
-        subtitle={`Currently paying $${home.subs.currentMonthly.toFixed(2)}/mo for Cam Plus across ${onPlanCount} cameras.`}
+        subtitle={
+          home.subs.currentMonthly > 0
+            ? `Currently paying $${home.subs.currentMonthly.toFixed(2)}/mo · ${home.subs.planName}.`
+            : `No active subscription — your cameras record 12-second clips only.`
+        }
       />
 
       {/* Current plan card */}
-      <div className="bg-white/[0.03] border border-white/[0.05] rounded-[10px] p-5 mb-7">
-        <div className="flex items-start justify-between mb-4">
+      <div className="bg-surface-1 border border-faint rounded-[10px] p-5 mb-7">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
           <div>
             <div className="text-[15px] font-semibold mb-1">Cam Plus × {onPlanCount}</div>
             <div className="text-[12px] text-text-muted">
               ${home.subs.currentMonthly.toFixed(2)}/mo · billed monthly · Visa ending 3403
             </div>
           </div>
-          <button className="bg-transparent text-text-secondary border border-text-faint/50 px-[14px] py-2 rounded-md text-[11px] hover:text-text-primary hover:border-text-muted transition-all">
+          <button className="bg-transparent text-text-secondary border border-text-faint/50 px-[14px] py-2 rounded-md text-[11px] hover:text-text-primary hover:border-text-muted transition-all self-start">
             Manage billing
           </button>
         </div>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {home.cameras.map((cam) => {
             const isCP = cam.tier === 'cam-plus';
             return (
               <div
                 key={cam.id}
                 className={`px-3 py-2 rounded-md flex items-center justify-between ${
-                  isCP ? 'bg-wyze-green/[0.06] border border-wyze-green/15' : 'bg-white/[0.02] border border-white/[0.05]'
+                  isCP ? 'bg-wyze-green/[0.06] border border-wyze-green/15' : 'bg-surface-1 border border-faint'
                 }`}
               >
                 <span className="text-[12px] font-medium">{cam.name}</span>
@@ -52,7 +56,7 @@ export default function PlansPage() {
         All three options give you AI detection on every camera. Pick the math that fits.
       </p>
 
-      <div className="grid grid-cols-3 gap-3 mb-10">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-10">
         <SimOption
           tag="CURRENT + ADD"
           tagColor="text-text-muted"
@@ -81,7 +85,7 @@ export default function PlansPage() {
         />
         <SimOption
           tag="UPGRADE"
-          tagColor="text-wyze-purple-light"
+          tagColor="text-accent-purple"
           name="Cam Unlimited Pro"
           price="$19.99"
           period="per month · all cameras"
@@ -95,13 +99,13 @@ export default function PlansPage() {
 
       {/* Billing */}
       <SectionLabel>Billing & payment</SectionLabel>
-      <div className="rounded-[10px] border border-white/[0.05] overflow-hidden">
+      <div className="rounded-[10px] border border-faint overflow-hidden">
         {[
           ['Next charge', '$8.97 on Jun 13, 2026'],
           ['Payment method', 'Visa ending in 3403 · Update →'],
           ['Billing history', 'View all charges →'],
         ].map(([label, value], i) => (
-          <div key={label} className={`flex items-center justify-between px-4 py-3.5 ${i > 0 ? 'border-t border-white/[0.04]' : ''} bg-white/[0.02]`}>
+          <div key={label} className={`flex items-center justify-between px-4 py-3.5 ${i > 0 ? 'border-t border-faint' : ''} bg-surface-1`}>
             <div className="text-[12px] text-text-muted">{label}</div>
             <div className="text-[12.5px]">{value}</div>
           </div>
@@ -134,7 +138,7 @@ function SimOption({
       className={`rounded-[10px] p-5 ${
         recommended
           ? 'bg-hero-gradient border border-wyze-green/30'
-          : 'bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.04] transition-all'
+          : 'bg-surface-1 border border-faint hover:bg-surface-2 transition-all'
       }`}
     >
       <div className={`text-[10px] font-semibold tracking-[1.5px] uppercase mb-3 ${tagColor}`}>{tag}</div>
@@ -152,7 +156,7 @@ function SimOption({
       <button
         className={`w-full px-[14px] py-2 rounded-md text-[11px] transition-all ${
           ctaVariant === 'primary'
-            ? 'bg-wyze-green text-bg-base font-semibold hover:bg-[#4dffd0]'
+            ? 'bg-wyze-green text-[#0a0a0a] font-semibold hover:bg-[#4dffd0]'
             : 'bg-transparent text-text-secondary border border-text-faint/50 hover:text-text-primary hover:border-text-muted'
         }`}
       >

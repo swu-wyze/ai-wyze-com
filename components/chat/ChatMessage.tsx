@@ -54,7 +54,7 @@ export function AssistantContent({ text, mode, onAction }: AssistantContentProps
               className={`rounded-[10px] p-3.5 mb-2.5 ${
                 isRec
                   ? 'bg-wyze-green/[0.08] border border-wyze-green/25'
-                  : 'bg-white/[0.04] border border-white/[0.06]'
+                  : 'bg-surface-2 border border-faint'
               }`}
             >
               <div className="flex items-baseline justify-between gap-3 mb-1">
@@ -73,7 +73,7 @@ export function AssistantContent({ text, mode, onAction }: AssistantContentProps
           return (
             <div
               key={i}
-              className="rounded-[10px] p-3.5 mb-2.5 bg-white/[0.03] border border-white/[0.06]"
+              className="rounded-[10px] p-3.5 mb-2.5 bg-surface-1 border border-faint"
             >
               {b.rows.map((r, j) => (
                 <div key={j} className={j < b.rows.length - 1 ? 'mb-3' : ''}>
@@ -83,7 +83,7 @@ export function AssistantContent({ text, mode, onAction }: AssistantContentProps
                       {r.amount}
                     </span>
                   </div>
-                  <div className="bg-white/[0.08] rounded h-2 overflow-hidden">
+                  <div className="bg-surface-3 rounded h-2 overflow-hidden">
                     <div
                       className={`h-full rounded transition-[width] duration-700 ease-out ${
                         r.highlight ? 'bg-wyze-green' : 'bg-text-muted/70'
@@ -105,7 +105,7 @@ export function AssistantContent({ text, mode, onAction }: AssistantContentProps
                   onClick={() => onAction?.(label)}
                   className={
                     j === 0
-                      ? 'bg-wyze-green text-bg-base px-[14px] py-2 rounded-md font-semibold text-[11.5px] hover:bg-[#4dffd0] hover:-translate-y-px transition-all'
+                      ? 'bg-wyze-green text-[#0a0a0a] px-[14px] py-2 rounded-md font-semibold text-[11.5px] hover:bg-[#4dffd0] hover:-translate-y-px transition-all'
                       : 'bg-transparent text-text-secondary border border-text-faint/50 px-[14px] py-2 rounded-md text-[11.5px] hover:text-text-primary hover:border-text-muted transition-all'
                   }
                 >

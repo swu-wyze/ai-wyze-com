@@ -10,24 +10,33 @@
 # 1. Install dependencies
 npm install        # or pnpm install / bun install
 
-# 2. (Optional) Drop in your Anthropic API key for real Claude in the chat strip
+# 2. (Optional) Wire up an AI provider — DeepSeek by default
 cp .env.example .env.local
-# edit .env.local → ANTHROPIC_API_KEY=sk-ant-...
+# edit .env.local → AI_API_KEY=<your DeepSeek key>
 
 # 3. Run
 npm run dev
 ```
 
-Open <http://localhost:3000>. You'll land on `/digest`.
+Open <http://localhost:3000>. You'll land on `/login` — sign in as `owen`, `bob`, or `sunny` with password `123456`.
 
-### Chat strip behavior
+### AI provider
 
-The chat strip works **with or without** an API key.
+All AI calls funnel through [`lib/ai.ts`](lib/ai.ts), which is provider-agnostic. Configure via env:
 
-- **With `ANTHROPIC_API_KEY` set** — every message hits real Claude (claude-sonnet-4-6 by default; override via `ANTHROPIC_MODEL`) with Sunny's home injected as the system prompt. Responses can use `**bold**`, `[CARD type="recommended|option|action"]…[/CARD]`, `[BARS]…[/BARS]`, and `[ACTION: Label]` markers — the frontend parses and renders all four.
-- **Without a key (or on API error)** — the server action falls back to a scripted response that matches one of five demo scenarios (or a helpful fallback). Scripted responses use the same marker shape as real Claude, so the UI looks identical either way.
+| Var            | Default                                            | Notes                                                |
+|----------------|----------------------------------------------------|------------------------------------------------------|
+| `AI_PROVIDER`  | `deepseek`                                         | `deepseek` · `openai` · `anthropic`                  |
+| `AI_API_KEY`   | _(empty)_                                          | Required for live AI. Empty → hardcoded fallback.   |
+| `AI_MODEL`     | provider-default (deepseek-chat / gpt-4o-mini / …) | Override to swap models within a provider.          |
+| `AI_BASE_URL`  | provider-default                                   | Override for OpenAI-compatible gateways (Groq, etc.) |
 
-The five demo scenarios are in `lib/chat-script.ts`. Triggers are keyword-based (e.g. "cheapest", "earning", "nursery", "doorbell", "compare").
+Three places use AI:
+1. **Chat** ([`app/actions/chat.ts`](app/actions/chat.ts)) — every user message → tailored response, using the home as system prompt.
+2. **Agent's opening briefing** ([`lib/agent-opening.ts`](lib/agent-opening.ts)) — generated when a user lands. Cached per user for 30 min.
+3. **"Built around your home" recommendations** ([`lib/recommendations.ts`](lib/recommendations.ts)) — AI picks 3 products from [`lib/product-catalog.ts`](lib/product-catalog.ts) using the user's fleet. Cached per user.
+
+**Without an `AI_API_KEY`**, all three fall back to deterministic hardcoded content per user (Owen / Bob / Sunny), so the demo always works.
 
 ## The 60-second demo
 

@@ -56,24 +56,34 @@ export function parseActionToCartItem(label: string): CartItem | null {
   const l = label.toLowerCase();
 
   // Plan trials / upgrades
+  if (/try .*unlimited pro.*free/.test(l)) {
+    return {
+      id: 'plan-cam-unlimited-pro',
+      kind: 'plan',
+      name: 'Cam Unlimited Pro',
+      detail: '$19.99/mo · 24/7 emergency dispatch + AI Video Search + 60-day history · 14-day free trial',
+      monthly: 19.99,
+      badge: 'TRIAL',
+    };
+  }
   if (/try .*unlimited.*free/.test(l) || /^try 14 days free/.test(l)) {
     return {
       id: 'plan-cam-unlimited',
       kind: 'plan',
       name: 'Cam Unlimited',
-      detail: '$9.99/mo · covers all 4 cameras · 14-day free trial',
+      detail: '$9.99/mo · covers unlimited cameras · 14-day free trial',
       monthly: 9.99,
       badge: 'TRIAL',
     };
   }
-  if (/try .*cam plus pro/.test(l)) {
+  if (/try cam plus(?! pro)/.test(l)) {
     return {
-      id: 'plan-cam-plus-pro-nursery',
+      id: 'plan-cam-plus',
       kind: 'plan',
-      name: 'Cam Plus Pro — Nursery',
-      detail: '+$6/mo · 24/7 monitoring on the cam you check at 3am',
-      monthly: 6,
-      badge: 'ADD-ON',
+      name: 'Cam Plus',
+      detail: '$2.99/mo per camera · full-length clips + 14-day history · 14-day free trial',
+      monthly: 2.99,
+      badge: 'TRIAL',
     };
   }
 

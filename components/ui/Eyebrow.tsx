@@ -7,7 +7,7 @@ interface EyebrowProps {
 export function Eyebrow({ children, variant = 'green', className = '' }: EyebrowProps) {
   const color =
     variant === 'green' ? 'text-wyze-green' :
-    variant === 'purple' ? 'text-wyze-purple-light' :
+    variant === 'purple' ? 'text-accent-purple' :
     'text-text-faint';
   return (
     <div className={`text-[10px] font-semibold tracking-[1.5px] uppercase ${color} ${className}`}>

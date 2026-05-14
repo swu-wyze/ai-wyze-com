@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 export default {
+  darkMode: 'class',
   content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
     extend: {
@@ -11,24 +12,42 @@ export default {
           purple: '#4E2FD2',
           'purple-light': '#B8C4FF',
         },
+        // Theme-aware purple accent — wyze-purple in light mode, wyze-purple-light in dark.
+        // Use this for any purple text/border meant to stay legible across both themes.
+        accent: {
+          purple: 'rgb(var(--accent-purple) / <alpha-value>)',
+        },
+        // Theme-swapping tokens. RGB-tuple vars so Tailwind alpha modifiers
+        // (e.g. bg-bg-base/[0.92]) work.
         bg: {
-          base: '#0a0a0a',
-          elevated: '#1a1a1a',
-          sunken: '#050505',
+          base: 'rgb(var(--bg-base) / <alpha-value>)',
+          elevated: 'rgb(var(--bg-elevated) / <alpha-value>)',
+          sunken: 'rgb(var(--bg-sunken) / <alpha-value>)',
         },
         text: {
-          primary: '#ffffff',
-          secondary: '#C8C8C8',
-          muted: '#A0A0A0',
-          faint: '#787878',
+          primary: 'rgb(var(--text-primary) / <alpha-value>)',
+          secondary: 'rgb(var(--text-secondary) / <alpha-value>)',
+          muted: 'rgb(var(--text-muted) / <alpha-value>)',
+          faint: 'rgb(var(--text-faint) / <alpha-value>)',
+        },
+        // Surface overlays — pre-baked alpha, no modifier needed
+        surface: {
+          1: 'var(--surface-1)',
+          2: 'var(--surface-2)',
+          3: 'var(--surface-3)',
+        },
+        border: {
+          faint: 'var(--border-faint)',
+          subtle: 'var(--border-subtle)',
+          medium: 'var(--border-medium)',
         },
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
       },
       backgroundImage: {
-        'hero-gradient': 'linear-gradient(135deg, rgba(29,240,187,0.12), rgba(78,47,210,0.18))',
-        'brand-gradient': 'linear-gradient(135deg, #1DF0BB, #4E2FD2)',
+        'hero-gradient': 'var(--hero-gradient)',
+        'brand-gradient': 'var(--brand-gradient)',
       },
       borderRadius: {
         pill: '999px',

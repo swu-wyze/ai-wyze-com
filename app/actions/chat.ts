@@ -1,40 +1,29 @@
 'use server';
 
-import Anthropic from '@anthropic-ai/sdk';
+import { aiComplete, isAIConfigured } from '@/lib/ai';
 import { buildSystemPrompt } from '@/lib/chat-context';
-import { getHome } from '@/lib/home-data';
+import { getCurrentHome } from '@/lib/home-data';
 import { matchScript } from '@/lib/chat-script';
 import type { ChatMessage } from '@/lib/types';
 
-const MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6';
-
-export async function chat(messages: ChatMessage[]): Promise<{ text: string; mode: 'ai' | 'scripted' }> {
+export async function chat(
+  messages: ChatMessage[]
+): Promise<{ text: string; mode: 'ai' | 'scripted' }> {
   const last = messages[messages.length - 1];
   const lastPrompt = last?.role === 'user' ? last.content : '';
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    // Graceful fallback: scripted response, same marker shape as real Claude.
+  if (!isAIConfigured()) {
+    // No provider configured — fall back to scripted demo responses.
     return { text: matchScript(lastPrompt), mode: 'scripted' };
   }
 
-  try {
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const home = getHome();
-    const response = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: 1024,
-      system: buildSystemPrompt(home),
-      messages: messages.map((m) => ({ role: m.role, content: m.content })),
-    });
+  const home = await getCurrentHome();
+  const result = await aiComplete({
+    system: buildSystemPrompt(home),
+    messages: messages.map((m) => ({ role: m.role, content: m.content })),
+    maxTokens: 1024,
+  });
 
-    const text = response.content
-      .filter((b) => b.type === 'text')
-      .map((b) => ('text' in b ? b.text : ''))
-      .join('\n');
-
-    return { text, mode: 'ai' };
-  } catch (err) {
-    console.error('Chat error:', err);
-    return { text: matchScript(lastPrompt), mode: 'scripted' };
-  }
+  if (!result) return { text: matchScript(lastPrompt), mode: 'scripted' };
+  return { text: result.text, mode: 'ai' };
 }

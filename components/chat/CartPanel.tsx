@@ -3,7 +3,6 @@
 import { ShoppingCart, X, ArrowRight } from 'lucide-react';
 import { cartTotals } from '@/lib/cart';
 import { useChatRail } from './ChatRailContext';
-import { getHome } from '@/lib/home-data';
 
 /**
  * Cart view. Used in two contexts:
@@ -11,14 +10,13 @@ import { getHome } from '@/lib/home-data';
  *  - LiveCanvas pane when the rail is in takeover mode (sits beside the chat)
  */
 export function CartPanel({ variant = 'rail' }: { variant?: 'rail' | 'canvas' }) {
-  const { cart, removeFromCart, clearCart } = useChatRail();
-  const home = getHome();
+  const { home, cart, removeFromCart, clearCart } = useChatRail();
   const totals = cartTotals(cart, home.subs.currentMonthly);
 
   return (
     <div className="flex flex-col h-full">
       {variant === 'canvas' && (
-        <div className="px-4 pt-4 pb-3 border-b border-white/[0.05]">
+        <div className="px-4 pt-4 pb-3 border-b border-faint">
           <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-wyze-green mb-1">
             Live · updating
           </div>
@@ -39,12 +37,12 @@ export function CartPanel({ variant = 'rail' }: { variant?: 'rail' | 'canvas' })
           cart.map((item) => (
             <div
               key={item.id}
-              className={`bg-white/[0.04] border rounded-[10px] p-3 flex items-start gap-3 ${
+              className={`bg-surface-2 border rounded-[10px] p-3 flex items-start gap-3 ${
                 item.kind === 'plan'
                   ? 'border-wyze-green/25'
                   : item.kind === 'plan-change'
-                  ? 'border-wyze-purple-light/25'
-                  : 'border-white/[0.08]'
+                  ? 'border-accent-purple/25'
+                  : 'border-subtle'
               }`}
             >
               <div className="flex-1 min-w-0">
@@ -56,8 +54,8 @@ export function CartPanel({ variant = 'rail' }: { variant?: 'rail' | 'canvas' })
                         item.kind === 'plan'
                           ? 'bg-wyze-green/20 text-wyze-green'
                           : item.kind === 'plan-change'
-                          ? 'bg-wyze-purple/20 text-wyze-purple-light'
-                          : 'bg-white/[0.08] text-text-muted'
+                          ? 'bg-wyze-purple/20 text-accent-purple'
+                          : 'bg-surface-3 text-text-muted'
                       }`}
                     >
                       {item.badge}
@@ -76,7 +74,7 @@ export function CartPanel({ variant = 'rail' }: { variant?: 'rail' | 'canvas' })
                       <span className="text-text-primary font-semibold">${item.oneTime.toFixed(2)}</span>
                     )}
                     {item.kind === 'plan-change' && (
-                      <span className="text-wyze-purple-light font-semibold">$0 · no charge</span>
+                      <span className="text-accent-purple font-semibold">$0 · no charge</span>
                     )}
                   </div>
                   <button
@@ -93,7 +91,7 @@ export function CartPanel({ variant = 'rail' }: { variant?: 'rail' | 'canvas' })
         )}
       </div>
 
-      <div className="px-4 py-3 border-t border-white/[0.05] bg-white/[0.02] flex flex-col gap-1.5">
+      <div className="px-4 py-3 border-t border-faint bg-surface-1 flex flex-col gap-1.5">
         <div className="flex justify-between text-[11px]">
           <span className="text-text-muted">Monthly</span>
           <span
@@ -115,7 +113,7 @@ export function CartPanel({ variant = 'rail' }: { variant?: 'rail' | 'canvas' })
         )}
         <button
           disabled={cart.length === 0}
-          className="mt-2 w-full bg-wyze-green text-bg-base px-3 py-2.5 rounded-md font-semibold text-[12px] hover:bg-[#4dffd0] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+          className="mt-2 w-full bg-wyze-green text-[#0a0a0a] px-3 py-2.5 rounded-md font-semibold text-[12px] hover:bg-[#4dffd0] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
         >
           Apply changes
           <ArrowRight size={14} />
