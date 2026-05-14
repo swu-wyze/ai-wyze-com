@@ -1,4 +1,3 @@
-import { Sparkles } from 'lucide-react';
 import type { Briefing } from '@/lib/briefing';
 
 /**
@@ -9,15 +8,6 @@ import type { Briefing } from '@/lib/briefing';
 export function BriefingSection({ briefing }: { briefing: Briefing }) {
   return (
     <section className="mb-12">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="w-7 h-7 rounded-full bg-brand-gradient flex items-center justify-center shrink-0">
-          <Sparkles size={14} className="text-[#0a0a0a]" />
-        </span>
-        <span className="text-[10px] font-semibold tracking-[1.5px] uppercase text-text-faint">
-          Wyze Intelligence · Briefing
-        </span>
-      </div>
-
       <h1 className="text-[26px] sm:text-[30px] font-semibold leading-[1.1] tracking-[-0.02em] mb-2 text-text-primary">
         {briefing.greeting}
       </h1>

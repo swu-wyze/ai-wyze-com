@@ -42,6 +42,11 @@
      white) and light purple (dark mode, readable on dark). Use this for any
      purple text or border that needs to be legible across themes. */
   --accent-purple: 78 47 210;
+
+  /* Semantic green accent. Same pattern — swaps wyze-green-dark in light mode
+     (readable on white) for wyze-green in dark mode (readable on dark). Use
+     for any green text/icons that need to stay legible across themes. */
+  --accent-green: 0 162 136;
 }
 
 html.dark {
@@ -68,6 +73,7 @@ html.dark {
   --scrollbar-thumb-hover: rgba(255, 255, 255, 0.20);
 
   --accent-purple: 184 196 255;
+  --accent-green: 29 240 187;
 }
 
 html, body {

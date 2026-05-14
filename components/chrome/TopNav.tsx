@@ -31,7 +31,7 @@ export function TopNav({ user }: { user: User }) {
               // collapse to give the avatar + cart room. Full row appears at md+.
               `${item.active ? 'flex' : 'hidden md:flex'} ${
                 item.active
-                  ? 'text-[13px] text-wyze-green font-medium relative after:content-[""] after:absolute after:-bottom-[20px] after:left-0 after:right-0 after:h-[2px] after:bg-wyze-green after:z-10'
+                  ? 'text-[13px] text-accent-green font-semibold relative after:content-[""] after:absolute after:-bottom-[20px] after:left-0 after:right-0 after:h-[2px] after:bg-accent-green after:z-10'
                   : 'text-[13px] text-text-secondary hover:text-text-primary cursor-pointer'
               }`
             }

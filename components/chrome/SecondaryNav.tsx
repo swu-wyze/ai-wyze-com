@@ -28,7 +28,7 @@ export function SecondaryNav() {
   );
 
   return (
-    <nav className="h-11 flex items-center gap-1 px-4 sm:px-8 border-b border-faint sticky top-14 z-[99] relative bg-surface-1 overflow-x-auto scrollbar-hide">
+    <nav className="h-11 flex items-center gap-1 px-4 sm:px-8 border-b border-faint sticky top-14 z-[99] relative bg-bg-base overflow-x-auto scrollbar-hide">
       <span className="hidden sm:flex items-center gap-1.5 mr-5 shrink-0 whitespace-nowrap relative z-10">
         <Home size={11} className="text-wyze-green" />
         <span className="text-[9px] font-semibold tracking-[1.5px] text-text-secondary">MY HOME</span>
@@ -44,11 +44,11 @@ export function SecondaryNav() {
             aria-current={isActive ? 'page' : undefined}
             className={`flex items-center gap-[7px] px-3 py-1.5 text-xs rounded-md transition-all shrink-0 whitespace-nowrap relative z-10 ${
               isActive
-                ? 'bg-wyze-green/15 text-wyze-green font-medium'
+                ? 'bg-accent-green/15 text-accent-green font-semibold'
                 : 'text-text-secondary hover:text-text-primary hover:bg-surface-2'
             }`}
           >
-            <Icon size={13} className={isActive ? 'text-wyze-green' : 'text-text-muted'} />
+            <Icon size={13} className={isActive ? 'text-accent-green' : 'text-text-muted'} />
             <span>{label}</span>
             {badge && (
               <span className="text-[9px] bg-wyze-green text-[#0a0a0a] px-1.5 rounded-lg font-semibold">

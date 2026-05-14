@@ -12,10 +12,13 @@ export default {
           purple: '#4E2FD2',
           'purple-light': '#B8C4FF',
         },
-        // Theme-aware purple accent — wyze-purple in light mode, wyze-purple-light in dark.
-        // Use this for any purple text/border meant to stay legible across both themes.
+        // Theme-aware accents — readable on white in light mode, readable on
+        // dark in dark mode. Use for any text/border that needs to stay legible
+        // across both themes. The non-accent wyze-green/wyze-purple values are
+        // still available for backgrounds, borders, and large color blocks.
         accent: {
           purple: 'rgb(var(--accent-purple) / <alpha-value>)',
+          green: 'rgb(var(--accent-green) / <alpha-value>)',
         },
         // Theme-swapping tokens. RGB-tuple vars so Tailwind alpha modifiers
         // (e.g. bg-bg-base/[0.92]) work.
