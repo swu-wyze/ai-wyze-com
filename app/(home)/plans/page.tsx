@@ -1,17 +1,31 @@
 import { Eyebrow, SectionLabel } from '@/components/ui/Eyebrow';
 import { PageTitle } from '@/components/ui/PageTitle';
+import { PlanSimulator } from '@/components/surfaces/plans/PlanSimulator';
 import { getCurrentHome } from '@/lib/home-data';
+import { getPlanRecommendation } from '@/lib/plan-recommendation';
+import { buildSimulator } from '@/lib/plan-simulator';
 
 export default async function PlansPage() {
   const home = await getCurrentHome();
+  const recommendation = await getPlanRecommendation(home);
+  const options = buildSimulator(home, recommendation);
+
   const onPlanCount = home.cameras.filter((c) => c.tier === 'cam-plus').length;
+  const hasPlan = home.subs.currentMonthly > 0;
+
+  // Demo billing details — date is fictional, dollar amount tracks the real
+  // current spend so the page stays internally consistent per user.
+  const nextChargeStr = hasPlan
+    ? `$${home.subs.currentMonthly.toFixed(2)} on Jun 13, 2026`
+    : 'No active subscription';
+
   return (
     <div className="surface">
       <Eyebrow className="mb-2">PLANS · YOUR SUBSCRIPTIONS</Eyebrow>
       <PageTitle
         title={`${onPlanCount} of ${home.cameras.length} cameras protected.`}
         subtitle={
-          home.subs.currentMonthly > 0
+          hasPlan
             ? `Currently paying $${home.subs.currentMonthly.toFixed(2)}/mo · ${home.subs.planName}.`
             : `No active subscription — your cameras record 12-second clips only.`
         }
@@ -21,14 +35,18 @@ export default async function PlansPage() {
       <div className="bg-surface-1 border border-faint rounded-[10px] p-5 mb-7">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
           <div>
-            <div className="text-[15px] font-semibold mb-1">Cam Plus × {onPlanCount}</div>
+            <div className="text-[15px] font-semibold mb-1">{home.subs.planName}</div>
             <div className="text-[12px] text-text-muted">
-              ${home.subs.currentMonthly.toFixed(2)}/mo · billed monthly · Visa ending 3403
+              {hasPlan
+                ? `$${home.subs.currentMonthly.toFixed(2)}/mo · billed monthly · Visa ending 3403`
+                : 'Sign up for any plan below to start protecting your cameras.'}
             </div>
           </div>
-          <button className="bg-transparent text-text-secondary border border-text-faint/50 px-[14px] py-2 rounded-md text-[11px] hover:text-text-primary hover:border-text-muted transition-all self-start">
-            Manage billing
-          </button>
+          {hasPlan && (
+            <button className="bg-transparent text-text-secondary border border-text-faint/50 px-[14px] py-2 rounded-md text-[11px] hover:text-text-primary hover:border-text-muted transition-all self-start">
+              Manage billing
+            </button>
+          )}
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {home.cameras.map((cam) => {
@@ -40,9 +58,9 @@ export default async function PlansPage() {
                   isCP ? 'bg-wyze-green/[0.06] border border-wyze-green/15' : 'bg-surface-1 border border-faint'
                 }`}
               >
-                <span className="text-[12px] font-medium">{cam.name}</span>
-                <span className={`text-[10px] ${isCP ? 'text-wyze-green' : 'text-text-faint'}`}>
-                  {isCP ? 'Cam Plus' : 'No plan'}
+                <span className="text-[12px] font-medium truncate">{cam.name}</span>
+                <span className={`text-[10px] shrink-0 ml-2 ${isCP ? 'text-accent-green' : 'text-text-faint'}`}>
+                  {isCP ? 'Covered' : 'No plan'}
                 </span>
               </div>
             );
@@ -52,116 +70,36 @@ export default async function PlansPage() {
 
       {/* Upgrade simulator */}
       <SectionLabel>What if you switched?</SectionLabel>
-      <p className="text-[12.5px] text-text-secondary mb-5 max-w-[640px]">
-        All three options give you AI detection on every camera. Pick the math that fits.
+      <p className="text-[12.5px] text-text-secondary mb-5">
+        Wyze Intelligence picked one as the best fit for your {home.cameras.length}-camera setup.
+        Pick the math that works for you.
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-10">
-        <SimOption
-          tag="CURRENT + ADD"
-          tagColor="text-text-muted"
-          name="Cam Plus × 4"
-          price="$11.96"
-          period="per month"
-          delta="+$2.99/mo"
-          deltaSub="covers all 4, no AI Video Search"
-          deltaTone="neutral"
-          cta="Add Cam Plus to Backyard"
-          ctaVariant="secondary"
-        />
-        <SimOption
-          tag="RECOMMENDED"
-          tagColor="text-wyze-green"
-          name="Cam Unlimited"
-          price="$9.99"
-          priceColor="text-wyze-green"
-          period="per month · all cameras"
-          delta="Save $2/mo"
-          deltaSub="+ AI Video Search, 60-day history"
-          deltaTone="positive"
-          cta="Try 14 days free"
-          ctaVariant="primary"
-          recommended
-        />
-        <SimOption
-          tag="UPGRADE"
-          tagColor="text-accent-purple"
-          name="Cam Unlimited Pro"
-          price="$19.99"
-          period="per month · all cameras"
-          delta="+$10/mo"
-          deltaSub="+ 24/7 monitoring, Direct Dispatch"
-          deltaTone="neutral"
-          cta="Learn more"
-          ctaVariant="secondary"
-        />
-      </div>
+      <PlanSimulator options={options} />
 
       {/* Billing */}
-      <SectionLabel>Billing & payment</SectionLabel>
-      <div className="rounded-[10px] border border-faint overflow-hidden">
-        {[
-          ['Next charge', '$8.97 on Jun 13, 2026'],
-          ['Payment method', 'Visa ending in 3403 · Update →'],
-          ['Billing history', 'View all charges →'],
-        ].map(([label, value], i) => (
-          <div key={label} className={`flex items-center justify-between px-4 py-3.5 ${i > 0 ? 'border-t border-faint' : ''} bg-surface-1`}>
-            <div className="text-[12px] text-text-muted">{label}</div>
-            <div className="text-[12.5px]">{value}</div>
+      {hasPlan && (
+        <>
+          <SectionLabel>Billing & payment</SectionLabel>
+          <div className="rounded-[10px] border border-faint overflow-hidden">
+            {[
+              ['Next charge', nextChargeStr],
+              ['Payment method', 'Visa ending in 3403 · Update →'],
+              ['Billing history', 'View all charges →'],
+            ].map(([label, value], i) => (
+              <div
+                key={label}
+                className={`flex items-center justify-between px-4 py-3.5 ${
+                  i > 0 ? 'border-t border-faint' : ''
+                } bg-surface-1`}
+              >
+                <div className="text-[12px] text-text-muted">{label}</div>
+                <div className="text-[12.5px]">{value}</div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-interface SimOptionProps {
-  tag: string;
-  tagColor: string;
-  name: string;
-  price: string;
-  priceColor?: string;
-  period: string;
-  delta: string;
-  deltaSub: string;
-  deltaTone: 'positive' | 'neutral';
-  cta: string;
-  ctaVariant: 'primary' | 'secondary';
-  recommended?: boolean;
-}
-
-function SimOption({
-  tag, tagColor, name, price, priceColor, period, delta, deltaSub, deltaTone, cta, ctaVariant, recommended,
-}: SimOptionProps) {
-  return (
-    <div
-      className={`rounded-[10px] p-5 ${
-        recommended
-          ? 'bg-hero-gradient border border-wyze-green/30'
-          : 'bg-surface-1 border border-faint hover:bg-surface-2 transition-all'
-      }`}
-    >
-      <div className={`text-[10px] font-semibold tracking-[1.5px] uppercase mb-3 ${tagColor}`}>{tag}</div>
-      <div className="text-[15px] font-semibold mb-2">{name}</div>
-      <div className={`text-[28px] font-semibold tabular-nums leading-none mb-1 ${priceColor ?? ''}`}>{price}</div>
-      <div className="text-[11px] text-text-faint mb-4">{period}</div>
-      <div
-        className={`text-[12px] mb-4 leading-snug ${
-          deltaTone === 'positive' ? 'text-wyze-green' : 'text-text-muted'
-        }`}
-      >
-        <div className="font-semibold">{delta}</div>
-        <div className="text-text-faint mt-0.5">{deltaSub}</div>
-      </div>
-      <button
-        className={`w-full px-[14px] py-2 rounded-md text-[11px] transition-all ${
-          ctaVariant === 'primary'
-            ? 'bg-wyze-green text-[#0a0a0a] font-semibold hover:bg-[#4dffd0]'
-            : 'bg-transparent text-text-secondary border border-text-faint/50 hover:text-text-primary hover:border-text-muted'
-        }`}
-      >
-        {cta}
-      </button>
+        </>
+      )}
     </div>
   );
 }
