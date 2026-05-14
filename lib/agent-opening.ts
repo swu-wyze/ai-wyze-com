@@ -1,29 +1,51 @@
-// Suggestion chips rendered under the chat input when the thread is empty
-// (or has only the auto-greeting). The full briefing now lives on the Digest
-// page via lib/briefing.ts — this file only holds the chips.
+// Starting suggestion chips that appear below the chat input on the rail's
+// empty state. Derived from the user's actual fleet: we surface hardware
+// categories they're MISSING first, then add-ons (lock, sensor), then a
+// generic catch-all. Each chip phrases as a natural "Add X" request so the
+// AI's reply includes a [PRODUCT: slug] card the user can drop in the cart.
 
 import type { Home } from './types';
 
+interface Owned {
+  doorbell: boolean;
+  floodlight: boolean;
+  outdoor: boolean;
+  /** The camera in a baby/nursery room, if any — drives sensor copy. */
+  nurseryCam: Home['cameras'][number] | undefined;
+}
+
+function inferOwned(home: Home): Owned {
+  return {
+    doorbell: home.cameras.some((c) => /doorbell/i.test(c.model)),
+    floodlight: home.cameras.some((c) => /floodlight/i.test(c.model)),
+    outdoor: home.cameras.some(
+      (c) =>
+        /yard|porch|deck|drive|patio|garden|outdoor/i.test(c.name) ||
+        /outdoor|battery|floodlight/i.test(c.model)
+    ),
+    nurseryCam: home.cameras.find((c) => /angie|baby|nursery|kid/i.test(c.name)),
+  };
+}
+
 export function startingChipsFor(home: Home): string[] {
-  switch (home.user.id) {
-    case 'owen':
-      return [
-        "What's the cheapest way to cover both cameras?",
-        'Show me everything I missed this week',
-        'How does Cam Plus differ from Cam Unlimited?',
-      ];
-    case 'bob':
-      return [
-        "What's the cheapest way to cover all 3?",
-        'Should I upgrade Baby to Cam Plus?',
-        'Which cam isn’t earning its keep?',
-      ];
-    case 'sunny':
-    default:
-      return [
-        'What did Angie see this week?',
-        'Should I add a Lock Bolt?',
-        'Should I upgrade to Cam Unlimited Pro?',
-      ];
+  const owned = inferOwned(home);
+  const candidates: string[] = [];
+
+  // Tier 1 — primary fleet gaps (something they don't have a category for yet)
+  if (!owned.doorbell) candidates.push('Add a Video Doorbell to my front door');
+  if (!owned.outdoor) candidates.push('Add an outdoor camera for the backyard');
+  if (!owned.floodlight) candidates.push('Add a Floodlight Cam for outdoor lighting');
+
+  // Tier 2 — broadly-useful add-ons that aren't cameras
+  candidates.push('Add a Smart Lock to my front door');
+  if (owned.nurseryCam) {
+    candidates.push(`Add a Climate Sensor for ${owned.nurseryCam.name}'s room`);
+  } else {
+    candidates.push('Add a Climate Sensor');
   }
+
+  // Tier 3 — generic expansion when there's nothing obvious missing
+  candidates.push('Add another camera to my system');
+
+  return candidates.slice(0, 3);
 }
