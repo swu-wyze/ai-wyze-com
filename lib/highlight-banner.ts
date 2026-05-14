@@ -95,7 +95,7 @@ CONSTRAINTS
 - The eyebrow must reference something specific from the events or fleet, ALL CAPS, under 50 chars. Cite real data — a camera name, a behavior, a time.
 - The title is the recommendation in plain language.
 - The priceLine carries the value: cost + the most relevant feature ("+$10/mo · 24/7 dispatch on Angie's 3 AM alerts").
-- The ctaLabel uses one of these patterns: "Try [plan] free for 14 days", "Add [product] to cart", "Upgrade to [plan]".
+- The ctaLabel uses one of these patterns: "Try [plan] free for 30 days", "Add [product] to cart", "Upgrade to [plan]".
 - illustrationSlug must be one of: shield (for plan upgrades), or any product slug from the catalog provided.
 - accent: 'purple' for Cam Unlimited Pro upgrade, 'green' for Cam Plus / Cam Unlimited / hardware add-ons.
 
@@ -158,8 +158,8 @@ function hardcodedHighlight(home: Home): HighlightBanner {
       return {
         eyebrow: 'BOTH CAMS ON FREE — 25 CLIPS CUT SHORT',
         title: 'Start with Cam Plus on Front Door',
-        priceLine: '$2.99/mo · full clips + 14-day history · 14-day free trial',
-        ctaLabel: 'Try Cam Plus free for 14 days',
+        priceLine: '$2.99/mo · full clips + 14-day history · 30-day free trial',
+        ctaLabel: 'Try Cam Plus free for 30 days',
         illustrationSlug: 'shield',
         accent: 'green',
       };
@@ -168,7 +168,7 @@ function hardcodedHighlight(home: Home): HighlightBanner {
         eyebrow: 'BABY CRY AT 2:14 AM — CLIPPED AT 12s',
         title: 'Cam Unlimited covers all 3 for $9.99/mo',
         priceLine: '+$7/mo over your current plan · full clips on Baby + Deck',
-        ctaLabel: 'Try Cam Unlimited free for 14 days',
+        ctaLabel: 'Try Cam Unlimited free for 30 days',
         illustrationSlug: 'shield',
         accent: 'green',
       };
@@ -178,7 +178,7 @@ function hardcodedHighlight(home: Home): HighlightBanner {
         eyebrow: "ANGIE'S 3 AM ALERTS — UPGRADE FOR DISPATCH",
         title: 'Upgrade to Cam Unlimited Pro',
         priceLine: '+$10/mo · 24/7 emergency dispatch + AI Video Search + 60-day history',
-        ctaLabel: 'Try Cam Unlimited Pro free for 14 days',
+        ctaLabel: 'Try Cam Unlimited Pro free for 30 days',
         illustrationSlug: 'shield',
         accent: 'purple',
       };

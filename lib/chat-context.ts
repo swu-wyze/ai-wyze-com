@@ -97,7 +97,7 @@ Renders a product card inline (image + name + price + "Add to cart" button). Slu
 Use the product card whenever you recommend a specific hardware item.
 
 [ACTION: Label]
-Big action buttons that sit at the bottom of your message. Use for plan-related actions (the cart picks up "Try [plan] free for 14 days", "Move [plan] from X to Y") and "Compare X and Y" prompts that should re-route to a new chat answer.
+Big action buttons that sit at the bottom of your message. Use for plan-related actions (the cart picks up "Try [plan] free for 30 days", "Move [plan] from X to Y") and "Compare X and Y" prompts that should re-route to a new chat answer.
 
 [CHIP: Label]
 Smaller quick-reply pills. Clicking sends the label as the user's next message — great for branching navigation ("Add a doorbell" / "Cover the front yard" / "Tell me where I want it"). Use 2-4 chips after open-ended questions.

@@ -22,7 +22,7 @@ Cam Unlimited | $9.99/mo | 84 | true
 
 **Saves $24/year, plus AI Video Search and 60-day history.**
 
-[ACTION: Try 14 days free]
+[ACTION: Try 30 days free]
 [ACTION: See what changes]`,
   },
   {
@@ -82,7 +82,7 @@ Note: 60-day history. All Cam Plus AI. AI Video Search ("find a package on Tuesd
 
 Cheaper *and* more. Only catch: it's $9.99/mo flat regardless of how many cameras you add, so if you ever drop to 1-2 cameras, Cam Plus becomes cheaper.
 
-[ACTION: Try Cam Unlimited free for 14 days]`,
+[ACTION: Try Cam Unlimited free for 30 days]`,
   },
 ];
 

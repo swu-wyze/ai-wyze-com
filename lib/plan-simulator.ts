@@ -20,7 +20,7 @@ export interface SimulatorOption {
   deltaTone: 'positive' | 'neutral';
   /** One-line feature summary. */
   features: string;
-  /** Button label — uses the existing cart parser's "Try ... free for 14 days" pattern. */
+  /** Button label — uses the existing cart parser's "Try ... free for 30 days" pattern. */
   cta: string;
   /** True when this is the user's current plan; disables the CTA. */
   isCurrent: boolean;
@@ -82,7 +82,7 @@ export function buildSimulator(
       delta: currentId === 'cam-plus' ? 'Current spend' : camPlusDelta.delta,
       deltaTone: currentId === 'cam-plus' ? 'neutral' : camPlusDelta.tone,
       features: 'Full clips, 14-day history, AI detection per camera.',
-      cta: currentId === 'cam-plus' ? "You're on this plan" : 'Try Cam Plus free for 14 days',
+      cta: currentId === 'cam-plus' ? "You're on this plan" : 'Try Cam Plus free for 30 days',
       isCurrent: currentId === 'cam-plus',
       isRecommended: recommendation.planId === 'cam-plus',
       reasonWhy: recommendation.planId === 'cam-plus' ? recommendation.reason : undefined,
@@ -97,7 +97,7 @@ export function buildSimulator(
       delta: currentId === 'cam-unlimited' ? 'Current spend' : unlimitedDelta.delta,
       deltaTone: currentId === 'cam-unlimited' ? 'neutral' : unlimitedDelta.tone,
       features: 'Cam Plus features + facial recognition + multi-cam timeline.',
-      cta: currentId === 'cam-unlimited' ? "You're on this plan" : 'Try Cam Unlimited free for 14 days',
+      cta: currentId === 'cam-unlimited' ? "You're on this plan" : 'Try Cam Unlimited free for 30 days',
       isCurrent: currentId === 'cam-unlimited',
       isRecommended: recommendation.planId === 'cam-unlimited',
       reasonWhy: recommendation.planId === 'cam-unlimited' ? recommendation.reason : undefined,
@@ -115,7 +115,7 @@ export function buildSimulator(
       cta:
         currentId === 'cam-unlimited-pro'
           ? "You're on this plan"
-          : 'Try Cam Unlimited Pro free for 14 days',
+          : 'Try Cam Unlimited Pro free for 30 days',
       isCurrent: currentId === 'cam-unlimited-pro',
       isRecommended: recommendation.planId === 'cam-unlimited-pro',
       reasonWhy: recommendation.planId === 'cam-unlimited-pro' ? recommendation.reason : undefined,

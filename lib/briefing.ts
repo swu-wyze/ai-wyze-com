@@ -123,7 +123,7 @@ CARD RULES
 - Other two cards are pure observations: a pattern, an alert, a clipped event. Not pitches.
 
 ACTION BUTTON RULES
-- Use these patterns: "Try [plan] free for 14 days", "Add [product] to cart", "See [thing]", "Compare [A] and [B]", "Move [plan] from [A] to [B]".
+- Use these patterns: "Try [plan] free for 30 days", "Add [product] to cart", "See [thing]", "Compare [A] and [B]", "Move [plan] from [A] to [B]".
 - 2-3 actions. First is typically the recommended action that ties to the flagged card.
 
 OUTPUT
@@ -211,7 +211,7 @@ function hardcodedBriefing(home: Home): Briefing {
             note: 'Covers your Front Door and Living Room (and anything you add later).',
           },
         ],
-        chatActions: ['Try Cam Plus free for 14 days', 'See the missed clips', 'Compare Cam Plus and Cam Unlimited'],
+        chatActions: ['Try Cam Plus free for 30 days', 'See the missed clips', 'Compare Cam Plus and Cam Unlimited'],
       };
 
     case 'bob':
@@ -233,7 +233,7 @@ function hardcodedBriefing(home: Home): Briefing {
             note: 'A doorbell upgrade pairs well if you ever go on vacation.',
           },
         ],
-        chatActions: ['Try Cam Unlimited free for 14 days', 'Add Cam Plus to Baby and Deck', "See Baby's missed cry clip"],
+        chatActions: ['Try Cam Unlimited free for 30 days', 'Add Cam Plus to Baby and Deck', "See Baby's missed cry clip"],
       };
 
     case 'sunny':
@@ -256,7 +256,7 @@ function hardcodedBriefing(home: Home): Briefing {
             note: 'A Lock Bolt would complete the front-door setup — pairs with your Cam v3.',
           },
         ],
-        chatActions: ['Try Cam Unlimited Pro free for 14 days', 'Add Lock Bolt to cart', "See Saturday's clip"],
+        chatActions: ['Try Cam Unlimited Pro free for 30 days', 'Add Lock Bolt to cart', "See Saturday's clip"],
       };
   }
 }

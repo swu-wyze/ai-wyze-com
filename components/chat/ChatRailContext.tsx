@@ -124,7 +124,7 @@ export function ChatRailProvider({ children, home, openingMessage, initialMode =
     const lines = cart.map((item) => {
       if (item.kind === 'plan') {
         return `• Started **${item.name}**${
-          item.badge === 'TRIAL' ? ' (14-day free trial — you won\'t be charged until day 15)' : ''
+          item.badge === 'TRIAL' ? ' (30-day free trial — you won\'t be charged until day 31)' : ''
         }`;
       }
       if (item.kind === 'plan-change') {
