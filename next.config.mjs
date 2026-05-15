@@ -8,6 +8,9 @@ const nextConfig = {
       // public homepage. Its CTAs link into /digest, which is gated by the
       // (home) layout and bounces unauthenticated users to /login.
       { source: '/', destination: '/wyzeai.html' },
+      // Direct handle so you can verify the landing page without going through
+      // the rewritten root (useful when the root is otherwise cached or gated).
+      { source: '/landing', destination: '/wyzeai.html' },
     ];
   },
 };
