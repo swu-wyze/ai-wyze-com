@@ -4,13 +4,10 @@ const nextConfig = {
   reactStrictMode: true,
   async rewrites() {
     return [
-      // Owen's pre-auth landing (static HTML in /public/wyzeai.html) is the
-      // public homepage. Its CTAs link into /digest, which is gated by the
-      // (home) layout and bounces unauthenticated users to /login.
+      // Root still serves the static HTML landing during the Next.js migration.
+      // The new TSX landing lives at /landing — once verified, we'll swap / to
+      // the Next route and delete public/wyzeai.html.
       { source: '/', destination: '/wyzeai.html' },
-      // Direct handle so you can verify the landing page without going through
-      // the rewritten root (useful when the root is otherwise cached or gated).
-      { source: '/landing', destination: '/wyzeai.html' },
     ];
   },
 };

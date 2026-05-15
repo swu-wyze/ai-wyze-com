@@ -1132,6 +1132,49 @@ body.nav-open { overflow: hidden; }
 }
 @media (min-width: 720px) { .wyatt-title { font-size: 22px; } }
 
+/* Hero treatment — merged Welcome-back + Wyatt greeting */
+.wyatt-greet--hero {
+  gap: 14px;
+  max-width: 760px;
+  margin: 0 auto 12px;
+  padding: 0 var(--pad-x);
+}
+.wyatt-greet-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+.wyatt-greet--hero .wyatt-title {
+  font-size: clamp(28px, 5vw, 44px);
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 1.12;
+  color: var(--wyze-deep);
+  text-align: center;
+}
+.wyatt-title-accent {
+  background: linear-gradient(115deg, #1E8EFF 0%, #2DDDB3 55%, #1E8EFF 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.wyatt-subline {
+  margin: 0;
+  font-size: 15px;
+  color: var(--ink-2);
+  text-align: center;
+}
+.wyatt-cc-link {
+  color: var(--wyze);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.wyatt-cc-link:hover { text-decoration: underline; }
+
 .card-prompt {
   font-size: clamp(36px, 10vw, 52px);
   font-weight: 700; letter-spacing: -0.028em; line-height: 1.05;
@@ -1429,6 +1472,42 @@ body.nav-open { overflow: hidden; }
 }
 body.chat-active .persistent-chat { display: none; }
 
+/* ═════════════ OUR PRODUCTS (standalone section) ═════════════ */
+.products-section {
+  background: var(--paper);
+  padding: clamp(56px, 8vw, 96px) var(--pad-x);
+}
+.products-section-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.products-section .pc-browse {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+  gap: clamp(20px, 3vw, 32px);
+}
+.products-section .pc-browse-header {
+  align-items: center;
+  text-align: center;
+}
+.products-section .pc-browse-title {
+  font-size: clamp(28px, 5vw, 44px);
+}
+@media (min-width: 720px) {
+  .products-section .pc-collections {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+}
+@media (min-width: 1024px) {
+  .products-section .pc-collections {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .products-section .pc-collection { height: 280px; }
+}
+
 /* ═════ Step 3 inputs ═════ */
 .space-grid { display: grid; gap: 10px; }
 @media (min-width: 720px) { .space-grid { grid-template-columns: 1fr 1fr; gap: 14px; } }
@@ -1564,105 +1643,160 @@ body.chat-active .persistent-chat { display: none; }
 /* ═════════════════════════════════════════════════════════
    AI CHAT SHOPPING
    ───────────────────────────────────────────────────────── */
+/* Pre-auth chat — aligned with post-auth /digest ChatRail visual language.
+   Tokens used: brand-gradient (green→purple), wyze-green #1DF0BB, wyze-purple #4E2FD2. */
 .chat {
   position: relative;
-  background: var(--paper);
-  border-top: 1px solid var(--line-2);
-  padding: var(--pad-y) var(--pad-x) 0;
+  background: #FAFAFA;
+  color: #0c0c0c;
+  padding: 0;
   display: none;
 }
-.chat.is-open { display: block; }
+/* Full-screen takeover — fixed overlay on top of every section. */
+.chat.is-open {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow: hidden;
+  border-top: 0;
+}
+body.chat-active { overflow: hidden; }
+
 .chat-inner {
-  max-width: 720px;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
   position: relative;
-  padding-bottom: 220px; /* room for composer + tray */
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 /* Header */
 .chat-header {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--line-2);
-  margin-bottom: 28px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  background: #FAFAFA;
+  flex-shrink: 0;
 }
 .ai-orb {
   flex-shrink: 0;
-  width: 42px; height: 42px;
+  width: 36px; height: 36px;
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 30% 30%, var(--teal-bright), var(--teal-deep) 65%),
-    var(--teal);
-  box-shadow: 0 0 0 4px rgba(35, 196, 160, 0.18), 0 6px 18px rgba(35, 196, 160, 0.32);
+  background: linear-gradient(135deg, #1DF0BB, #4E2FD2);
+  display: grid; place-items: center;
+  color: #0a0a0a;
   position: relative;
 }
-.ai-orb::after {
+.ai-orb-icon { width: 18px; height: 18px; display: block; }
+.chat-title-block { flex: 1; min-width: 0; }
+.chat-title {
+  font-size: 14px; font-weight: 600; letter-spacing: -0.01em;
+  margin: 0; line-height: 1.2;
+  color: #0c0c0c;
+}
+.chat-status {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 2px;
+  font-size: 11px;
+  color: #6e6e6e;
+}
+.chat-status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #1DF0BB;
+  box-shadow: 0 0 0 2px rgba(29,240,187,0.18);
+}
+.chat-context {
+  font-size: 11px; color: #6e6e6e;
+  margin: 4px 0 0;
+  display: flex; flex-wrap: wrap; gap: 4px 6px;
+  align-items: center;
+}
+.chat-context:empty { display: none; }
+.chat-context .ctx-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10.5px;
+  background: rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: #3c3c3c;
+}
+.chat-context .ctx-chip .swatch {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: linear-gradient(135deg, #1DF0BB, #4E2FD2);
+}
+.chat-reset {
+  appearance: none; border: 0; background: transparent;
+  font-family: inherit; font-size: 11.5px;
+  color: #6e6e6e; cursor: pointer;
+  padding: 6px 10px; border-radius: 8px;
+  display: inline-flex; align-items: center; gap: 6px;
+  flex-shrink: 0;
+  transition: color 160ms var(--ease), background 160ms var(--ease);
+}
+.chat-reset svg { width: 14px; height: 14px; }
+.chat-reset:hover { color: #0c0c0c; background: rgba(0,0,0,0.05); }
+.chat-reset-label { display: none; }
+@media (min-width: 640px) {
+  .chat-reset-label { display: inline; }
+}
+
+/* Thread */
+.thread {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 24px 20px 24px;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+.msg { display: flex; gap: 10px; max-width: 100%; }
+.msg-ai { align-self: flex-start; width: 100%; }
+.msg-user { align-self: flex-end; max-width: 80%; justify-content: flex-end; }
+
+.msg-avatar {
+  flex-shrink: 0;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background:
+    linear-gradient(135deg, #1DF0BB, #4E2FD2),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230a0a0a'><path d='M12 2.5L13.7 8L19 9.7L13.7 11.4L12 16.9L10.3 11.4L5 9.7L10.3 8L12 2.5z'/></svg>") center / 14px 14px no-repeat;
+  background-blend-mode: normal;
+  position: relative;
+  margin-top: 2px;
+}
+.msg-avatar::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), transparent 50%);
-}
-.chat-title-block { flex: 1; min-width: 0; }
-.chat-title {
-  font-size: 22px; font-weight: 700; letter-spacing: -0.02em;
-  margin: 0 0 4px; line-height: 1.15;
-}
-.chat-context {
-  font-size: 13px; color: var(--ink-2);
-  margin: 0;
-  display: flex; flex-wrap: wrap; gap: 4px 8px;
-  align-items: center;
-}
-.chat-context .ctx-chip {
-  display: inline-flex; align-items: center; gap: 5px;
-  font-size: 11.5px;
-  background: var(--paper-3);
-  border: 1px solid var(--line);
-  padding: 3px 9px;
-  border-radius: 999px;
-}
-.chat-context .ctx-chip .swatch {
-  width: 5px; height: 5px; border-radius: 50%; background: var(--wyze);
-}
-.chat-reset {
-  appearance: none; border: 0; background: transparent;
-  font-family: inherit; font-size: 12px;
-  color: var(--ink-3); cursor: pointer;
-  padding: 4px 8px; border-radius: 6px;
-  align-self: flex-start;
-  transition: color 200ms var(--ease), background 200ms var(--ease);
-}
-.chat-reset:hover { color: var(--ink); background: var(--paper-3); }
-
-/* Thread */
-.thread { display: flex; flex-direction: column; gap: 22px; }
-.msg { display: flex; gap: 12px; max-width: 100%; }
-.msg-ai { align-self: flex-start; width: 100%; }
-.msg-user { align-self: flex-end; max-width: 80%; }
-
-.msg-avatar {
-  flex-shrink: 0;
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, var(--teal-bright), var(--teal-deep) 65%);
-  margin-top: 2px;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230a0a0a'><path d='M12 2.5L13.7 8L19 9.7L13.7 11.4L12 16.9L10.3 11.4L5 9.7L10.3 8L12 2.5zM19 14L19.85 16.65L22.5 17.5L19.85 18.35L19 21L18.15 18.35L15.5 17.5L18.15 16.65L19 14z'/></svg>") center / 14px 14px no-repeat;
 }
 .msg-body { flex: 1; min-width: 0; }
 .msg-ai .msg-body p {
-  font-size: 15px; line-height: 1.55;
-  color: var(--ink); margin: 0 0 8px;
+  font-size: 13.5px; line-height: 1.55;
+  color: #0c0c0c; margin: 0 0 8px;
 }
 .msg-ai .msg-body p:last-child { margin-bottom: 0; }
-.msg-user { justify-content: flex-end; }
 .msg-user .msg-body {
-  background: var(--wyze);
-  color: #fff;
-  padding: 11px 16px;
-  border-radius: 18px 18px 4px 18px;
-  font-size: 15px;
+  background: rgba(78,47,210,0.18);
+  color: #0c0c0c;
+  padding: 9px 14px;
+  border-radius: 14px 14px 4px 14px;
+  font-size: 13px;
   line-height: 1.45;
 }
 .msg-user .msg-body p { margin: 0; }
@@ -1671,7 +1805,7 @@ body.chat-active .persistent-chat { display: none; }
 .typing { display: inline-flex; align-items: center; gap: 4px; padding: 4px 0; }
 .typing span {
   width: 6px; height: 6px; border-radius: 50%;
-  background: var(--ink-3);
+  background: #6e6e6e;
   animation: typing-bounce 1.2s var(--ease) infinite;
 }
 .typing span:nth-child(2) { animation-delay: 0.15s; }
@@ -1815,75 +1949,89 @@ body.chat-active .persistent-chat { display: none; }
   gap: 8px;
   overflow-x: auto;
   scroll-behavior: smooth;
-  padding: 8px 0 4px;
-  margin-top: 18px;
+  padding: 8px 20px 12px;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
   scrollbar-width: none;
+  flex-shrink: 0;
 }
+.suggestions:empty { display: none; }
 .suggestions::-webkit-scrollbar { display: none; }
 .suggestion {
   flex-shrink: 0;
-  appearance: none; border: 1px solid var(--line);
-  background: var(--paper-2);
-  color: var(--ink-2);
-  font-family: inherit; font-size: 13px; font-weight: 500;
-  padding: 8px 14px;
+  appearance: none;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: transparent;
+  color: #3c3c3c;
+  font-family: inherit; font-size: 11.5px; font-weight: 500;
+  padding: 6px 12px;
   border-radius: 999px;
   cursor: pointer;
-  transition: background 200ms var(--ease), color 200ms var(--ease), border-color 200ms var(--ease);
+  transition: background 160ms var(--ease), color 160ms var(--ease), border-color 160ms var(--ease);
 }
 .suggestion:hover {
-  background: var(--wyze);
-  color: #fff;
-  border-color: var(--wyze);
+  background: rgba(0,0,0,0.05);
+  color: #0c0c0c;
+  border-color: rgba(0,0,0,0.2);
 }
 
-/* Composer + tray (sticky bottom) */
+/* Composer + tray (sticky bottom of the overlay) */
 .dock {
-  position: sticky;
+  position: relative;
   bottom: 0;
-  background: linear-gradient(180deg, rgba(250, 251, 252, 0), var(--paper) 18%, var(--paper) 100%);
-  padding: 12px 0 calc(16px + var(--safe-bottom));
-  margin: 18px calc(-1 * var(--pad-x)) 0;
-  padding-left: var(--pad-x);
-  padding-right: var(--pad-x);
+  background: #FAFAFA;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  padding: 12px 20px calc(14px + var(--safe-bottom));
+  margin: 0;
   z-index: 20;
+  flex-shrink: 0;
 }
 .composer {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: var(--paper-2);
-  border: 1.5px solid var(--line);
-  border-radius: 28px;
-  padding: 4px 4px 4px 18px;
-  transition: border-color 200ms var(--ease), box-shadow 200ms var(--ease);
+  gap: 10px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  max-width: 720px;
+  margin: 0 auto;
+  transition: none;
 }
-.composer:focus-within {
-  border-color: var(--wyze);
-  box-shadow: 0 0 0 4px var(--wyze-ring);
-}
+.composer:focus-within { box-shadow: none; }
 .composer-input {
   flex: 1;
-  appearance: none; border: 0; background: transparent;
-  font-family: inherit; font-size: 15px;
-  padding: 12px 0;
+  appearance: none;
+  background: rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 999px;
+  font-family: inherit; font-size: 13px;
+  padding: 10px 16px;
   outline: 0;
-  color: var(--ink);
+  color: #0c0c0c;
   min-width: 0;
+  transition: border-color 160ms var(--ease), background 160ms var(--ease);
 }
-.composer-input::placeholder { color: var(--ink-3); }
+.composer-input:focus {
+  border-color: rgba(29,240,187,0.4);
+}
+.composer-input::placeholder { color: #999; }
 .composer-send {
   appearance: none; border: 0;
-  width: 40px; height: 40px;
+  width: 30px; height: 30px;
   border-radius: 50%;
-  background: var(--wyze);
-  color: #fff;
+  background: #1DF0BB;
+  color: #0a0a0a;
   display: grid; place-items: center;
   cursor: pointer;
-  transition: background 200ms var(--ease), transform 200ms var(--ease), opacity 200ms var(--ease);
+  transition: background 160ms var(--ease), transform 160ms var(--ease), opacity 160ms var(--ease);
   flex-shrink: 0;
 }
-.composer-send:hover { background: var(--wyze-bright); }
+.composer-send:hover { background: #4dffd0; transform: scale(1.05); }
+.composer-send:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.composer-send svg { width: 14px; height: 14px; }
 .composer-send:disabled { opacity: 0.4; cursor: not-allowed; }
 .composer-send svg { width: 18px; height: 18px; }
 
@@ -2134,12 +2282,12 @@ body.chat-active .persistent-chat { display: none; }
 @media (min-width: 820px) {
   .plans-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 22px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
     overflow: visible;
     padding: 0;
     margin: 0 auto;
-    max-width: 1200px;
+    max-width: 1320px;
     align-items: stretch;
   }
   .plans-grid > .plan-card { flex: initial; }
@@ -2212,6 +2360,29 @@ body.chat-active .persistent-chat { display: none; }
   .plan-card--unlimited:hover { transform: translateY(-10px); }
 }
 
+/* Pro — top tier, premium gold-leaning accent */
+.plan-card--pro {
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--night), var(--night)) padding-box,
+    linear-gradient(115deg, #C8A4FF 0%, #8A47E8 30%, #5BC0FF 65%, #C8A4FF 100%) border-box;
+  box-shadow: 0 20px 56px rgba(138,71,232,0.22), 0 0 0 1px rgba(200,164,255,0.22) inset;
+}
+.plan-card--pro:hover {
+  box-shadow: 0 32px 78px rgba(138,71,232,0.32), 0 0 0 1px rgba(200,164,255,0.36) inset;
+  transform: translateY(-4px);
+}
+@media (min-width: 820px) {
+  .plan-card--pro { transform: translateY(-10px); }
+  .plan-card--pro:hover { transform: translateY(-14px); }
+}
+
+.plan-card-ribbon--pro {
+  background: linear-gradient(115deg, #C8A4FF 0%, #5BC0FF 50%, #C8A4FF 100%);
+  background-size: 200% 100%;
+  box-shadow: 0 6px 18px rgba(138,71,232,0.40);
+}
+
 .plan-card-ribbon {
   position: absolute; top: 14px; right: 14px;
   z-index: 3;
@@ -2249,6 +2420,11 @@ body.chat-active .persistent-chat { display: none; }
   background:
     radial-gradient(ellipse at 30% 30%, rgba(45,221,179,0.22), transparent 55%),
     radial-gradient(ellipse at 70% 70%, rgba(91,192,255,0.22), transparent 60%);
+}
+.plan-card-media-glow--pro {
+  background:
+    radial-gradient(ellipse at 30% 30%, rgba(200,164,255,0.26), transparent 55%),
+    radial-gradient(ellipse at 70% 70%, rgba(138,71,232,0.24), transparent 60%);
 }
 .plan-card-media-img {
   position: relative; z-index: 1;
@@ -2380,6 +2556,11 @@ body.chat-active .persistent-chat { display: none; }
   border: 1px solid rgba(255,255,255,0.10);
 }
 .plan-card-tag--plus { background: rgba(30,142,255,0.14); color: #5BC0FF; border-color: rgba(30,142,255,0.32); }
+.plan-card-tag--pro {
+  background: rgba(200,164,255,0.16);
+  color: #C8A4FF;
+  border-color: rgba(200,164,255,0.38);
+}
 .plan-card-tag--unlimited {
   background: rgba(45,221,179,0.14);
   color: #2DDDB3;
@@ -2491,6 +2672,16 @@ body.chat-active .persistent-chat { display: none; }
 .plan-trial-btn:hover { opacity: 0.88; transform: translateY(-1px); }
 .plan-card--unlimited .plan-trial-btn {
   background: linear-gradient(135deg, #6C5CE7, #8E7CF8);
+}
+.plan-card--pro .plan-trial-btn {
+  background: linear-gradient(135deg, #1A2330, #0F1620);
+  color: #fff;
+  border: 1px solid rgba(200,164,255,0.45);
+  box-shadow: 0 8px 24px rgba(138,71,232,0.30), 0 0 0 1px rgba(200,164,255,0.18) inset;
+}
+.plan-card--pro .plan-trial-btn:hover {
+  border-color: rgba(200,164,255,0.70);
+  box-shadow: 0 12px 30px rgba(138,71,232,0.42), 0 0 0 1px rgba(200,164,255,0.32) inset;
 }
 
 .plan-card-foot {
@@ -2620,7 +2811,7 @@ body.chat-active .persistent-chat { display: none; }
     <a href="https://www.wyze.com/collections/cameras" role="menuitem">Cameras</a>
     <a href="https://www.wyze.com/collections/services" role="menuitem">Subscriptions</a>
     <a href="https://support.wyze.com/" role="menuitem">Support</a>
-    <a href="https://my.wyze.com/" role="menuitem">Sign In</a>
+    <a href="/login" role="menuitem">Sign In</a>
   </div>
   <button class="nav-toggle" id="nav-toggle" type="button"
           aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile">
@@ -2637,7 +2828,7 @@ body.chat-active .persistent-chat { display: none; }
     <a href="https://www.wyze.com/collections/cameras">Cameras</a>
     <a href="https://www.wyze.com/collections/services">Subscriptions</a>
     <a href="https://support.wyze.com/">Support</a>
-    <a href="https://my.wyze.com/">Sign In</a>
+    <a href="/login">Sign In</a>
   </div>
 </div>
 
@@ -2735,11 +2926,156 @@ body.chat-active .persistent-chat { display: none; }
   </button>
 </section>
 
-<!-- ════════════════ WELCOME BACK ════════════════ -->
-<section class="welcome" aria-label="Welcome back">
-  <div class="welcome-inner">
-    <h2 class="welcome-title">Welcome back, <span class="user-name">Owen!</span></h2>
-    <a href="/digest" class="btn-command">Command Center <span aria-hidden="true">→</span></a>
+<!-- ════════════════ ONBOARDING ════════════════ -->
+<section class="onboard" id="start">
+  <div class="onboard-inner">
+
+    <div class="wyatt-greet wyatt-greet--hero">
+      <img class="wyatt-avatar" src="assets/wyatt.png" alt="Wyatt the Wyze mascot" width="140" height="140">
+      <div class="wyatt-greet-text">
+        <h2 class="wyatt-title">What keeps you up at night? <span class="wyatt-title-accent">Let Wyatt help!</span></h2>
+        <p class="wyatt-subline">Existing customer with devices? <a href="/digest" class="wyatt-cc-link">Access My Home command center <span aria-hidden="true">→</span></a></p>
+      </div>
+    </div>
+
+    <div class="card-stage" id="stage">
+
+      <!-- Card 1: Concerns -->
+      <div class="card is-active" data-card="1" id="card-1">
+        <h2 class="card-prompt">Pick what's on your mind.</h2>
+        <p class="card-help">Multiple is fine — Wyze will route each one.</p>
+
+        <div class="tile-grid cols-2">
+          <button class="tile" data-concern="package" data-key="1" type="button">
+            <span class="tile-key">1</span>
+            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="m223.68 66.15l-88-48.15a15.88 15.88 0 0 0-15.36 0l-88 48.17a16 16 0 0 0-8.32 14v95.64a16 16 0 0 0 8.32 14l88 48.17a15.88 15.88 0 0 0 15.36 0l88-48.17a16 16 0 0 0 8.32-14V80.18a16 16 0 0 0-8.32-14.03M128 32l80.34 44l-29.77 16.3l-80.35-44Zm0 88L47.66 76l33.9-18.56l80.34 44ZM40 90l80 43.78v85.79l-80-43.75Zm176 85.78l-80 43.79v-85.75l32-17.51V152a8 8 0 0 0 16 0v-44.45L216 90v85.77Z"/></svg></span>
+            <span class="tile-text">
+              <span class="tile-label">Package theft</span>
+              <span class="tile-benefit">Catch porch pirates the moment they show up.</span>
+            </span>
+          </button>
+
+          <button class="tile" data-concern="intruders" data-key="2" type="button">
+            <span class="tile-key">2</span>
+            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M248 112h-27.92l-47.5-65.41a16 16 0 0 0-25.31-.72l-12.85 14.9l-.2.23a7.95 7.95 0 0 1-12.44 0l-.2-.23l-12.85-14.9a16 16 0 0 0-25.31.72L35.92 112H8a8 8 0 0 0 0 16h240a8 8 0 0 0 0-16M96.34 56l.19.23l12.85 14.89a24 24 0 0 0 37.24 0l12.85-14.89c.06-.08.1-.15.17-.23l40.66 56H55.69ZM180 144a36 36 0 0 0-35.77 32h-32.46a36 36 0 1 0-1.83 16h36.12A36 36 0 1 0 180 144M76 200a20 20 0 1 1 20-20a20 20 0 0 1-20 20m104 0a20 20 0 1 1 20-20a20 20 0 0 1-20 20"/></svg></span>
+            <span class="tile-text">
+              <span class="tile-label">Unwanted visitors</span>
+              <span class="tile-benefit">Know who's at the door before you open it.</span>
+            </span>
+          </button>
+
+          <button class="tile" data-concern="vacation" data-key="3" type="button">
+            <span class="tile-key">3</span>
+            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M238.25 229a8 8 0 0 1-11.25 1.25c-.37-.3-38.82-30.25-99-30.25s-98.64 30-99 30.26a8 8 0 0 1-10-12.51c1.63-1.3 38.52-30.26 98.29-33.45a120 120 0 0 1-3.29-37.93c1.74-21.71 10.92-50.63 43-72.48A64.7 64.7 0 0 0 140.26 72c-19 .62-30.94 11.71-36.5 33.92A8 8 0 0 1 96 112a7.6 7.6 0 0 1-1.94-.24a8 8 0 0 1-5.82-9.7c9.25-36.95 33.11-45.42 51.5-46a81.5 81.5 0 0 1 21.68 2.45c-3.83-6.33-9.43-12.93-17.21-16.25c-10-4.24-22.17-2.39-36.31 5.51a8 8 0 0 1-7.8-14c18.74-10.45 35.72-12.54 50.48-6.2c12.49 5.36 20.73 15.78 25.87 25c6.18-9.64 13.88-16.17 22.39-18.94c11.86-3.87 24.64-.72 38 9.37a8 8 0 0 1-9.64 12.76c-8.91-6.73-16.77-9.06-23.35-6.93c-7.29 2.35-12.87 10-16.37 16.61A70.5 70.5 0 0 1 208 73.07c14.61 8.35 32 26.05 32 62.94a8 8 0 0 1-16 0c0-23.46-8.07-40-24-49a51 51 0 0 0-5.75-2.8a55.64 55.64 0 0 1 5.06 33.06a59.4 59.4 0 0 1-8.86 23.41a8 8 0 0 1-13.09-9.2c.74-1.09 16.33-24.38-3.26-49.37c-27 15.21-41.89 37.25-44.16 65.59a104.3 104.3 0 0 0 3.83 36.44c62.65 1.81 101.52 32.33 103.2 33.66a8 8 0 0 1 1.28 11.2M24 140a28 28 0 1 1 28 28a28 28 0 0 1-28-28m16 0a12 12 0 1 0 12-12a12 12 0 0 0-12 12"/></svg></span>
+            <span class="tile-text">
+              <span class="tile-label">Away from home</span>
+              <span class="tile-benefit">Eyes on the house while you're on the road.</span>
+            </span>
+          </button>
+
+          <button class="tile" data-concern="family" data-key="4" type="button">
+            <span class="tile-key">4</span>
+            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M212 80a28 28 0 1 0 28 28a28 28 0 0 0-28-28m0 40a12 12 0 1 1 12-12a12 12 0 0 1-12 12M72 108a28 28 0 1 0-28 28a28 28 0 0 0 28-28m-28 12a12 12 0 1 1 12-12a12 12 0 0 1-12 12m48-32a28 28 0 1 0-28-28a28 28 0 0 0 28 28m0-40a12 12 0 1 1-12 12a12 12 0 0 1 12-12m72 40a28 28 0 1 0-28-28a28 28 0 0 0 28 28m0-40a12 12 0 1 1-12 12a12 12 0 0 1 12-12m23.12 100.86a35.3 35.3 0 0 1-16.87-21.14a44 44 0 0 0-84.5 0A35.25 35.25 0 0 1 69 148.82A40 40 0 0 0 88 224a39.5 39.5 0 0 0 15.52-3.13a64.1 64.1 0 0 1 48.87 0a40 40 0 0 0 34.73-72ZM168 208a24 24 0 0 1-9.45-1.93a80.14 80.14 0 0 0-61.19 0a24 24 0 0 1-20.71-43.26a51.22 51.22 0 0 0 24.46-30.67a28 28 0 0 1 53.78 0a51.27 51.27 0 0 0 24.53 30.71A24 24 0 0 1 168 208"/></svg></span>
+            <span class="tile-text">
+              <span class="tile-label">Kids &amp; pets</span>
+              <span class="tile-benefit">Check on the people who matter, from anywhere.</span>
+            </span>
+          </button>
+
+        </div>
+
+        <div class="card-footer">
+          <button class="btn btn-primary" id="next-1" disabled type="button">Continue <span class="btn-arrow" aria-hidden="true">→</span></button>
+        </div>
+      </div>
+
+      <!-- Card 2: Property -->
+      <div class="card" data-card="2" id="card-2">
+        <h2 class="card-prompt">Where are we setting this up?</h2>
+        <p class="card-help">Pick one.</p>
+        <div class="tile-grid cols-3">
+          <button class="tile" data-property="home" data-key="1" type="button">
+            <span class="tile-key">1</span>
+            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M240 208h-16v-72l2.34 2.34A8 8 0 0 0 237.66 127l-98.35-98.32a16 16 0 0 0-22.62 0L18.34 127a8 8 0 0 0 11.32 11.31L32 136v72H16a8 8 0 0 0 0 16h224a8 8 0 0 0 0-16M48 120l80-80l80 80v88h-48v-56a8 8 0 0 0-8-8h-48a8 8 0 0 0-8 8v56H48Zm96 88h-32v-48h32Z"/></svg></span>
+            <span class="tile-text"><span class="tile-label">Single-family home</span><span class="tile-benefit">Front door, back yard, the whole footprint.</span></span>
+          </button>
+          <button class="tile" data-property="apartment" data-key="2" type="button">
+            <span class="tile-key">2</span>
+            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M240 208h-16V96a16 16 0 0 0-16-16h-64V32a16 16 0 0 0-24.88-13.32L39.12 72A16 16 0 0 0 32 85.34V208H16a8 8 0 0 0 0 16h224a8 8 0 0 0 0-16M208 96v112h-64V96ZM48 85.34L128 32v176H48ZM112 112v16a8 8 0 0 1-16 0v-16a8 8 0 1 1 16 0m-32 0v16a8 8 0 0 1-16 0v-16a8 8 0 1 1 16 0m0 56v16a8 8 0 0 1-16 0v-16a8 8 0 0 1 16 0m32 0v16a8 8 0 0 1-16 0v-16a8 8 0 0 1 16 0"/></svg></span>
+            <span class="tile-text"><span class="tile-label">Apartment or condo</span><span class="tile-benefit">Smaller space, plug-and-play, no wiring.</span></span>
+          </button>
+          <button class="tile" data-property="business" data-key="3" type="button">
+            <span class="tile-key">3</span>
+            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M232 96a8 8 0 0 0-.3-2.2l-14.35-50.2A16.07 16.07 0 0 0 202 32H54a16.07 16.07 0 0 0-15.35 11.6L24.31 93.8A8 8 0 0 0 24 96v16a40 40 0 0 0 16 32v72a8 8 0 0 0 8 8h160a8 8 0 0 0 8-8v-72a40 40 0 0 0 16-32zM54 48h148l11.42 40H42.61Zm50 56h48v8a24 24 0 0 1-48 0Zm-16 0v8a24 24 0 0 1-35.12 21.26a8 8 0 0 0-1.82-1.06A24 24 0 0 1 40 112v-8Zm112 104H56v-56.8a40.6 40.6 0 0 0 8 .8a40 40 0 0 0 32-16a40 40 0 0 0 64 0a40 40 0 0 0 32 16a40.6 40.6 0 0 0 8-.8Zm4.93-75.8a8 8 0 0 0-1.8 1.05A24 24 0 0 1 168 112v-8h48v8a24 24 0 0 1-11.07 20.2"/></svg></span>
+            <span class="tile-text"><span class="tile-label">Office or storefront</span><span class="tile-benefit">Coverage that watches the till and back door.</span></span>
+          </button>
+        </div>
+        <div class="card-footer card-footer-back">
+          <button class="btn btn-ghost" id="back-2" type="button"><span style="display:inline-block;transform:rotate(180deg);">→</span> Back</button>
+          <span class="card-footer-hint">Tap to choose</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Space -->
+      <div class="card" data-card="3" id="card-3">
+        <h2 class="card-prompt">Tell me about the space.</h2>
+        <p class="card-help">Rough numbers are fine. We round up so you're never short on coverage.</p>
+        <div class="space-grid">
+          <div class="space-row" data-row="entrances">
+            <div class="space-left">
+              <span class="space-icon" aria-hidden="true"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M232 216h-24V40a16 16 0 0 0-16-16H64a16 16 0 0 0-16 16v176H24a8 8 0 0 0 0 16h208a8 8 0 0 0 0-16m-40 0h-16V40h16ZM64 40h96v176H64Zm80 92a12 12 0 1 1-12-12a12 12 0 0 1 12 12"/></svg></span>
+              <div class="space-label"><span class="lbl">Entrances</span><span class="sub">Doors that lead outside</span></div>
+            </div>
+            <div class="stepper" role="group" aria-label="Entrances">
+              <button type="button" data-step="entrances" data-delta="-1" aria-label="Decrease">−</button>
+              <span class="val" id="val-entrances">1</span>
+              <button type="button" data-step="entrances" data-delta="1" aria-label="Increase">+</button>
+            </div>
+          </div>
+          <div class="space-row" data-row="rooms">
+            <div class="space-left">
+              <span class="space-icon" aria-hidden="true"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M240 106.17V72a16 16 0 0 0-16-16H32a16 16 0 0 0-16 16v34.17A16 16 0 0 0 8 120v48a16 16 0 0 0 16 16h8v16a8 8 0 0 0 16 0v-16h160v16a8 8 0 0 0 16 0v-16h8a16 16 0 0 0 16-16v-48a16 16 0 0 0-8-13.83M224 104h-8a16 16 0 0 0-16 16v16h-64V72h88ZM120 72v64H56v-16a16 16 0 0 0-16-16h-8V72Zm112 96H24v-48h16v24a8 8 0 0 0 8 8h160a8 8 0 0 0 8-8v-24h16Z"/></svg></span>
+              <div class="space-label"><span class="lbl">Rooms to cover</span><span class="sub">Indoor spaces you want eyes on</span></div>
+            </div>
+            <div class="stepper" role="group" aria-label="Rooms">
+              <button type="button" data-step="rooms" data-delta="-1" aria-label="Decrease">−</button>
+              <span class="val" id="val-rooms">2</span>
+              <button type="button" data-step="rooms" data-delta="1" aria-label="Increase">+</button>
+            </div>
+          </div>
+          <div class="space-row" data-row="garage">
+            <div class="space-left">
+              <span class="space-icon" aria-hidden="true"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M240 192h-8V98.67a16 16 0 0 0-7.12-13.31l-88-58.67a16 16 0 0 0-17.75 0l-88 58.67A16 16 0 0 0 24 98.67V192h-8a8 8 0 0 0 0 16h224a8 8 0 0 0 0-16M40 98.67L128 40l88 58.66V192h-24v-56a8 8 0 0 0-8-8H72a8 8 0 0 0-8 8v56H40ZM176 144v16h-40v-16Zm-56 16H80v-16h40Zm-40 16h40v16H80Zm56 0h40v16h-40Z"/></svg></span>
+              <div class="space-label"><span class="lbl">Garage</span><span class="sub">Detached or attached</span></div>
+            </div>
+            <button class="toggle" type="button" data-toggle="garage" aria-pressed="false" aria-label="Garage"></button>
+          </div>
+          <div class="space-row" data-row="yard">
+            <div class="space-left">
+              <span class="space-icon" aria-hidden="true"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M247.63 47.89a8 8 0 0 0-7.52-7.52c-51.76-3-93.32 12.74-111.18 42.22c-11.8 19.49-11.78 43.16-.16 65.74a71.3 71.3 0 0 0-14.17 27L98.33 159c7.82-16.33 7.52-33.35-1-47.49c-13.2-21.79-43.67-33.47-81.5-31.25a8 8 0 0 0-7.52 7.52c-2.23 37.83 9.46 68.3 31.25 81.5A45.8 45.8 0 0 0 63.44 176A54.6 54.6 0 0 0 87 170.33l25 25V224a8 8 0 0 0 16 0v-29.49a55.6 55.6 0 0 1 12.27-35a73.9 73.9 0 0 0 33.31 8.4a60.9 60.9 0 0 0 31.83-8.86c29.48-17.84 45.26-59.4 42.22-111.16M47.81 155.6C32.47 146.31 23.79 124.32 24 96c28.32-.24 50.31 8.47 59.6 23.81c4.85 8 5.64 17.33 2.46 26.94l-24.41-24.41a8 8 0 0 0-11.31 11.31l24.41 24.41c-9.61 3.18-18.93 2.39-26.94-2.46m149.31-10.22c-13.4 8.11-29.15 8.73-45.15 2l53.69-53.7a8 8 0 0 0-11.31-11.31L140.65 136c-6.76-16-6.15-31.76 2-45.15c13.94-23 47-35.82 89.33-34.83c.96 42.32-11.84 75.42-34.86 89.36"/></svg></span>
+              <div class="space-label"><span class="lbl">Yard or driveway</span><span class="sub">Anywhere outdoors that matters</span></div>
+            </div>
+            <button class="toggle" type="button" data-toggle="yard" aria-pressed="false" aria-label="Yard"></button>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-ghost" id="back-3" type="button"><span style="display:inline-block;transform:rotate(180deg);">→</span> Back</button>
+          <button class="btn btn-primary" id="next-3" type="button">Build my setup <span class="btn-arrow" aria-hidden="true">→</span></button>
+        </div>
+      </div>
+
+    </div>
+
+    <aside class="persistent-chat" id="persistent-chat">
+      <h3 class="pc-title">Or just tell me what you need!</h3>
+      <form class="pc-composer" id="pc-composer">
+        <img class="pc-wyatt" src="assets/wyatt.png" alt="" aria-hidden="true" width="32" height="32">
+        <input class="pc-input" id="pc-input" type="text" autocomplete="off" placeholder="Describe your situation…">
+        <button class="pc-send" type="submit" aria-label="Send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>
+        </button>
+      </form>
+    </aside>
   </div>
 </section>
 
@@ -2777,10 +3113,10 @@ body.chat-active .persistent-chat { display: none; }
       <header class="plans-compare-head">
         <h2 id="plans-compare-title" class="plans-compare-title">
           Capable out of the box,<br>
-          <span>smarter with Cam Plan.</span>
+          <span>smarter with Security Plans.</span>
         </h2>
         <p class="plans-compare-sub">
-          Free is capable. Cam Plus and Cam Unlimited unlock the AI alerts, 14&#8209;day recordings, and Friendly Faces that turn every clip into something you actually understand.
+          Free is capable. Cam Plus, Cam Unlimited, and Cam Unlimited Pro unlock the AI alerts, cloud recordings, and Friendly Faces that turn every clip into something you actually understand.
         </p>
       </header>
 
@@ -2943,11 +3279,73 @@ body.chat-active .persistent-chat { display: none; }
           </div>
         </article>
 
+        <!-- ─── CAM UNLIMITED PRO ─── -->
+        <article class="plan-card plan-card--pro" role="listitem">
+          <div class="plan-card-ribbon plan-card-ribbon--pro" aria-label="Most comprehensive">
+            <span>◆ Most comprehensive</span>
+          </div>
+          <div class="plan-card-media">
+            <div class="plan-card-media-glow plan-card-media-glow--pro" aria-hidden="true"></div>
+            <img class="plan-card-media-img"
+                 src="https://www.wyze.com/cdn/shop/files/Cam_Unlimited_-_Multi_Cam_New.webp?v=1715209587&width=900"
+                 alt="" loading="lazy"
+                 onerror="this.classList.add('is-broken')">
+            <div class="plan-card-media-fallback plan-tile--pro" aria-hidden="true">
+              <div class="plan-tile-frame plan-tile-frame--pro">
+                <div class="plan-tile-feed">
+                  <div class="plan-tile-feed-label">REC · 60d</div>
+                  <div class="plan-tile-feed-time">●</div>
+                </div>
+                <div class="plan-tile-chips">
+                  <span class="plan-tile-chip">24/7 Dispatch</span>
+                  <span class="plan-tile-chip">NBD Filter</span>
+                  <span class="plan-tile-chip">AI Search</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="plan-card-body">
+            <div class="plan-card-tier-row">
+              <span class="plan-card-tier">Cam Unlimited Pro</span>
+              <span class="plan-card-tag plan-card-tag--pro">Premium tier</span>
+            </div>
+            <div class="plan-card-price">
+              <span class="plan-card-price-amt">$19.99</span>
+              <span class="plan-card-price-sub">/mo · or $199.99/yr · unlimited cameras</span>
+            </div>
+            <p class="plan-card-pitch">Everything in Cam Unlimited, plus 60-day cloud, 24/7 emergency dispatch, and the NBD filter that strips notification noise down to what matters.</p>
+            <ul class="plan-feats">
+              <li class="ok"><strong>Everything in Cam Unlimited</strong>, on every cam</li>
+              <li class="ok"><strong>Up to 60-day cloud recording</strong> (toggle on/off)</li>
+              <li class="ok"><strong>24/7 emergency dispatch</strong> — medical, police, fire</li>
+              <li class="ok"><strong>NBD filter</strong> — cuts the notification noise</li>
+              <li class="ok">Descriptive Alerts (AI-narrated)</li>
+              <li class="ok">AI Video Search — sort by relevance or date</li>
+              <li class="ok">Advanced home automations</li>
+              <li class="ok">Subscriber-exclusive deals &amp; discounts</li>
+            </ul>
+            <div class="plan-billing-wrap">
+              <div class="plan-billing-row">
+                <span class="plan-billing-lbl is-active" data-billing-monthly="pro">Monthly</span>
+                <button class="plan-billing-pill" type="button" id="pro-billing-pill" aria-pressed="false" aria-label="Switch to annual billing"></button>
+                <span class="plan-billing-lbl" data-billing-annual="pro">Annual</span>
+                <span class="plan-save-badge" id="pro-save-badge">Save 17%</span>
+              </div>
+              <a href="https://www.wyze.com/products/cam-unlimited-pro" class="plan-trial-btn">Get Cam Unlimited Pro</a>
+            </div>
+            <div class="plan-card-foot">
+              <span class="plan-card-foot-label">Best for</span>
+              <span class="plan-card-foot-text">A real security posture — long retention, dispatch, smart filtering</span>
+            </div>
+          </div>
+        </article>
+
       </div>
       <div class="plans-dots" role="tablist" aria-label="Choose plan">
         <button class="plans-dot is-active" type="button" data-dot="0" role="tab" aria-label="Free"></button>
         <button class="plans-dot" type="button" data-dot="1" role="tab" aria-label="Cam Plus"></button>
         <button class="plans-dot" type="button" data-dot="2" role="tab" aria-label="Cam Unlimited"></button>
+        <button class="plans-dot" type="button" data-dot="3" role="tab" aria-label="Cam Unlimited Pro"></button>
       </div>
       </div>
 
@@ -2965,6 +3363,7 @@ body.chat-active .persistent-chat { display: none; }
                 <th scope="col" class="m-free">Free</th>
                 <th scope="col" class="m-plus">Cam Plus</th>
                 <th scope="col" class="m-unlim">Cam Unlimited</th>
+                <th scope="col" class="m-pro">Cam Unlimited Pro</th>
               </tr>
             </thead>
             <tbody>
@@ -2973,16 +3372,19 @@ body.chat-active .persistent-chat { display: none; }
                 <td>Per device</td>
                 <td>1 per license <small>(max 3)</small></td>
                 <td class="m-best">Unlimited</td>
+                <td class="m-best">Unlimited</td>
               </tr>
               <tr>
                 <th scope="row">Cloud video recording</th>
                 <td>Thumbnails only</td>
                 <td>14 days</td>
-                <td class="m-best">14 days · every cam</td>
+                <td>14 days · every cam</td>
+                <td class="m-best">Up to 60 days · every cam</td>
               </tr>
               <tr>
                 <th scope="row">Delay between recordings</th>
                 <td>5 minutes</td>
+                <td class="m-best">Back-to-back</td>
                 <td class="m-best">Back-to-back</td>
                 <td class="m-best">Back-to-back</td>
               </tr>
@@ -2991,10 +3393,12 @@ body.chat-active .persistent-chat { display: none; }
                 <td class="m-no">—</td>
                 <td class="m-yes">✓</td>
                 <td class="m-yes">✓</td>
+                <td class="m-yes">✓</td>
               </tr>
               <tr>
                 <th scope="row">Sound detections (barking, glass, smoke)</th>
                 <td class="m-no">—</td>
+                <td class="m-yes">✓</td>
                 <td class="m-yes">✓</td>
                 <td class="m-yes">✓</td>
               </tr>
@@ -3003,10 +3407,12 @@ body.chat-active .persistent-chat { display: none; }
                 <td class="m-no">—</td>
                 <td class="m-yes">✓</td>
                 <td class="m-yes">✓</td>
+                <td class="m-yes">✓</td>
               </tr>
               <tr>
                 <th scope="row">Rich animated GIF notifications</th>
                 <td class="m-no">—</td>
+                <td class="m-yes">✓</td>
                 <td class="m-yes">✓</td>
                 <td class="m-yes">✓</td>
               </tr>
@@ -3015,10 +3421,12 @@ body.chat-active .persistent-chat { display: none; }
                 <td class="m-no">—</td>
                 <td class="m-yes">✓</td>
                 <td class="m-yes">✓</td>
+                <td class="m-yes">✓</td>
               </tr>
               <tr>
                 <th scope="row">AI Video Search</th>
                 <td class="m-no">—</td>
+                <td class="m-yes">✓</td>
                 <td class="m-yes">✓</td>
                 <td class="m-yes">✓</td>
               </tr>
@@ -3027,21 +3435,46 @@ body.chat-active .persistent-chat { display: none; }
                 <td class="m-no">—</td>
                 <td class="m-yes">✓</td>
                 <td class="m-yes">✓</td>
+                <td class="m-yes">✓</td>
               </tr>
               <tr>
                 <th scope="row">Multi-camera timeline</th>
                 <td class="m-no">—</td>
                 <td class="m-no">—</td>
-                <td class="m-yes m-best">✓</td>
+                <td class="m-yes">✓</td>
+                <td class="m-yes m-best">✓ (up to 4 live)</td>
               </tr>
               <tr>
                 <th scope="row">Self-monitoring modes (Home / Away)</th>
                 <td class="m-no">—</td>
                 <td class="m-no">—</td>
-                <td class="m-yes m-best">✓</td>
+                <td class="m-yes">✓</td>
+                <td class="m-yes">✓</td>
               </tr>
               <tr>
                 <th scope="row">My Day &amp; Home Summary</th>
+                <td class="m-no">—</td>
+                <td class="m-no">—</td>
+                <td class="m-yes">✓</td>
+                <td class="m-yes">✓</td>
+              </tr>
+              <tr>
+                <th scope="row">24/7 emergency dispatch</th>
+                <td class="m-no">—</td>
+                <td class="m-no">—</td>
+                <td class="m-no">—</td>
+                <td class="m-yes m-best">✓ Pro-exclusive</td>
+              </tr>
+              <tr>
+                <th scope="row">NBD filter (notification noise reduction)</th>
+                <td class="m-no">—</td>
+                <td class="m-no">—</td>
+                <td class="m-no">—</td>
+                <td class="m-yes m-best">✓ Pro-exclusive</td>
+              </tr>
+              <tr>
+                <th scope="row">Advanced home automations</th>
+                <td class="m-no">—</td>
                 <td class="m-no">—</td>
                 <td class="m-no">—</td>
                 <td class="m-yes m-best">✓</td>
@@ -3049,6 +3482,7 @@ body.chat-active .persistent-chat { display: none; }
               <tr>
                 <th scope="row">Subscriber discounts on hardware</th>
                 <td class="m-no">—</td>
+                <td class="m-yes">✓</td>
                 <td class="m-yes">✓</td>
                 <td class="m-yes">✓</td>
               </tr>
@@ -3128,153 +3562,10 @@ body.chat-active .persistent-chat { display: none; }
   </div>
 </section>
 
-<!-- ════════════════ ONBOARDING ════════════════ -->
-<section class="onboard" id="start">
-  <div class="onboard-inner">
-
-    <div class="wyatt-greet">
-      <img class="wyatt-avatar" src="assets/wyatt.png" alt="Wyatt the Wyze mascot" width="140" height="140">
-      <h2 class="wyatt-title">Let Wyatt help!</h2>
-    </div>
-
-    <div class="card-stage" id="stage">
-
-      <!-- Card 1: Concerns -->
-      <div class="card is-active" data-card="1" id="card-1">
-        <h2 class="card-prompt">What keeps you<br class="br-mobile"> up at night?</h2>
-        <p class="card-help">Pick any that matter.</p>
-
-        <div class="tile-grid cols-2">
-          <button class="tile" data-concern="package" data-key="1" type="button">
-            <span class="tile-key">1</span>
-            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="m223.68 66.15l-88-48.15a15.88 15.88 0 0 0-15.36 0l-88 48.17a16 16 0 0 0-8.32 14v95.64a16 16 0 0 0 8.32 14l88 48.17a15.88 15.88 0 0 0 15.36 0l88-48.17a16 16 0 0 0 8.32-14V80.18a16 16 0 0 0-8.32-14.03M128 32l80.34 44l-29.77 16.3l-80.35-44Zm0 88L47.66 76l33.9-18.56l80.34 44ZM40 90l80 43.78v85.79l-80-43.75Zm176 85.78l-80 43.79v-85.75l32-17.51V152a8 8 0 0 0 16 0v-44.45L216 90v85.77Z"/></svg></span>
-            <span class="tile-text">
-              <span class="tile-label">Package theft</span>
-              <span class="tile-benefit">Catch porch pirates the moment they show up.</span>
-            </span>
-          </button>
-
-          <button class="tile" data-concern="intruders" data-key="2" type="button">
-            <span class="tile-key">2</span>
-            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M248 112h-27.92l-47.5-65.41a16 16 0 0 0-25.31-.72l-12.85 14.9l-.2.23a7.95 7.95 0 0 1-12.44 0l-.2-.23l-12.85-14.9a16 16 0 0 0-25.31.72L35.92 112H8a8 8 0 0 0 0 16h240a8 8 0 0 0 0-16M96.34 56l.19.23l12.85 14.89a24 24 0 0 0 37.24 0l12.85-14.89c.06-.08.1-.15.17-.23l40.66 56H55.69ZM180 144a36 36 0 0 0-35.77 32h-32.46a36 36 0 1 0-1.83 16h36.12A36 36 0 1 0 180 144M76 200a20 20 0 1 1 20-20a20 20 0 0 1-20 20m104 0a20 20 0 1 1 20-20a20 20 0 0 1-20 20"/></svg></span>
-            <span class="tile-text">
-              <span class="tile-label">Unwanted visitors</span>
-              <span class="tile-benefit">Know who's at the door before you open it.</span>
-            </span>
-          </button>
-
-          <button class="tile" data-concern="vacation" data-key="3" type="button">
-            <span class="tile-key">3</span>
-            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M238.25 229a8 8 0 0 1-11.25 1.25c-.37-.3-38.82-30.25-99-30.25s-98.64 30-99 30.26a8 8 0 0 1-10-12.51c1.63-1.3 38.52-30.26 98.29-33.45a120 120 0 0 1-3.29-37.93c1.74-21.71 10.92-50.63 43-72.48A64.7 64.7 0 0 0 140.26 72c-19 .62-30.94 11.71-36.5 33.92A8 8 0 0 1 96 112a7.6 7.6 0 0 1-1.94-.24a8 8 0 0 1-5.82-9.7c9.25-36.95 33.11-45.42 51.5-46a81.5 81.5 0 0 1 21.68 2.45c-3.83-6.33-9.43-12.93-17.21-16.25c-10-4.24-22.17-2.39-36.31 5.51a8 8 0 0 1-7.8-14c18.74-10.45 35.72-12.54 50.48-6.2c12.49 5.36 20.73 15.78 25.87 25c6.18-9.64 13.88-16.17 22.39-18.94c11.86-3.87 24.64-.72 38 9.37a8 8 0 0 1-9.64 12.76c-8.91-6.73-16.77-9.06-23.35-6.93c-7.29 2.35-12.87 10-16.37 16.61A70.5 70.5 0 0 1 208 73.07c14.61 8.35 32 26.05 32 62.94a8 8 0 0 1-16 0c0-23.46-8.07-40-24-49a51 51 0 0 0-5.75-2.8a55.64 55.64 0 0 1 5.06 33.06a59.4 59.4 0 0 1-8.86 23.41a8 8 0 0 1-13.09-9.2c.74-1.09 16.33-24.38-3.26-49.37c-27 15.21-41.89 37.25-44.16 65.59a104.3 104.3 0 0 0 3.83 36.44c62.65 1.81 101.52 32.33 103.2 33.66a8 8 0 0 1 1.28 11.2M24 140a28 28 0 1 1 28 28a28 28 0 0 1-28-28m16 0a12 12 0 1 0 12-12a12 12 0 0 0-12 12"/></svg></span>
-            <span class="tile-text">
-              <span class="tile-label">Away from home</span>
-              <span class="tile-benefit">Eyes on the house while you're on the road.</span>
-            </span>
-          </button>
-
-          <button class="tile" data-concern="family" data-key="4" type="button">
-            <span class="tile-key">4</span>
-            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M212 80a28 28 0 1 0 28 28a28 28 0 0 0-28-28m0 40a12 12 0 1 1 12-12a12 12 0 0 1-12 12M72 108a28 28 0 1 0-28 28a28 28 0 0 0 28-28m-28 12a12 12 0 1 1 12-12a12 12 0 0 1-12 12m48-32a28 28 0 1 0-28-28a28 28 0 0 0 28 28m0-40a12 12 0 1 1-12 12a12 12 0 0 1 12-12m72 40a28 28 0 1 0-28-28a28 28 0 0 0 28 28m0-40a12 12 0 1 1-12 12a12 12 0 0 1 12-12m23.12 100.86a35.3 35.3 0 0 1-16.87-21.14a44 44 0 0 0-84.5 0A35.25 35.25 0 0 1 69 148.82A40 40 0 0 0 88 224a39.5 39.5 0 0 0 15.52-3.13a64.1 64.1 0 0 1 48.87 0a40 40 0 0 0 34.73-72ZM168 208a24 24 0 0 1-9.45-1.93a80.14 80.14 0 0 0-61.19 0a24 24 0 0 1-20.71-43.26a51.22 51.22 0 0 0 24.46-30.67a28 28 0 0 1 53.78 0a51.27 51.27 0 0 0 24.53 30.71A24 24 0 0 1 168 208"/></svg></span>
-            <span class="tile-text">
-              <span class="tile-label">Kids &amp; pets</span>
-              <span class="tile-benefit">Check on the people who matter, from anywhere.</span>
-            </span>
-          </button>
-
-        </div>
-
-        <div class="card-footer">
-          <button class="btn btn-primary" id="next-1" disabled type="button">Continue <span class="btn-arrow" aria-hidden="true">→</span></button>
-        </div>
-      </div>
-
-      <!-- Card 2: Property -->
-      <div class="card" data-card="2" id="card-2">
-        <h2 class="card-prompt">Where are we setting this up?</h2>
-        <p class="card-help">Pick one.</p>
-        <div class="tile-grid cols-3">
-          <button class="tile" data-property="home" data-key="1" type="button">
-            <span class="tile-key">1</span>
-            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M240 208h-16v-72l2.34 2.34A8 8 0 0 0 237.66 127l-98.35-98.32a16 16 0 0 0-22.62 0L18.34 127a8 8 0 0 0 11.32 11.31L32 136v72H16a8 8 0 0 0 0 16h224a8 8 0 0 0 0-16M48 120l80-80l80 80v88h-48v-56a8 8 0 0 0-8-8h-48a8 8 0 0 0-8 8v56H48Zm96 88h-32v-48h32Z"/></svg></span>
-            <span class="tile-text"><span class="tile-label">Single-family home</span><span class="tile-benefit">Front door, back yard, the whole footprint.</span></span>
-          </button>
-          <button class="tile" data-property="apartment" data-key="2" type="button">
-            <span class="tile-key">2</span>
-            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M240 208h-16V96a16 16 0 0 0-16-16h-64V32a16 16 0 0 0-24.88-13.32L39.12 72A16 16 0 0 0 32 85.34V208H16a8 8 0 0 0 0 16h224a8 8 0 0 0 0-16M208 96v112h-64V96ZM48 85.34L128 32v176H48ZM112 112v16a8 8 0 0 1-16 0v-16a8 8 0 1 1 16 0m-32 0v16a8 8 0 0 1-16 0v-16a8 8 0 1 1 16 0m0 56v16a8 8 0 0 1-16 0v-16a8 8 0 0 1 16 0m32 0v16a8 8 0 0 1-16 0v-16a8 8 0 0 1 16 0"/></svg></span>
-            <span class="tile-text"><span class="tile-label">Apartment or condo</span><span class="tile-benefit">Smaller space, plug-and-play, no wiring.</span></span>
-          </button>
-          <button class="tile" data-property="business" data-key="3" type="button">
-            <span class="tile-key">3</span>
-            <span class="tile-icon"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M232 96a8 8 0 0 0-.3-2.2l-14.35-50.2A16.07 16.07 0 0 0 202 32H54a16.07 16.07 0 0 0-15.35 11.6L24.31 93.8A8 8 0 0 0 24 96v16a40 40 0 0 0 16 32v72a8 8 0 0 0 8 8h160a8 8 0 0 0 8-8v-72a40 40 0 0 0 16-32zM54 48h148l11.42 40H42.61Zm50 56h48v8a24 24 0 0 1-48 0Zm-16 0v8a24 24 0 0 1-35.12 21.26a8 8 0 0 0-1.82-1.06A24 24 0 0 1 40 112v-8Zm112 104H56v-56.8a40.6 40.6 0 0 0 8 .8a40 40 0 0 0 32-16a40 40 0 0 0 64 0a40 40 0 0 0 32 16a40.6 40.6 0 0 0 8-.8Zm4.93-75.8a8 8 0 0 0-1.8 1.05A24 24 0 0 1 168 112v-8h48v8a24 24 0 0 1-11.07 20.2"/></svg></span>
-            <span class="tile-text"><span class="tile-label">Office or storefront</span><span class="tile-benefit">Coverage that watches the till and back door.</span></span>
-          </button>
-        </div>
-        <div class="card-footer card-footer-back">
-          <button class="btn btn-ghost" id="back-2" type="button"><span style="display:inline-block;transform:rotate(180deg);">→</span> Back</button>
-          <span class="card-footer-hint">Tap to choose</span>
-        </div>
-      </div>
-
-      <!-- Card 3: Space -->
-      <div class="card" data-card="3" id="card-3">
-        <h2 class="card-prompt">Tell me about the space.</h2>
-        <p class="card-help">Rough numbers are fine. We round up so you're never short on coverage.</p>
-        <div class="space-grid">
-          <div class="space-row" data-row="entrances">
-            <div class="space-left">
-              <span class="space-icon" aria-hidden="true"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M232 216h-24V40a16 16 0 0 0-16-16H64a16 16 0 0 0-16 16v176H24a8 8 0 0 0 0 16h208a8 8 0 0 0 0-16m-40 0h-16V40h16ZM64 40h96v176H64Zm80 92a12 12 0 1 1-12-12a12 12 0 0 1 12 12"/></svg></span>
-              <div class="space-label"><span class="lbl">Entrances</span><span class="sub">Doors that lead outside</span></div>
-            </div>
-            <div class="stepper" role="group" aria-label="Entrances">
-              <button type="button" data-step="entrances" data-delta="-1" aria-label="Decrease">−</button>
-              <span class="val" id="val-entrances">1</span>
-              <button type="button" data-step="entrances" data-delta="1" aria-label="Increase">+</button>
-            </div>
-          </div>
-          <div class="space-row" data-row="rooms">
-            <div class="space-left">
-              <span class="space-icon" aria-hidden="true"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M240 106.17V72a16 16 0 0 0-16-16H32a16 16 0 0 0-16 16v34.17A16 16 0 0 0 8 120v48a16 16 0 0 0 16 16h8v16a8 8 0 0 0 16 0v-16h160v16a8 8 0 0 0 16 0v-16h8a16 16 0 0 0 16-16v-48a16 16 0 0 0-8-13.83M224 104h-8a16 16 0 0 0-16 16v16h-64V72h88ZM120 72v64H56v-16a16 16 0 0 0-16-16h-8V72Zm112 96H24v-48h16v24a8 8 0 0 0 8 8h160a8 8 0 0 0 8-8v-24h16Z"/></svg></span>
-              <div class="space-label"><span class="lbl">Rooms to cover</span><span class="sub">Indoor spaces you want eyes on</span></div>
-            </div>
-            <div class="stepper" role="group" aria-label="Rooms">
-              <button type="button" data-step="rooms" data-delta="-1" aria-label="Decrease">−</button>
-              <span class="val" id="val-rooms">2</span>
-              <button type="button" data-step="rooms" data-delta="1" aria-label="Increase">+</button>
-            </div>
-          </div>
-          <div class="space-row" data-row="garage">
-            <div class="space-left">
-              <span class="space-icon" aria-hidden="true"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M240 192h-8V98.67a16 16 0 0 0-7.12-13.31l-88-58.67a16 16 0 0 0-17.75 0l-88 58.67A16 16 0 0 0 24 98.67V192h-8a8 8 0 0 0 0 16h224a8 8 0 0 0 0-16M40 98.67L128 40l88 58.66V192h-24v-56a8 8 0 0 0-8-8H72a8 8 0 0 0-8 8v56H40ZM176 144v16h-40v-16Zm-56 16H80v-16h40Zm-40 16h40v16H80Zm56 0h40v16h-40Z"/></svg></span>
-              <div class="space-label"><span class="lbl">Garage</span><span class="sub">Detached or attached</span></div>
-            </div>
-            <button class="toggle" type="button" data-toggle="garage" aria-pressed="false" aria-label="Garage"></button>
-          </div>
-          <div class="space-row" data-row="yard">
-            <div class="space-left">
-              <span class="space-icon" aria-hidden="true"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M247.63 47.89a8 8 0 0 0-7.52-7.52c-51.76-3-93.32 12.74-111.18 42.22c-11.8 19.49-11.78 43.16-.16 65.74a71.3 71.3 0 0 0-14.17 27L98.33 159c7.82-16.33 7.52-33.35-1-47.49c-13.2-21.79-43.67-33.47-81.5-31.25a8 8 0 0 0-7.52 7.52c-2.23 37.83 9.46 68.3 31.25 81.5A45.8 45.8 0 0 0 63.44 176A54.6 54.6 0 0 0 87 170.33l25 25V224a8 8 0 0 0 16 0v-29.49a55.6 55.6 0 0 1 12.27-35a73.9 73.9 0 0 0 33.31 8.4a60.9 60.9 0 0 0 31.83-8.86c29.48-17.84 45.26-59.4 42.22-111.16M47.81 155.6C32.47 146.31 23.79 124.32 24 96c28.32-.24 50.31 8.47 59.6 23.81c4.85 8 5.64 17.33 2.46 26.94l-24.41-24.41a8 8 0 0 0-11.31 11.31l24.41 24.41c-9.61 3.18-18.93 2.39-26.94-2.46m149.31-10.22c-13.4 8.11-29.15 8.73-45.15 2l53.69-53.7a8 8 0 0 0-11.31-11.31L140.65 136c-6.76-16-6.15-31.76 2-45.15c13.94-23 47-35.82 89.33-34.83c.96 42.32-11.84 75.42-34.86 89.36"/></svg></span>
-              <div class="space-label"><span class="lbl">Yard or driveway</span><span class="sub">Anywhere outdoors that matters</span></div>
-            </div>
-            <button class="toggle" type="button" data-toggle="yard" aria-pressed="false" aria-label="Yard"></button>
-          </div>
-        </div>
-        <div class="card-footer">
-          <button class="btn btn-ghost" id="back-3" type="button"><span style="display:inline-block;transform:rotate(180deg);">→</span> Back</button>
-          <button class="btn btn-primary" id="next-3" type="button">Build my setup <span class="btn-arrow" aria-hidden="true">→</span></button>
-        </div>
-      </div>
-
-    </div>
-
-    <aside class="persistent-chat" id="persistent-chat">
-      <h3 class="pc-title">Or just tell me what you need!</h3>
-      <form class="pc-composer" id="pc-composer">
-        <img class="pc-wyatt" src="assets/wyatt.png" alt="" aria-hidden="true" width="32" height="32">
-        <input class="pc-input" id="pc-input" type="text" autocomplete="off" placeholder="Describe your situation…">
-        <button class="pc-send" type="submit" aria-label="Send">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>
-        </button>
-      </form>
-      <div class="pc-browse">
+<!-- ════════════════ OUR PRODUCTS ════════════════ -->
+<section class="products-section" aria-label="Browse products">
+  <div class="products-section-inner">
+    <div class="pc-browse">
       <header class="pc-browse-header">
         <h3 class="pc-browse-title">Our Products</h3>
       </header>
@@ -3312,22 +3603,31 @@ body.chat-active .persistent-chat { display: none; }
           </div>
         </a>
       </nav>
-      </div>
-    </aside>
+    </div>
   </div>
 </section>
+
 
 <!-- ════════════════ AI CHAT SHOPPING ════════════════ -->
 <section class="chat" id="chat">
   <div class="chat-inner">
 
     <header class="chat-header">
-      <div class="ai-orb" aria-hidden="true"></div>
+      <div class="ai-orb" aria-hidden="true">
+        <svg class="ai-orb-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5L13.7 8L19 9.7L13.7 11.4L12 16.9L10.3 11.4L5 9.7L10.3 8L12 2.5zM19 14L19.85 16.65L22.5 17.5L19.85 18.35L19 21L18.15 18.35L15.5 17.5L18.15 16.65L19 14z"/></svg>
+      </div>
       <div class="chat-title-block">
-        <h2 class="chat-title" id="chat-title">Your AI setup</h2>
+        <h2 class="chat-title" id="chat-title">Wyze Intelligence</h2>
+        <div class="chat-status">
+          <span class="chat-status-dot" aria-hidden="true"></span>
+          <span class="chat-status-text">Helping you plan</span>
+        </div>
         <div class="chat-context" id="chat-context"></div>
       </div>
-      <button class="chat-reset" id="chat-reset" type="button">Start over</button>
+      <button class="chat-reset" id="chat-reset" type="button" aria-label="Start over">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <span class="chat-reset-label">Start over</span>
+      </button>
     </header>
 
     <div class="thread" id="thread"></div>
@@ -3696,7 +3996,7 @@ body.chat-active .persistent-chat { display: none; }
     renderContext();
     seedConversation();
     requestAnimationFrame(() => {
-      $chat.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      $chat.scrollTop = 0;
       if (initialText) {
         // Send the user's launcher text into the conversation as their first message
         setTimeout(() => handleUserMessage(initialText), 720);
@@ -4649,6 +4949,12 @@ body.chat-active .persistent-chat { display: none; }
         monthlyAttr: 'unlimited', annualAttr: 'unlimited',
         monthlyAmt: '$9.99', monthlySub: '/mo · unlimited cameras',
         annualAmt: '$99', annualSub: '/yr · unlimited cameras · ~$8.25/mo'
+      },
+      {
+        pillId: 'pro-billing-pill', badgeId: 'pro-save-badge',
+        monthlyAttr: 'pro', annualAttr: 'pro',
+        monthlyAmt: '$19.99', monthlySub: '/mo · unlimited cameras',
+        annualAmt: '$199.99', annualSub: '/yr · unlimited cameras · ~$16.66/mo'
       }
     ];
     configs.forEach(function(cfg) {
